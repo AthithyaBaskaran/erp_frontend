@@ -9,9 +9,9 @@ import EditIcon from '@mui/icons-material/Edit';
 import SendIcon from "@mui/icons-material/Send";
 import Roles from "../Autocomplete/Roles";
 import CloseIcon from '@mui/icons-material/Close';
-import { showUsers } from '../Api/apiUrl';
+import { showDepartment, showUsers } from '../Api/apiUrl';
 import { getDepartmentSchema } from "../Validations/ValidationSchema";
-import { useForm, SubmitHandler } from "react-hook-form";
+import { useForm, SubmitHandler, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import {addDepartment} from "../Api/apiUrl";
 import { useNavigate } from "react-router-dom";
@@ -28,6 +28,7 @@ const Users: React.FC = () => {
 
   const [openSidebarToggle, setOpenSidebarToggle] = useState(false);
   const [users , SetUsers] = useState<Users[]>([]);
+  const [department , SetDepartment] = useState<Department[]>([]);
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
   const [snackbarSeverity, setSnackbarSeverity] = useState<"success" | "error">("success");
@@ -40,6 +41,7 @@ const Users: React.FC = () => {
       register: registerDepartment,
       handleSubmit: handleDepartmentSubmit,
       reset: resetDepartment,
+      control: controlDepartment,
       formState: { errors: DepartmentErrors, isSubmitting: isDepartment },
     } = useForm<Department>({ resolver: yupResolver(getDepartmentSchema()) });
   
@@ -84,6 +86,25 @@ const Users: React.FC = () => {
   };
   useEffect(()=>{
     fetchUsers();
+  },[]);
+  const fetchDepartment = async() => {
+    try{
+      const response = await showDepartment();
+      const data = response.data;
+      SetDepartment(Array.isArray(data) ? data :[]);
+      setSnackbarMessage("✅ User added successfully!");
+      setSnackbarSeverity("success");
+    }
+    catch (error) {
+      setSnackbarMessage("❌ Failed to add user");
+      setSnackbarSeverity("error");
+      console.error("Error adding user:", error);
+    } finally {
+      setOpenSnackbar(true);
+    }
+  };
+  useEffect(()=>{
+    fetchDepartment();
   },[]);
  
  
@@ -229,13 +250,37 @@ const handleDepartment: SubmitHandler<Department> = async (data: Department) => 
               Cuddalore
             </Typography>
           </Box>
-          <Autocomplete
+          {/* <Autocomplete
             fullWidth
             disablePortal
             options={Roles}
             sx={{ width: 340 }}
             renderInput={(params) => <TextField {...params} label="Department" />}
+          /> */}
+          <Controller
+            name="name"
+            control={controlDepartment}
+            rules={{ required: "Department is required" }}
+            render={({ field }) => (
+              <Autocomplete
+                options={department.map((item) => item.name)} // <- only use names
+                value={field.value || null}
+                onChange={(e, value) => field.onChange(value || "")} // <- store string value
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label="Department Name"
+                    margin="normal"
+                    error={!!DepartmentErrors.name}
+                    helperText={DepartmentErrors.name?.message}
+                  />
+                )}
+                isOptionEqualToValue={(option, value) => option === value}
+                freeSolo={false}
+              />
+            )}
           />
+
           <Autocomplete
             fullWidth
             disablePortal
