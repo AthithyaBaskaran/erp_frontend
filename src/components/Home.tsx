@@ -51,7 +51,7 @@ const Home: React.FC = () => {
               <BsFillArchiveFill className="card_icon" />
           </div>
           <h1>300</h1>
-        </div>c
+        </div>
         {/* </Link> */}
 
 

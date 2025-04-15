@@ -1,10 +1,8 @@
 import { apiUrl } from "../Api/BaseUrl";
 
-
 export const LoginForm = async (email: string, password: string,) => {
-
     try {
-        const response = await apiUrl.post(`/auth/login`, { email, password }); 
+        const response = await apiUrl.post(`auth/login`, { email, password }); 
         console.log(response.data);
         
         // ✅ Changed delete to post
@@ -27,10 +25,22 @@ export const addUsers = async (user: { name: string; email: string; phone?: stri
         throw error;
     }
 };
+export const addDepartment = async ( name: string) => {
+
+    try {
+        const response = await apiUrl.post(`/users/add-department`, {name} );
+        console.log("responseDepartment", response);
+
+        // ✅ Changed delete to post
+        return response.data;
+    } catch (error) {
+        console.error("❌ Error deleting product:", error);
+        throw error;
+    }
+};
 export const showUsers = async () => {
     try {
       const response = await apiUrl.get('/admin/users');
-      console.log("✅ Response:", response.data.data);
  
       return response.data;
     } catch (error) {

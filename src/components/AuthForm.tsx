@@ -92,6 +92,8 @@ const AuthForm: React.FC = () => {
   const handleLogin: SubmitHandler<LoginFormData> = async (data: LoginFormData) => {
     try {
       const response = await LoginForm(data.email, data.password);
+      console.log(response.data.data);
+      
       if (response.data) {
         localStorage.setItem("token", response.data.token);
         setSnackbarMessage("✅ Login successfully!");

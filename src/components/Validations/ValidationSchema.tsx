@@ -28,3 +28,8 @@ export const getRegisterSchema = () => {
       .required("Password is required"),
     });
   };
+  export const getDepartmentSchema = () => {
+    return yup.object().shape({
+      name: yup.string().required("Name is required"),
+    });
+  };

@@ -3,22 +3,28 @@ import { DataGrid, GridColDef } from '@mui/x-data-grid';
 import Paper from '@mui/material/Paper';
 import Header from '../Header'; // adjust path if needed
 import Sidebar from '../Sidebar'; // if you have one
-import { Alert, Autocomplete, Box, Button, IconButton, Modal, Snackbar, TextField, Typography } from '@mui/material';
+import { Alert, Autocomplete, Box, Button, IconButton, Input, Modal, Snackbar, TextField, Typography } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import SendIcon from "@mui/icons-material/Send";
 import Roles from "../Autocomplete/Roles";
 import CloseIcon from '@mui/icons-material/Close';
 import { showUsers } from '../Api/apiUrl';
-import { apiUrl } from '../Api/BaseUrl';
-
+import { getDepartmentSchema } from "../Validations/ValidationSchema";
+import { useForm, SubmitHandler } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import {addDepartment} from "../Api/apiUrl";
+import { useNavigate } from "react-router-dom";
 interface Users{
   name:string;
   email:string;
   phone:string;
   address:string;
 }
-const users = () => {
+interface Department{
+  name:string;
+}
+const Users: React.FC = () => {
 
   const [openSidebarToggle, setOpenSidebarToggle] = useState(false);
   const [users , SetUsers] = useState<Users[]>([]);
@@ -26,6 +32,18 @@ const users = () => {
   const [snackbarMessage, setSnackbarMessage] = useState("");
   const [snackbarSeverity, setSnackbarSeverity] = useState<"success" | "error">("success");
   const [openEdit, setOpenEdit] = useState(false);
+  const [openDepartment, setOpenDepartment] = useState(false);
+  
+  const navigate = useNavigate();
+  
+  const {
+      register: registerDepartment,
+      handleSubmit: handleDepartmentSubmit,
+      reset: resetDepartment,
+      formState: { errors: DepartmentErrors, isSubmitting: isDepartment },
+    } = useForm<Department>({ resolver: yupResolver(getDepartmentSchema()) });
+  
+  
   const OpenSidebar = () => {
     setOpenSidebarToggle(!openSidebarToggle);
   };
@@ -33,10 +51,16 @@ const users = () => {
   const handleCloseEdit = () => {
     setOpenEdit(false);
   };
-
+  const handleAddDepartmentClose = () => {
+    setOpenDepartment(false);
+  };
   const handleEditClick = () => {
     setOpenEdit(true);
   };
+  const handleaddRole = () => {
+    setOpenDepartment(true);
+  };
+
   const handleCloseSnackbar = () => {
     setOpenSnackbar(false);
   };
@@ -102,7 +126,27 @@ const users = () => {
       ),
     },
   ];
-
+const handleDepartment: SubmitHandler<Department> = async (data: Department) => {
+    try {
+      const response = await addDepartment(data.name);
+      console.log(response.data.data);
+      
+      if (response.data) {
+        setSnackbarMessage("✅ Add Department successfully!");
+        setSnackbarSeverity("success");
+        resetDepartment();
+        navigate("/dashboard");
+      }
+  
+      return response.data;
+    } catch (error) {
+      setSnackbarMessage("❌ Login failed");
+      setSnackbarSeverity("error");
+      console.error("Error logging in:", error);
+    } finally {
+      setOpenSnackbar(true);
+    }
+  };
  
   const paginationModel = { page: 0, pageSize: 5 };
 
@@ -111,8 +155,16 @@ const users = () => {
       <Header OpenSidebar={OpenSidebar} />
       {/* <div className="layout-container"> */}
         <Sidebar openSidebarToggle={openSidebarToggle} OpenSidebar={OpenSidebar} />
+        
         <div className="main-container">
+        <Button
+            variant="outlined"
+            color="success"
+            size="small"
+            onClick={handleaddRole}
+          >Add Department</Button>
           <Paper sx={{ height: 500, width: '100%', p: 2 }}>
+            
             <DataGrid
               rows={users}
               columns={columns}
@@ -203,6 +255,55 @@ const users = () => {
           </Box>
         </Box>
       </Modal>
+      <Modal open={openDepartment} onClose={handleAddDepartmentClose}>
+      <form className="sign-in-form" onSubmit={handleDepartmentSubmit(handleDepartment)}>
+        <Box
+          sx={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            width: 400,
+            bgcolor: "background.paper",
+            boxShadow: 24,
+            p: 4,
+            borderRadius: 2,
+            display: "flex",
+            flexDirection: "column",
+            gap: 2,
+          }}
+        >
+          <IconButton
+            onClick={handleAddDepartmentClose}
+            sx={{ position: 'absolute', top: 8, right: 8 }}
+          >
+            <CloseIcon />
+          </IconButton>
+          <Typography variant="h6" mb={2}>
+            Add Department
+          </Typography>
+          <TextField
+            placeholder="Department"
+            variant="outlined"
+            {...registerDepartment("name")}
+            error={!!DepartmentErrors.name}
+            helperText={DepartmentErrors.name?.message}
+          />
+
+          <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
+          <Button
+              type="submit"
+              variant="outlined"
+              color="primary"
+              endIcon={<SendIcon />}
+              disabled={isDepartment}
+            >
+              {isDepartment ? "Submitting..." : "Submit"}
+            </Button>
+          </Box>
+        </Box>
+      </form>
+      </Modal>
       <Snackbar
         open={openSnackbar}
         autoHideDuration={2000}
@@ -221,4 +322,4 @@ const users = () => {
   )
 }
 
-export default users;
+export default Users;

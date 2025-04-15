@@ -22,4 +22,5 @@ apiUrl.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
+
 export { apiUrl };
