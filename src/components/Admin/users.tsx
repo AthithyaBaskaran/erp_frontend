@@ -4,11 +4,10 @@ import { DataGrid, GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
 import Paper from '@mui/material/Paper';
 import Header from '../Header'; // adjust path if needed
 import Sidebar from '../Sidebar'; // if you have one
-import { Alert, Autocomplete, Box, Button, IconButton, Input, Modal, Snackbar, TextField, Typography } from '@mui/material';
+import { Alert, Autocomplete, Box, Button, IconButton, Modal, Snackbar, TextField, Typography } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import SendIcon from "@mui/icons-material/Send";
-import Roles from "../Autocomplete/Roles";
 import CloseIcon from '@mui/icons-material/Close';
 import { addRole, showDepartment,assignRoleAndDept, showUsers, AssignRole, fetchUserForEdit } from '../Api/apiUrl';
 import { getRoleSchema } from "../Validations/ValidationSchema";
@@ -21,6 +20,8 @@ interface Users {
   email: string;
   phone: string;
   address: string;
+  roleName:string;
+  departmentName:string;
 }
 interface Department {
   id?: string;
@@ -380,37 +381,57 @@ const Users: React.FC = () => {
               Edit User
             </Typography>
             {user && (
-              <>
+            <>
+              <Box>
+                <span>Name: </span>
+                <Typography variant="subtitle2" component="span">
+                  {user.name}
+                </Typography>
+              </Box>
+
+              <Box>
+                <span>Email: </span>
+                <Typography variant="subtitle2" component="span">
+                  {user.email}
+                </Typography>
+              </Box>
+
+              <Box>
+                <span>Phone: </span>
+                <Typography variant="subtitle2" component="span">
+                  {user.phone}
+                </Typography>
+              </Box>
+
+              <Box>
+                <span>Address: </span>
+                <Typography variant="subtitle2" component="span">
+                  {user.address}
+                </Typography>
+              </Box>
+
+              {user?.departmentName && (
                 <Box>
-                  <span>Name: </span>
+                  <span>Department: </span>
                   <Typography variant="subtitle2" component="span">
-                    {user.name} {/* Now accessing the name property of the user object */}
+                    {user.departmentName}
                   </Typography>
                 </Box>
+              )}
 
+              {user?.roleName && (
                 <Box>
-                  <span>Email: </span>
+                  <span>RoleName: </span>
                   <Typography variant="subtitle2" component="span">
-                    {user.email}
+                    {user.roleName}
                   </Typography>
                 </Box>
+              )}
+            </>
+          )}
 
-                <Box>
-                  <span>Phone: </span>
-                  <Typography variant="subtitle2" component="span">
-                    {user.phone}
-                  </Typography>
-                </Box>
-
-                <Box>
-                  <span>Address: </span>
-                  <Typography variant="subtitle2" component="span">
-                    {user.address}
-                  </Typography>
-                </Box>
-              </>
-            )}
-
+          {user?.departmentName == null && (
+            <>
             <Controller
               name="deptId"
               control={controlRoleAndDept}
@@ -437,7 +458,10 @@ const Users: React.FC = () => {
                 />
               )}
             />
-
+          </>
+          )}
+           {user?.roleName == null && (
+            <>
             <Controller
               name="roleId"
               control={controlRoleAndDept}
@@ -462,6 +486,8 @@ const Users: React.FC = () => {
                 />
               )}
             />
+            </>
+           )}
             <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
               <Button
                 type="submit"
