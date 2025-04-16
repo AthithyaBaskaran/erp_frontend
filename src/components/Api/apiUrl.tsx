@@ -108,3 +108,12 @@ export const AddDepartment = async () => {
       throw error;
     }
 };
+export const deleteUser = async (userId: number) => {
+  try {
+    const response = await apiUrl.delete(`/admin/user/delete?userId=${userId}`); // Include userId in the endpoint
+    return response.data;
+  } catch (error) {
+    console.error('Error deleting user:', error);
+    throw error;
+  }
+};

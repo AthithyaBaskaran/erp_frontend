@@ -14,7 +14,7 @@ import { addRole, showDepartment,assignRoleAndDept, showUsers, AssignRole, fetch
 import { getRoleSchema } from "../Validations/ValidationSchema";
 import { useForm, SubmitHandler, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { addDepartment } from "../Api/apiUrl";
+import { addDepartment , deleteUser} from "../Api/apiUrl";
 import { useNavigate } from "react-router-dom";
 interface Users {
   name: string;
@@ -209,6 +209,22 @@ const Users: React.FC = () => {
     }
   };
 
+  const handleDeleteUser = async (userId: number) => {
+    try {
+      const response = await deleteUser(userId);
+      setSnackbarMessage("✅ User deleted successfully!");
+      setSnackbarSeverity("success");
+      fetchUsers();
+    }
+    catch (error) {
+      setSnackbarMessage("❌ Failed to delete user");
+      setSnackbarSeverity("error");
+      console.error("Error deleting user:", error);
+    } finally {
+      setOpenSnackbar(true);
+    }
+  };
+
 
   const columns: GridColDef[] = [
     {
@@ -237,14 +253,18 @@ const Users: React.FC = () => {
             Edit
           </Button>
           <Button
-            variant="outlined"
-            color="error"
-            size="small"
-            sx={{ ml: 1 }}
-            startIcon={<DeleteIcon />}
-          >
-            Delete
-          </Button>
+              variant="outlined"
+              color="error"
+              size="small"
+              sx={{ ml: 1 }}
+              startIcon={<DeleteIcon />}
+              onClick={() => {
+                console.log(params.row.id);
+                handleDeleteUser(params.row.id);
+              }}
+              >
+              Delete
+            </Button>
         </>
       ),
     },
