@@ -57,3 +57,12 @@ export const showDepartment = async () => {
       throw error;
     }
 };
+export const AddDepartment = async () => {
+    try {
+      const response = await apiUrl.get('/users/department');
+      return response.data;
+    } catch (error) {
+      console.log("❌ Error fetching users:", error);
+      throw error;
+    }
+};

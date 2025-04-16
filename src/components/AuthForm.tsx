@@ -74,7 +74,6 @@ const AuthForm: React.FC = () => {
       });
   
       if (response.data) {
-        localStorage.setItem("token", response.data.token);
         setSnackbarMessage("✅ User Added successfully!");
         setSnackbarSeverity("success");
         resetRegister();

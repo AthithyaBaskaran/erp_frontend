@@ -33,3 +33,10 @@ export const getRegisterSchema = () => {
       name: yup.string().required("Name is required"),
     });
   };
+
+  export const getRoleSchema = () => {
+    return yup.object().shape({
+      roleName: yup.string().required("Role is required"),
+      dept_id: yup.number().required("Department is required"),
+    });
+  };

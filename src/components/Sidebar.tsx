@@ -10,6 +10,7 @@ import {
   BsFillGearFill
 } from 'react-icons/bs';
 import { Link } from 'react-router-dom';
+import '../styles/sidebar.css';
 
 type SidebarProps = {
   openSidebarToggle: boolean;
@@ -27,16 +28,16 @@ const Sidebar: React.FC<SidebarProps> = ({ openSidebarToggle, OpenSidebar }) => 
       </div>
 
       <ul className="sidebar-list">
-        <li className="sidebar-list-item">
-          <Link to="/dashboard">
-            <BsGrid1X2Fill className="icon" /> Dashboard
+        <Link to="/dashboard" className='Dashboard_link_sidebar' key='dashboard_users'>
+          <li className="sidebar-list-item" >
+              <BsGrid1X2Fill className="icon" /> Dashboard
+          </li>
           </Link>
-        </li>
-        <li className="sidebar-list-item">
-          <Link to="/admin_users">
-            <BsGrid1X2Fill className="icon" /> Users
-          </Link>
-        </li>
+        <Link to="/admin_users" className='Admin_link_sidebar' key='admin_users'>
+          <li className="sidebar-list-item">
+              <BsGrid1X2Fill className="icon" /> Users
+          </li>
+        </Link>
         <li className="sidebar-list-item">
           <Link to="/products">
             <BsFillArchiveFill className="icon" /> Products
