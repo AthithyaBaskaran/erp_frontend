@@ -134,8 +134,6 @@ const Users: React.FC = () => {
       const response = await showDepartment();
       const data = response.data;
       SetDepartment(Array.isArray(data) ? data : []);
-      setSnackbarMessage("✅ User Fetch successfully!");
-      setSnackbarSeverity("success");
     }
     catch (error) {
       setSnackbarMessage("❌ Failed to add user");
@@ -154,8 +152,6 @@ const Users: React.FC = () => {
       const response = await AssignRole(departmentId);
       const data = response.data;
       SetRole(Array.isArray(data) ? data : []);
-      setSnackbarMessage("✅ User Fetch successfully!");
-      setSnackbarSeverity("success");
     }
     catch (error) {
       setSnackbarMessage("❌ Failed to add user");
@@ -172,10 +168,7 @@ const Users: React.FC = () => {
   
       const response = await fetchUserForEdit(userId);
       const data = response?.data.data ?? null;
-      setUser(data); // Directly set the user object
-  
-      setSnackbarMessage("✅ User fetched successfully!");
-      setSnackbarSeverity("success");
+      setUser(data);
     } catch (error) {
       setSnackbarMessage("❌ Failed to fetch user");
       setSnackbarSeverity("error");
@@ -541,14 +534,7 @@ const Users: React.FC = () => {
             <Typography variant="h6" mb={2}>
               Add Role
             </Typography>
-            <TextField
-              placeholder="Role"
-              variant="outlined"
-              {...registerRole("roleName")}
-              error={!!RoleErrors.roleName}
-              helperText={RoleErrors.roleName?.message}
-            />
-
+            
             <Controller
               name="dept_id"
               control={controlRole}
@@ -580,6 +566,14 @@ const Users: React.FC = () => {
                 />
               )}
             />
+            <TextField
+              placeholder="Role"
+              variant="outlined"
+              {...registerRole("roleName")}
+              error={!!RoleErrors.roleName}
+              helperText={RoleErrors.roleName?.message}
+            />
+
             <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
               <Button
                 type="submit"
