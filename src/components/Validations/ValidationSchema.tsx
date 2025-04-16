@@ -43,4 +43,21 @@ export const getRegisterSchema = () => {
     }
     )
   }
- 
+export const getChangeUserSchema = () => {
+  return yup.object().shape({
+    email: yup
+      .string()
+      .email("Invalid email")
+      .required("Email is required"),
+
+    oldPassword: yup
+      .string()
+      .required("Old password is required")
+      .matches(/\d/, "Must contain at least one number"),
+
+    newPassword: yup
+      .string()
+      .required("New password is required")
+      .matches(/\d/, "Must contain at least one number"),
+  });
+};

@@ -117,3 +117,12 @@ export const deleteUser = async (userId: number) => {
     throw error;
   }
 };
+export const ChangeUser = async (email:string,oldPassword:string,newPassword:string) => {
+    try {
+      const response = await apiUrl.post(`/auth/change-password`,{email,oldPassword,newPassword}); 
+      return response.data;
+    } catch (error) {
+      console.error('Error deleting user:', error);
+      throw error;
+    }
+  };
