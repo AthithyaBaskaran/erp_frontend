@@ -1,5 +1,6 @@
 
 import * as yup from "yup";
+
 export const getRegisterSchema = () => {
     return yup.object().shape({
       email: yup.string().email("Invalid email").required("Email is required"),
@@ -28,15 +29,18 @@ export const getRegisterSchema = () => {
       .required("Password is required"),
     });
   };
-  export const getDepartmentSchema = () => {
-    return yup.object().shape({
-      name: yup.string().required("Name is required"),
-    });
-  };
-
+  // export const getDepartmentSchema = () => {
+  //   return yup.object().shape({
+  //     id: yup.string().optional(),
+  //     name: yup.string().required("Name is required"),
+  //   });
+  // };
+  
   export const getRoleSchema = () => {
     return yup.object().shape({
-      roleName: yup.string().required("Role is required"),
-      dept_id: yup.number().required("Department is required"),
-    });
-  };
+      roleName:yup.string().required("Role is required"),
+      dept_id:yup.number().required("Department is required"),
+    }
+    )
+  }
+ 
