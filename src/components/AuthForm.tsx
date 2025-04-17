@@ -27,6 +27,7 @@ const AuthForm: React.FC = () => {
   const navigate = useNavigate();
   const [isStrongPassword, setIsStrongPassword] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+
   const {
     register: registerRegister,
     handleSubmit: handleRegisterSubmit,
@@ -47,6 +48,7 @@ const AuthForm: React.FC = () => {
 
 
 
+console.log();
 
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
@@ -78,10 +80,10 @@ const AuthForm: React.FC = () => {
         setSnackbarSeverity("success");
         resetRegister();
       }
-  
       return response.data;
-    } catch (error) {
-      setSnackbarMessage("❌ Login failed");
+    } catch (error:any) {
+      const message = error?.message || "❌ Registration failed";
+      setSnackbarMessage(`❌ ${message}`);
       setSnackbarSeverity("error");
       console.error("Error logging in:", error);
     } finally {

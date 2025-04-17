@@ -20,9 +20,12 @@ export const addUsers = async (user: { name: string; email: string; phone?: stri
 
         // ✅ Changed delete to post
         return response.data;
-    } catch (error) {
-        console.error("❌ Error deleting product:", error);
-        throw error;
+    } catch (error: any) {
+        if (error.response && error.response.data && error.response.data.statusMessage) {
+            throw new Error(error.response.data.statusMessage);
+          } else {
+            throw new Error("Something went wrong while adding the user.");
+          }
     }
 };
 export const assignRoleAndDept = async (userId: number,roleId: number,deptId: number) => {
