@@ -393,7 +393,7 @@ const handleCloseUserModal = () => {
             checkboxSelection
             initialState={{
               pagination: {
-                paginationModel: { page: 0, pageSize: 5 },
+                paginationModel: { page: 0, pageSize: 20 },
               },
             }}
             sx={{ border: 0 }}
