@@ -13,7 +13,7 @@ import { addRole, showDepartment,assignRoleAndDept, showUsers, AssignRole, fetch
 import { getRoleSchema } from "../Validations/ValidationSchema";
 import { useForm, SubmitHandler, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { addDepartment , deleteUser} from "../Api/apiUrl";
+import { addDepartment , deleteUser ,addUsers} from "../Api/apiUrl";
 import { useNavigate } from "react-router-dom";
 interface Users {
   name: string;
@@ -55,7 +55,7 @@ const Users: React.FC = () => {
   const [selectedDeptId, setSelectedDeptId] = useState<number | null>(null);
   const [selectedRoleId, setSelectedRoleId] = useState<number | null>(null);
   const [user, setUser] = useState<Users | null>(null); // Single user, can be null initially
-
+  const [openUserModal, setOpenUserModal] = useState(false);
 
 
   const navigate = useNavigate();
@@ -85,6 +85,13 @@ const Users: React.FC = () => {
     formState: { errors: RoleAndDeptErrors, isSubmitting: isRoleAndDept },
   } = useForm<assignRoleAndDepartment>();
 
+  const {
+    register: registerUser,
+    handleSubmit: handleUserSubmit,
+    reset: resetUser,
+    formState: { errors: userErrors, isSubmitting: isUserSubmitting },
+  } = useForm<Users>();
+
   const OpenSidebar = () => {
     setOpenSidebarToggle(!openSidebarToggle);
   };
@@ -105,6 +112,14 @@ const Users: React.FC = () => {
   const handleaddDepartment = () => {
     setOpenDepartment(true);
   }
+
+  const handleAddUser = () => {
+    setOpenUserModal(true);
+  };
+  
+const handleCloseUserModal = () => {
+    setOpenUserModal(false);
+  };
 
   const handleCloseSnackbar = () => {
     setOpenSnackbar(false);
@@ -226,6 +241,25 @@ const Users: React.FC = () => {
     }
   };
 
+  const handleUser: SubmitHandler<Users> = async (data: Users) => {
+    try {
+      const response = await addUsers(data);
+      if (response.data) {
+        setSnackbarMessage("✅ User added successfully!");
+        setSnackbarSeverity("success");
+        resetUser();
+        fetchUsers(); // Refresh the user list
+        handleCloseUserModal(); // Close the modal
+      }
+    } catch (error) {
+      setSnackbarMessage("❌ Failed to add user");
+      setSnackbarSeverity("error");
+      console.error("Error adding user:", error);
+    } finally {
+      setOpenSnackbar(true);
+    }
+  };
+
 
   const columns: GridColDef[] = [
     {
@@ -314,7 +348,7 @@ const Users: React.FC = () => {
   }
   console.log("users",user);
   
-  const paginationModel = { page: 0, pageSize: 5 };
+  const paginationModel = { page: 0, pageSize: 10 };
 
   return (
     <div className="grid-container">
@@ -335,6 +369,20 @@ const Users: React.FC = () => {
           size="small"
           onClick={handleaddRole}
         >Add Role</Button>
+        <Button
+          variant="outlined"
+          color="success"
+          size="small"
+          onClick={handleAddUser}
+          style={{
+            position: 'absolute',
+            right: '100px', 
+            top: '80px',   
+          }}
+        >
+          Add User
+        </Button>
+
 
         <Paper sx={{ height: 500, width: '100%', p: 2 }}>
 
@@ -634,6 +682,116 @@ const Users: React.FC = () => {
           </Box>
         </form>
       </Modal>
+
+      {/* Add user */}
+            <Modal open={openUserModal} onClose={handleCloseUserModal}>
+            <form onSubmit={handleUserSubmit(handleUser)}>
+          <Box
+            sx={{
+              position: "absolute",
+              top: "50%",
+              left: "50%",
+              transform: "translate(-50%, -50%)",
+              width: 400,
+              bgcolor: "background.paper",
+              boxShadow: 24,
+              p: 4,
+              borderRadius: 2,
+              display: "flex",
+              flexDirection: "column",
+              gap: 2,
+            }}
+          >
+            <IconButton
+              onClick={handleCloseUserModal}
+              sx={{ position: 'absolute', top: 8, right: 8 }}
+            >
+              <CloseIcon />
+            </IconButton>
+            <Typography variant="h6" mb={2}>
+              Add User
+            </Typography>
+          <TextField
+              placeholder="Name"
+              variant="outlined"
+              fullWidth
+              margin="normal"
+              {...registerUser("name", { required: "Name is required" })}
+              error={!!userErrors.name}
+              helperText={userErrors.name?.message}
+              onChange={(e) => {
+                const cleaned = e.target.value.replace(/[^a-zA-Z\s]/g, ""); // Remove non-alphabetic characters
+                e.target.value = cleaned; // Update the input value
+              }}
+            />
+
+            <TextField
+              placeholder="Email"
+              variant="outlined"
+              fullWidth
+              margin="normal"
+              {...registerUser("email", { required: "Email is required" })}
+              error={!!userErrors.email}
+              helperText={userErrors.email?.message}
+              onChange={(e) => {
+                const cleaned = e.target.value
+                  .toLowerCase() // Force lowercase
+                  .replace(/[^a-z0-9@._-]/g, ""); // Allow only valid email characters
+                e.target.value = cleaned; // Update the input value
+              }}
+            />
+
+
+            <TextField
+              placeholder="Phone"
+              variant="outlined"
+              fullWidth
+              margin="normal"
+              {...registerUser("phone", { 
+                required: "Phone is required",
+                pattern: {
+                  value: /^[0-9]{10}$/,
+                  message: "Phone number must be exactly 10 digits"
+                }
+              })}
+              error={!!userErrors.phone}
+              helperText={userErrors.phone?.message}
+              onChange={(e) => {
+                const cleaned = e.target.value.replace(/[^0-9]/g, "").slice(0, 10); // Remove non-numeric characters and limit to 10 digits
+                e.target.value = cleaned; // Update the input value
+              }}
+            />
+
+            <TextField
+              placeholder="Address"
+              variant="outlined"
+              fullWidth
+              margin="normal"
+              {...registerUser("address", { required: "Address is required" })}
+              error={!!userErrors.address}
+              helperText={userErrors.address?.message}
+              onChange={(e) => {
+                const cleaned = e.target.value.replace(/[^a-zA-Z\s]/g, ""); // Remove non-alphabetic characters
+                e.target.value = cleaned; // Update the input value
+              }}
+            />
+
+
+            <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
+              <Button
+                type="submit"
+                variant="outlined"
+                color="primary"
+                endIcon={<SendIcon />}
+                disabled={isUserSubmitting}
+              >
+                {isUserSubmitting ? "Submitting..." : "Save"}
+              </Button>
+            </Box>
+          </Box>
+        </form>
+      </Modal>
+
       <Snackbar
         open={openSnackbar}
         autoHideDuration={2000}
