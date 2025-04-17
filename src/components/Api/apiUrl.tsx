@@ -129,3 +129,13 @@ export const ChangeUser = async (email:string,oldPassword:string,newPassword:str
       throw error;
     }
   };
+
+export const ForgetUser = async (email:string) => {
+    try {
+      const response = await apiUrl.post(`/auth/reset-password-request?email=${email}`); 
+      return response.data;
+    } catch (error) {
+      console.error('Error deleting user:', error);
+      throw error;
+    }
+  };

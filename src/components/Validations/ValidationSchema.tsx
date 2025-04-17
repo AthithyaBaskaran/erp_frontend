@@ -61,3 +61,11 @@ export const getChangeUserSchema = () => {
       .matches(/\d/, "Must contain at least one number"),
   });
 };
+export const getForgetUserSchema = () => {
+  return yup.object().shape({
+    email: yup
+      .string()
+      .email("Invalid email")
+      .required("Email is required"),
+  });
+}

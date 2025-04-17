@@ -1,24 +1,19 @@
 import React, { useState } from "react";
 import { FaFacebookF, FaTwitter, FaGoogle, FaLinkedinIn } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
-import { ChangeUser } from "./Api/apiUrl";
-import PersonIcon from '@mui/icons-material/Person';
+import { ForgetUser } from "./Api/apiUrl";
 import EmailIcon from '@mui/icons-material/Email';
 import { useForm, SubmitHandler } from "react-hook-form";
-import { Alert, Box, Button, IconButton, InputAdornment, Snackbar, TextField, Typography } from "@mui/material";
+import { Alert, Box, Button, InputAdornment, Snackbar, TextField } from "@mui/material";
 import SendIcon from "@mui/icons-material/Send";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { getChangeUserSchema } from "./Validations/ValidationSchema";
-import { Visibility, VisibilityOff } from "@mui/icons-material";
+import { getForgetUserSchema } from "./Validations/ValidationSchema";
 
-interface changeUsers {
+interface ForgetUsers {
   email: string;
-  oldPassword: string;
-  newPassword: string;
 }
-const AuthForm: React.FC = () => {
+const ForgetPasswordForm: React.FC = () => {
   const navigate = useNavigate();
-  const [showPassword, setShowPassword] = useState(false);
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
   const [snackbarSeverity, setSnackbarSeverity] = useState<"success" | "error">("success");
@@ -36,15 +31,15 @@ const AuthForm: React.FC = () => {
   };
 
   const {
-    register: registerchangeUser,
-    handleSubmit: handlechangeUserSubmit,
-    setValue: setchangeUserValue,
-    reset: resetchangeUser,
-    formState: { errors: changeUserErrors, isSubmitting: ischangeUserIn },
-  } = useForm<changeUsers>({ resolver: yupResolver(getChangeUserSchema()) });
+    register: registerForgetUser,
+    handleSubmit: handleForgetUserSubmit,
+    setValue: setForgetUserValue,
+    reset: resetForgetUser,
+    formState: { errors: ForgetUserErrors, isSubmitting: isForgetUserIn },
+  } = useForm<ForgetUsers>({ resolver: yupResolver(getForgetUserSchema()) });
 
 
-  const changeUsertextFieldProps = {
+  const ForgetUsertextFieldProps = {
     sx: {
       '& .MuiOutlinedInput-root': {
         borderRadius: '50px',
@@ -62,16 +57,14 @@ const AuthForm: React.FC = () => {
       },
     },
   };
-  const handlechangeUser: SubmitHandler<changeUsers> = async (data: changeUsers) => {
+  const handleForgetUser: SubmitHandler<ForgetUsers> = async (data: ForgetUsers) => {
     try {
-      const response = await ChangeUser(data.email, data.oldPassword, data.newPassword);
-      console.log(response.data.data);
-
+      const response = await ForgetUser(data.email);
+      console.log(response.data);
       if (response.data) {
-        localStorage.setItem("token", response.data.token);
         setSnackbarMessage("✅ Change password successfully!");
         setSnackbarSeverity("success");
-        resetchangeUser();
+        resetForgetUser();
         navigate("/");
       }
       return response.data;
@@ -87,22 +80,22 @@ const AuthForm: React.FC = () => {
     <div className="signin-signup">
       {/* Sign In Form */}
 
-      <form className="sign-in-form" onSubmit={handlechangeUserSubmit(handlechangeUser)}>
-        <h2 className="title">ChangePassword</h2>
+      <form className="sign-in-form" onSubmit={handleForgetUserSubmit(handleForgetUser)}>
+        <h2 className="title">Forget Password</h2>
         <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
           <Box sx={{ display: "flex", alignItems: "center" }}>
             <TextField
               placeholder="Email"
               variant="outlined"
-              {...registerchangeUser("email")}
+              {...registerForgetUser("email")}
               onChange={(e) => {
                 const cleaned = e.target.value
                   .toLowerCase() // force lowercase
                   .replace(/[^a-z0-9@.]/g, ""); // strip unwanted chars
-                setchangeUserValue("email", cleaned);
+                setForgetUserValue("email", cleaned);
               }}
-              error={!!changeUserErrors.email}
-              helperText={changeUserErrors.email?.message}
+              error={!!ForgetUserErrors.email}
+              helperText={ForgetUserErrors.email?.message}
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
@@ -110,69 +103,19 @@ const AuthForm: React.FC = () => {
                   </InputAdornment>
                 ),
               }}
-              {...changeUsertextFieldProps}
+              {...ForgetUsertextFieldProps}
             />
           </Box>
           <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
-            <TextField
-              type={showPassword ? "text" : "password"}
-              placeholder="Password"
-              variant="outlined"
-              {...registerchangeUser("oldPassword")}
-              error={!!changeUserErrors.oldPassword}
-              helperText={changeUserErrors.oldPassword?.message}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <PersonIcon />
-                  </InputAdornment>
-                ),
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <IconButton onClick={() => setShowPassword(!showPassword)} edge="end">
-                      {showPassword ? <VisibilityOff /> : <Visibility />}
-                    </IconButton>
-                  </InputAdornment>
-                ),
-              }}
-              {...changeUsertextFieldProps}
-            />
-            <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
-              <TextField
-                type={showPassword ? "text" : "password"}
-                placeholder="New Password"
-                variant="outlined"
-                {...registerchangeUser("newPassword")}
-                error={!!changeUserErrors.newPassword}
-                helperText={changeUserErrors.newPassword?.message}
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <PersonIcon />
-                    </InputAdornment>
-                  ),
-                  endAdornment: (
-                    <InputAdornment position="end">
-                      <IconButton onClick={() => setShowPassword(!showPassword)} edge="end">
-                        {showPassword ? <VisibilityOff /> : <Visibility />}
-                      </IconButton>
-                    </InputAdornment>
-                  ),
-                }}
-                {...changeUsertextFieldProps}
-              />
-            </Box>
-
-
             <Box sx={{ display: "flex", justifyContent: "flex-end", alignItems: "center" }}>
               <Button
                 type="submit"
                 variant="outlined"
                 color="primary"
                 endIcon={<SendIcon />}
-                disabled={ischangeUserIn}
+                disabled={isForgetUserIn}
               >
-                {ischangeUserIn ? "Submitting..." : "Change Password"}
+                {isForgetUserIn ? "Submitting..." : "Confirm"}
               </Button>
             </Box>
           </Box>
@@ -205,4 +148,4 @@ const AuthForm: React.FC = () => {
   );
 };
 
-export default AuthForm;
+export default ForgetPasswordForm;

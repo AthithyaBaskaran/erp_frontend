@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import "../styles/style.css";
-import ChangePasswordForm from "./ChangePasswordForm";
+import ForgetPasswordForm from "./ForgetPasswordForm";
 import Panel from "./Panel";
 import logImg from "../assets/images/log.svg";
 import registerImg from "../assets/images/register.svg";
@@ -13,7 +13,7 @@ const App: React.FC = () => {
   return (
     <div className={`container ${isSignUpMode ? "sign-up-mode" : ""}`}>
       <div className="forms-container">
-        <ChangePasswordForm />
+        <ForgetPasswordForm />
       </div>
       <div className="panels-container">
         <Panel

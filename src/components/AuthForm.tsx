@@ -1,18 +1,18 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { FaFacebookF, FaTwitter, FaGoogle, FaLinkedinIn } from "react-icons/fa";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import PersonIcon from '@mui/icons-material/Person';
 import EmailIcon from '@mui/icons-material/Email';
 import LocalPhoneIcon from '@mui/icons-material/LocalPhone';
 import HomeIcon from '@mui/icons-material/Home';
 import { useForm, SubmitHandler } from "react-hook-form";
-import { Alert, Box, Button, IconButton, InputAdornment, Snackbar, TextField, Typography } from "@mui/material";
+import { Alert, Box, Button, CircularProgress, IconButton, InputAdornment, Snackbar, TextField, Typography } from "@mui/material";
 import SendIcon from "@mui/icons-material/Send";
-import { apiUrl } from "./Api/BaseUrl";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { getRegisterSchema, getLoginSchema } from "./Validations/ValidationSchema";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { LoginForm,addUsers } from "./Api/apiUrl";
+import '../styles/Admin.css';
 interface RegisterFormData {
   name: string;
   email: string;
@@ -27,6 +27,8 @@ const AuthForm: React.FC = () => {
   const navigate = useNavigate();
   const [isStrongPassword, setIsStrongPassword] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false); // login button loading
+  const [pageLoading, setPageLoading] = useState(true); // page initial loading
 
   const {
     register: registerRegister,
@@ -48,7 +50,12 @@ const AuthForm: React.FC = () => {
 
 
 
-console.log();
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setPageLoading(false);
+    }, 800); // Simulate page loading delay
+    return () => clearTimeout(timer);
+  }, []);
 
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
@@ -92,6 +99,7 @@ console.log();
   };
   const handleLogin: SubmitHandler<LoginFormData> = async (data: LoginFormData) => {
     try {
+      setLoading(true);
       const response = await LoginForm(data.email, data.password);
       console.log(response.data.data);
       
@@ -109,6 +117,7 @@ console.log();
       setSnackbarSeverity("error");
       console.error("Error logging in:", error);
     } finally {
+      setLoading(false);
       setOpenSnackbar(true);
     }
   };
@@ -149,7 +158,18 @@ console.log();
     },
   };
 
-
+  if (pageLoading) {
+    return (
+      <Box
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        height="100vh"
+      >
+        <CircularProgress size={60} />
+      </Box>
+    );
+  }
   return (
     <div className="signin-signup">
       {/* Sign In Form */}
@@ -214,10 +234,12 @@ console.log();
                     Use Strong Password Validation
                 </Typography>
             </Box>
+            <Link to="/forgot-password" className="forgot-password">Forget Password</Link> 
+
           </Box>
 
 
-          <Box sx={{ display: "flex", justifyContent: "flex-end", alignItems: "center" }}>
+          {/* <Box sx={{ display: "flex", justifyContent: "flex-end", alignItems: "center" }}>
             <Button
               type="submit"
               variant="outlined"
@@ -226,6 +248,18 @@ console.log();
               disabled={isLoggingIn}
             >
               {isLoggingIn ? "Submitting..." : "Login"}
+            </Button>
+            
+          </Box> */}
+          <Box sx={{ display: "flex", justifyContent: "flex-end", alignItems: "center" }}>
+            <Button
+              type="submit"
+              variant="outlined"
+              color="primary"
+              endIcon={!isLoggingIn && <SendIcon />}
+              disabled={isLoggingIn}
+            >
+              {isLoggingIn ? <CircularProgress size={20} /> : "Login"}
             </Button>
           </Box>
         </Box>

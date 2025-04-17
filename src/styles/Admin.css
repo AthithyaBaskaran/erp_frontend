@@ -17,3 +17,9 @@
   overflow-y: auto;
   background-color: #fff;
 }
+.forgot-password{
+  text-decoration: none;
+  outline: none;
+  border: none;
+  color: #9e9ea4;
+}

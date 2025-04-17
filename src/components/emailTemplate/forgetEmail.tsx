@@ -1,14 +1,14 @@
 import React, { useState } from "react";
 import { FaFacebookF, FaTwitter, FaGoogle, FaLinkedinIn } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
-import { ChangeUser } from "./Api/apiUrl";
+import { ChangeUser } from "../Api/apiUrl";
 import PersonIcon from '@mui/icons-material/Person';
 import EmailIcon from '@mui/icons-material/Email';
 import { useForm, SubmitHandler } from "react-hook-form";
 import { Alert, Box, Button, IconButton, InputAdornment, Snackbar, TextField, Typography } from "@mui/material";
 import SendIcon from "@mui/icons-material/Send";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { getChangeUserSchema } from "./Validations/ValidationSchema";
+import { getChangeUserSchema } from "../Validations/ValidationSchema";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 
 interface changeUsers {
@@ -16,7 +16,7 @@ interface changeUsers {
   oldPassword: string;
   newPassword: string;
 }
-const AuthForm: React.FC = () => {
+const EmailForgetPassword: React.FC = () => {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [openSnackbar, setOpenSnackbar] = useState(false);
@@ -205,4 +205,4 @@ const AuthForm: React.FC = () => {
   );
 };
 
-export default AuthForm;
+export default EmailForgetPassword;
