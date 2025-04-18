@@ -21,11 +21,15 @@ type SidebarProps = {
 
 const Sidebar: React.FC<SidebarProps> = ({ openSidebarToggle, OpenSidebar }) => {
   const [role, setRole] = useState<string | null>(null);
+  const [department, setDepartment] = useState<string | null>(null);
 
   useEffect(() => {
     const storedRole = localStorage.getItem('roles');
+    const storedDepartment = localStorage.getItem('department');
     setRole(storedRole);
+    setDepartment(storedDepartment);
     console.log("User Role:", storedRole);
+    console.log("User Department:", storedDepartment);
   }, []);
 
   return (
@@ -40,7 +44,7 @@ const Sidebar: React.FC<SidebarProps> = ({ openSidebarToggle, OpenSidebar }) => 
       <ul className="sidebar-list">
 
         {/* Admin-only sidebar */}
-        {role === "Admin" ? (
+        {role === "Admin" && department === "Admin" ? (
           <li className="sidebar-list-item">
             <Link to="/admin_users" className="Admin_link_sidebar">
               <BsGrid1X2Fill className="icon" /> Users
