@@ -1,4 +1,4 @@
-import React from 'react';
+import React , {useState, useEffect} from 'react';
 import {
   BsCart3,
   BsGrid1X2Fill,
@@ -17,7 +17,17 @@ type SidebarProps = {
   OpenSidebar: () => void;
 };
 
+
+
 const Sidebar: React.FC<SidebarProps> = ({ openSidebarToggle, OpenSidebar }) => {
+  const [role, setRole] = useState<string | null>(null);
+
+  useEffect(() => {
+    const storedRole = localStorage.getItem('roles');
+    setRole(storedRole);
+    console.log("User Role:", storedRole);
+  }, []);
+
   return (
     <aside id="sidebar" className={openSidebarToggle ? 'sidebar-responsive' : ''}>
       <div className="sidebar-title">
@@ -28,46 +38,54 @@ const Sidebar: React.FC<SidebarProps> = ({ openSidebarToggle, OpenSidebar }) => 
       </div>
 
       <ul className="sidebar-list">
-        <Link to="/dashboard" className='Dashboard_link_sidebar' key='dashboard_users'>
-          <li className="sidebar-list-item" >
-              <BsGrid1X2Fill className="icon" /> Dashboard
-          </li>
-          </Link>
-        <Link to="/admin_users" className='Admin_link_sidebar' key='admin_users'>
+
+        {/* Admin-only sidebar */}
+        {role === "Admin" ? (
           <li className="sidebar-list-item">
+            <Link to="/admin_users" className="Admin_link_sidebar">
               <BsGrid1X2Fill className="icon" /> Users
+            </Link>
           </li>
-        </Link>
-        <li className="sidebar-list-item">
-          <Link to="/products">
-            <BsFillArchiveFill className="icon" /> Products
-          </Link>
-        </li>
-        <li className="sidebar-list-item">
-          <Link to="/categories">
-            <BsFillGrid3X3GapFill className="icon" /> Categories
-          </Link>
-        </li>
-        <li className="sidebar-list-item">
-          <Link to="/customers">
-            <BsPeopleFill className="icon" /> Customers
-          </Link>
-        </li>
-        <li className="sidebar-list-item">
-          <Link to="/inventory">
-            <BsListCheck className="icon" /> Inventory
-          </Link>
-        </li>
-        <li className="sidebar-list-item">
-          <Link to="/reports">
-            <BsMenuButtonWideFill className="icon" /> Reports
-          </Link>
-        </li>
-        <li className="sidebar-list-item">
-          <Link to="/settings">
-            <BsFillGearFill className="icon" /> Setting
-          </Link>
-        </li>
+        ) : (
+          <>
+            <li className="sidebar-list-item">
+              <Link to="/dashboard" className="Dashboard_link_sidebar">
+                <BsGrid1X2Fill className="icon" /> Dashboard
+              </Link>
+            </li>
+            <li className="sidebar-list-item">
+              <Link to="/products">
+                <BsFillArchiveFill className="icon" /> Products
+              </Link>
+            </li>
+            <li className="sidebar-list-item">
+              <Link to="/categories">
+                <BsFillGrid3X3GapFill className="icon" /> Categories
+              </Link>
+            </li>
+            <li className="sidebar-list-item">
+              <Link to="/customers">
+                <BsPeopleFill className="icon" /> Customers
+              </Link>
+            </li>
+            <li className="sidebar-list-item">
+              <Link to="/inventory">
+                <BsListCheck className="icon" /> Inventory
+              </Link>
+            </li>
+            <li className="sidebar-list-item">
+              <Link to="/reports">
+                <BsMenuButtonWideFill className="icon" /> Reports
+              </Link>
+            </li>
+            <li className="sidebar-list-item">
+              <Link to="/settings">
+                <BsFillGearFill className="icon" /> Setting
+              </Link>
+            </li>
+          </>
+        )}
+
       </ul>
     </aside>
   );

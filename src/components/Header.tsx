@@ -25,6 +25,7 @@ const Header: React.FC<HeaderProps> = ({ OpenSidebar }) => {
     const profileRef = useRef<HTMLDivElement>(null);
     function handleLogout() {
       localStorage.removeItem("token");
+      localStorage.removeItem("role");
         navigate("/");
     }
 
