@@ -15,6 +15,7 @@ import { useForm, SubmitHandler, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { addDepartment, deleteUser, addUsers } from "../Api/apiUrl";
 import { useNavigate } from "react-router-dom";
+import "../../styles/Admin.css";
 interface Users {
   name: string;
   email: string;
@@ -279,10 +280,10 @@ const Users: React.FC = () => {
 
   const columns: GridColDef[] = [
     {
-      field: "id",
+      field: "sno",
       headerName: "S.No",
       width: 80,
-      renderCell: (params) => params.row.id,
+      renderCell: (params) => params.api.getAllRowIds().indexOf(params.id) + 1,
     },
     { field: 'name', headerName: 'Name', width: 130 },
     { field: 'email', headerName: 'Email', width: 130 },
@@ -373,20 +374,25 @@ const Users: React.FC = () => {
       <Sidebar openSidebarToggle={openSidebarToggle} OpenSidebar={OpenSidebar} />
 
       <div className="main-container">
+        <div className='admin-buttons-container'>
         <Button
           variant="outlined"
+          className='admin-action-button'
           color="success"
           size="small"
           onClick={handleaddDepartment}
         >Add Department</Button>
         <Button
           variant="outlined"
+          className='admin-action-button'
           color="success"
           size="small"
           onClick={handleaddRole}
         >Add Role</Button>
+        </div>
         <Button
           variant="outlined"
+          className='admin-action-button'
           color="success"
           size="small"
           onClick={handleAddUser}
