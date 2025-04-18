@@ -101,10 +101,17 @@ const AuthForm: React.FC = () => {
     try {
       setLoading(true);
       const response = await LoginForm(data.email, data.password);
-      console.log(response.data.data);
+      const role=response.data.role;
+      const department = response.data.department;
+      console.log("Role:", role);
+      console.log("Department:", department);
+  
+      
       
       if (response.data) {
         localStorage.setItem("token", response.data.token);
+        localStorage.setItem("roles", response.data.role);
+        localStorage.setItem("department", department);
         setSnackbarMessage("✅ Login successfully!");
         setSnackbarSeverity("success");
         resetLogin();
