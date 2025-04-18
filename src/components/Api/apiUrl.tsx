@@ -132,7 +132,19 @@ export const ChangeUser = async (email:string,oldPassword:string,newPassword:str
 
 export const ForgetUser = async (email:string) => {
     try {
-      const response = await apiUrl.post(`/auth/reset-password-request?email=${email}`); 
+      const response = await apiUrl.post(`/auth/forgot-password?email=${email}`); 
+      return response.data;
+    } catch (error) {
+      console.error('Error deleting user:', error);
+      throw error;
+    }
+  };
+  export const ResetEmail = async (token:string,newPassword: string, confirmPassword: string) => {
+    try {
+      const response = await apiUrl.post(`/auth/reset?token=${token}`, {
+        newPassword,
+        confirmPassword,
+      }); 
       return response.data;
     } catch (error) {
       console.error('Error deleting user:', error);
