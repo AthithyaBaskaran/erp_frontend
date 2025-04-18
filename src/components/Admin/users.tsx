@@ -289,6 +289,8 @@ const Users: React.FC = () => {
     { field: 'email', headerName: 'Email', width: 130 },
     { field: 'phone', headerName: 'Phone Number', width: 130 },
     { field: 'address', headerName: 'Address', width: 130 },
+    { field: 'role', headerName: 'Role', width: 130 },
+    { field: 'department', headerName: 'Department', width: 130 },
     {
       field: "actions",
       headerName: "Actions",
