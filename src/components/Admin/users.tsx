@@ -9,19 +9,25 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import SendIcon from "@mui/icons-material/Send";
 import CloseIcon from '@mui/icons-material/Close';
-import { addRole, showDepartment,assignRoleAndDept, showUsers, AssignRole, fetchUserForEdit } from '../Api/apiUrl';
-import { getRoleSchema } from "../Validations/ValidationSchema";
+import { addRole, showDepartment, assignRoleAndDept, showUsers, AssignRole, fetchUserForEdit } from '../Api/apiUrl';
+import { getRegisterSchema, getRoleSchema } from "../Validations/ValidationSchema";
 import { useForm, SubmitHandler, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { addDepartment , deleteUser ,addUsers} from "../Api/apiUrl";
+import { addDepartment, deleteUser, addUsers } from "../Api/apiUrl";
 import { useNavigate } from "react-router-dom";
 interface Users {
   name: string;
   email: string;
   phone: string;
   address: string;
-  roleName:string;
-  departmentName:string;
+  roleName: string;
+  departmentName: string;
+}
+interface RegisterFormData {
+  name: string;
+  email: string;
+  phone: string;
+  address: string;
 }
 interface Department {
   id?: string;
@@ -86,11 +92,14 @@ const Users: React.FC = () => {
   } = useForm<assignRoleAndDepartment>();
 
   const {
-    register: registerUser,
-    handleSubmit: handleUserSubmit,
-    reset: resetUser,
-    formState: { errors: userErrors, isSubmitting: isUserSubmitting },
-  } = useForm<Users>();
+    register: registerRegister,
+    handleSubmit: handleRegisterSubmit,
+    setValue: setRegisterValue,
+    reset: resetRegister,
+    formState: { errors: registerErrors, isSubmitting: isRegistering },
+  } = useForm<RegisterFormData>({ resolver: yupResolver(getRegisterSchema()) });
+
+
 
   const OpenSidebar = () => {
     setOpenSidebarToggle(!openSidebarToggle);
@@ -116,8 +125,8 @@ const Users: React.FC = () => {
   const handleAddUser = () => {
     setOpenUserModal(true);
   };
-  
-const handleCloseUserModal = () => {
+
+  const handleCloseUserModal = () => {
     setOpenUserModal(false);
   };
 
@@ -181,7 +190,7 @@ const handleCloseUserModal = () => {
     try {
       setSelectedUserId(userId);
       setOpenEdit(true);
-  
+
       const response = await fetchUserForEdit(userId);
       const data = response?.data.data ?? null;
       setUser(data);
@@ -193,9 +202,9 @@ const handleCloseUserModal = () => {
       setOpenSnackbar(true);
     }
   };
-  
-  
-  
+
+
+
 
   const handleRoleAndDepartment: SubmitHandler<assignRoleAndDepartment> = async (data) => {
     if (!selectedUserId || !selectedRoleId || !selectedDeptId) {
@@ -212,7 +221,7 @@ const handleCloseUserModal = () => {
         setSnackbarMessage("✅ Department and Role assigned successfully!");
         setSnackbarSeverity("success");
         resetRoleAndDept();
-        navigate("/dashboard");
+        handleCloseEdit();
       }
 
       return response.data;
@@ -241,20 +250,27 @@ const handleCloseUserModal = () => {
     }
   };
 
-  const handleUser: SubmitHandler<Users> = async (data: Users) => {
+  const handleRegister: SubmitHandler<RegisterFormData> = async (data: RegisterFormData) => {
     try {
-      const response = await addUsers(data);
+      const response = await addUsers({
+        name: data.name,
+        email: data.email,
+        phone: data.phone,
+        address: data.address,
+      });
+
       if (response.data) {
-        setSnackbarMessage("✅ User added successfully!");
+        setSnackbarMessage("✅ User Added successfully!");
         setSnackbarSeverity("success");
-        resetUser();
-        fetchUsers(); // Refresh the user list
-        handleCloseUserModal(); // Close the modal
+        resetRegister();
+        handleCloseUserModal();
       }
-    } catch (error) {
-      setSnackbarMessage("❌ Failed to add user");
+      return response.data;
+    } catch (error: any) {
+      const message = error?.message || "❌ Registration failed";
+      setSnackbarMessage(`❌ ${message}`);
       setSnackbarSeverity("error");
-      console.error("Error adding user:", error);
+      console.error("Error logging in:", error);
     } finally {
       setOpenSnackbar(true);
     }
@@ -288,18 +304,18 @@ const handleCloseUserModal = () => {
             Edit
           </Button>
           <Button
-              variant="outlined"
-              color="error"
-              size="small"
-              sx={{ ml: 1 }}
-              startIcon={<DeleteIcon />}
-              onClick={() => {
-                console.log(params.row.id);
-                handleDeleteUser(params.row.id);
-              }}
-              >
-              Delete
-            </Button>
+            variant="outlined"
+            color="error"
+            size="small"
+            sx={{ ml: 1 }}
+            startIcon={<DeleteIcon />}
+            onClick={() => {
+              console.log(params.row.id);
+              handleDeleteUser(params.row.id);
+            }}
+          >
+            Delete
+          </Button>
         </>
       ),
     },
@@ -313,7 +329,7 @@ const handleCloseUserModal = () => {
         setSnackbarMessage("✅ Add Department successfully!");
         setSnackbarSeverity("success");
         resetDepartment();
-        navigate("/dashboard");
+        handleAddDepartmentClose();
       }
 
       return response.data;
@@ -334,7 +350,7 @@ const handleCloseUserModal = () => {
         setSnackbarMessage("✅ Add Role successfully!");
         setSnackbarSeverity("success");
         resetRole();
-        navigate("/dashboard");
+        handleAddRoleClose();
       }
 
       return response.data;
@@ -346,8 +362,8 @@ const handleCloseUserModal = () => {
       setOpenSnackbar(true);
     }
   }
-  console.log("users",user);
-  
+  console.log("users", user);
+
   const paginationModel = { page: 0, pageSize: 10 };
 
   return (
@@ -376,8 +392,8 @@ const handleCloseUserModal = () => {
           onClick={handleAddUser}
           style={{
             position: 'absolute',
-            right: '100px', 
-            top: '80px',   
+            right: '100px',
+            top: '80px',
           }}
         >
           Add User
@@ -429,113 +445,113 @@ const handleCloseUserModal = () => {
               Edit User
             </Typography>
             {user && (
-            <>
-              <Box>
-                <span>Name: </span>
-                <Typography variant="subtitle2" component="span">
-                  {user.name}
-                </Typography>
-              </Box>
-
-              <Box>
-                <span>Email: </span>
-                <Typography variant="subtitle2" component="span">
-                  {user.email}
-                </Typography>
-              </Box>
-
-              <Box>
-                <span>Phone: </span>
-                <Typography variant="subtitle2" component="span">
-                  {user.phone}
-                </Typography>
-              </Box>
-
-              <Box>
-                <span>Address: </span>
-                <Typography variant="subtitle2" component="span">
-                  {user.address}
-                </Typography>
-              </Box>
-
-              {user?.departmentName && (
+              <>
                 <Box>
-                  <span>Department: </span>
+                  <span>Name: </span>
                   <Typography variant="subtitle2" component="span">
-                    {user.departmentName}
+                    {user.name}
                   </Typography>
                 </Box>
-              )}
 
-              {user?.roleName && (
                 <Box>
-                  <span>RoleName: </span>
+                  <span>Email: </span>
                   <Typography variant="subtitle2" component="span">
-                    {user.roleName}
+                    {user.email}
                   </Typography>
                 </Box>
-              )}
-            </>
-          )}
 
-          {user?.departmentName == null && (
-            <>
-            <Controller
-              name="deptId"
-              control={controlRoleAndDept}
-              rules={{ required: "Department is required" }}
-              render={({ field }) => (
-                <Autocomplete
-                  options={department}
-                  getOptionLabel={(option) => option.name}
-                  onChange={(e, value) => {
-                    const deptId = value?.id ? Number(value.id) : null;
-                    setSelectedDeptId(deptId);
-                    field.onChange(deptId);
-                    if (deptId) fetchAssignRole(deptId);
-                  }}
+                <Box>
+                  <span>Phone: </span>
+                  <Typography variant="subtitle2" component="span">
+                    {user.phone}
+                  </Typography>
+                </Box>
 
-                  renderInput={(params) => (
-                    <TextField
-                      {...params}
-                      label="Department"
-                      error={!!RoleAndDeptErrors.deptId}
-                      helperText={RoleAndDeptErrors.deptId?.message}
+                <Box>
+                  <span>Address: </span>
+                  <Typography variant="subtitle2" component="span">
+                    {user.address}
+                  </Typography>
+                </Box>
+
+                {user?.departmentName && (
+                  <Box>
+                    <span>Department: </span>
+                    <Typography variant="subtitle2" component="span">
+                      {user.departmentName}
+                    </Typography>
+                  </Box>
+                )}
+
+                {user?.roleName && (
+                  <Box>
+                    <span>RoleName: </span>
+                    <Typography variant="subtitle2" component="span">
+                      {user.roleName}
+                    </Typography>
+                  </Box>
+                )}
+              </>
+            )}
+
+            {user?.departmentName == null && (
+              <>
+                <Controller
+                  name="deptId"
+                  control={controlRoleAndDept}
+                  rules={{ required: "Department is required" }}
+                  render={({ field }) => (
+                    <Autocomplete
+                      options={department}
+                      getOptionLabel={(option) => option.name}
+                      onChange={(e, value) => {
+                        const deptId = value?.id ? Number(value.id) : null;
+                        setSelectedDeptId(deptId);
+                        field.onChange(deptId);
+                        if (deptId) fetchAssignRole(deptId);
+                      }}
+
+                      renderInput={(params) => (
+                        <TextField
+                          {...params}
+                          label="Department"
+                          error={!!RoleAndDeptErrors.deptId}
+                          helperText={RoleAndDeptErrors.deptId?.message}
+                        />
+                      )}
                     />
                   )}
                 />
-              )}
-            />
-          </>
-          )}
-           {user?.roleName == null && (
-            <>
-            <Controller
-              name="roleId"
-              control={controlRoleAndDept}
-              rules={{ required: "Role is required" }}
-              render={({ field }) => (
-                <Autocomplete
-                  options={role}
-                  getOptionLabel={(option) => option.roleName}
-                  onChange={(e, value) => {
-                    const roleId = value?.id ? Number(value.id) : null;
-                    setSelectedRoleId(roleId);
-                    field.onChange(roleId);
-                  }}
-                  renderInput={(params) => (
-                    <TextField
-                      {...params}
-                      label="Role"
-                      error={!!RoleAndDeptErrors.roleId}
-                      helperText={RoleAndDeptErrors.roleId?.message}
+              </>
+            )}
+            {user?.roleName == null && (
+              <>
+                <Controller
+                  name="roleId"
+                  control={controlRoleAndDept}
+                  rules={{ required: "Role is required" }}
+                  render={({ field }) => (
+                    <Autocomplete
+                      options={role}
+                      getOptionLabel={(option) => option.roleName}
+                      onChange={(e, value) => {
+                        const roleId = value?.id ? Number(value.id) : null;
+                        setSelectedRoleId(roleId);
+                        field.onChange(roleId);
+                      }}
+                      renderInput={(params) => (
+                        <TextField
+                          {...params}
+                          label="Role"
+                          error={!!RoleAndDeptErrors.roleId}
+                          helperText={RoleAndDeptErrors.roleId?.message}
+                        />
+                      )}
                     />
                   )}
                 />
-              )}
-            />
-            </>
-           )}
+              </>
+            )}
             <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
               <Button
                 type="submit"
@@ -628,7 +644,7 @@ const handleCloseUserModal = () => {
             <Typography variant="h6" mb={2}>
               Add Role
             </Typography>
-            
+
             <Controller
               name="dept_id"
               control={controlRole}
@@ -684,8 +700,8 @@ const handleCloseUserModal = () => {
       </Modal>
 
       {/* Add user */}
-            <Modal open={openUserModal} onClose={handleCloseUserModal}>
-            <form onSubmit={handleUserSubmit(handleUser)}>
+      <Modal open={openUserModal} onClose={handleCloseUserModal}>
+        <form onSubmit={handleRegisterSubmit(handleRegister)}>
           <Box
             sx={{
               position: "absolute",
@@ -711,14 +727,14 @@ const handleCloseUserModal = () => {
             <Typography variant="h6" mb={2}>
               Add User
             </Typography>
-          <TextField
+            <TextField
               placeholder="Name"
               variant="outlined"
               fullWidth
               margin="normal"
-              {...registerUser("name", { required: "Name is required" })}
-              error={!!userErrors.name}
-              helperText={userErrors.name?.message}
+              {...registerRegister("name", { required: "Name is required" })}
+              error={!!registerErrors.name}
+              helperText={registerErrors.name?.message}
               onChange={(e) => {
                 const cleaned = e.target.value.replace(/[^a-zA-Z\s]/g, ""); // Remove non-alphabetic characters
                 e.target.value = cleaned; // Update the input value
@@ -730,9 +746,9 @@ const handleCloseUserModal = () => {
               variant="outlined"
               fullWidth
               margin="normal"
-              {...registerUser("email", { required: "Email is required" })}
-              error={!!userErrors.email}
-              helperText={userErrors.email?.message}
+              {...registerRegister("email", { required: "Email is required" })}
+              error={!!registerErrors.email}
+              helperText={registerErrors.email?.message}
               onChange={(e) => {
                 const cleaned = e.target.value
                   .toLowerCase() // Force lowercase
@@ -747,15 +763,15 @@ const handleCloseUserModal = () => {
               variant="outlined"
               fullWidth
               margin="normal"
-              {...registerUser("phone", { 
+              {...registerRegister("phone", {
                 required: "Phone is required",
                 pattern: {
                   value: /^[0-9]{10}$/,
                   message: "Phone number must be exactly 10 digits"
                 }
               })}
-              error={!!userErrors.phone}
-              helperText={userErrors.phone?.message}
+              error={!!registerErrors.phone}
+              helperText={registerErrors.phone?.message}
               onChange={(e) => {
                 const cleaned = e.target.value.replace(/[^0-9]/g, "").slice(0, 10); // Remove non-numeric characters and limit to 10 digits
                 e.target.value = cleaned; // Update the input value
@@ -767,9 +783,9 @@ const handleCloseUserModal = () => {
               variant="outlined"
               fullWidth
               margin="normal"
-              {...registerUser("address", { required: "Address is required" })}
-              error={!!userErrors.address}
-              helperText={userErrors.address?.message}
+              {...registerRegister("address", { required: "Address is required" })}
+              error={!!registerErrors.address}
+              helperText={registerErrors.address?.message}
               onChange={(e) => {
                 const cleaned = e.target.value.replace(/[^a-zA-Z\s]/g, ""); // Remove non-alphabetic characters
                 e.target.value = cleaned; // Update the input value
@@ -783,9 +799,9 @@ const handleCloseUserModal = () => {
                 variant="outlined"
                 color="primary"
                 endIcon={<SendIcon />}
-                disabled={isUserSubmitting}
+                disabled={isRegistering}
               >
-                {isUserSubmitting ? "Submitting..." : "Save"}
+                {isRegistering ? "Submitting..." : "Save"}
               </Button>
             </Box>
           </Box>
