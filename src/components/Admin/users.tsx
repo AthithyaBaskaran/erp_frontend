@@ -240,7 +240,10 @@ const Users: React.FC = () => {
       const response = await deleteUser(userId);
       setSnackbarMessage("✅ User deleted successfully!");
       setSnackbarSeverity("success");
-      fetchUsers();
+      setOpenSnackbar(true);
+      setTimeout(() => {
+        fetchUsers();
+      }, 1000);
     }
     catch (error) {
       setSnackbarMessage("❌ Failed to delete user");
@@ -825,7 +828,9 @@ const Users: React.FC = () => {
         <Alert
           onClose={handleCloseSnackbar}
           severity={snackbarSeverity}
-          sx={{ width: "100%" }}
+          sx={{ width: "100%" ,
+            color: snackbarMessage === "✅ User deleted successfully!" ? "red" : undefined
+          }}
         >
           {snackbarMessage}
         </Alert>
