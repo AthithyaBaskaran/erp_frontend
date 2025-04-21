@@ -68,8 +68,9 @@ const ForgetPasswordForm: React.FC = () => {
                 navigate("/");
             }
             return response.data;
-        } catch (error) {
-            setSnackbarMessage("❌ Forget password failed");
+        } catch (error:any) {
+            const message = error?.message || "❌ Forget password failed";
+            setSnackbarMessage(`❌ ${message}`);
             setSnackbarSeverity("error");
             console.error("Error logging in:", error);
         } finally {

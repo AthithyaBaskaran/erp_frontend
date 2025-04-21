@@ -13,13 +13,16 @@ interface RefreshTokenResponse {
 export const LoginForm = async (email: string, password: string,) => {
     try {
         const response = await apiUrl.post(`auth/login`, { email, password });
-        console.log(response.data);
+        console.log(response.data.statusMessage);
 
         // ✅ Changed delete to post
         return response.data;
-    } catch (error) {
-        console.error("❌ Error deleting product:", error);
-        throw error;
+    } catch (error: any) {
+        if (error.response && error.response.data && error.response.data.statusMessage) {
+            throw new Error(error.response.data.statusMessage);
+        } else {
+            throw new Error("Something went wrong while adding the user.");
+        }
     }
 };
 export const addUsers = async (user: { name: string; email: string; phone?: string, address: string }) => {
@@ -134,9 +137,12 @@ export const ChangeUser = async (email: string, oldPassword: string, newPassword
     try {
         const response = await apiUrl.post(`/auth/change-password`, { email, oldPassword, newPassword });
         return response.data;
-    } catch (error) {
-        console.error('Error deleting user:', error);
-        throw error;
+    } catch (error: any) {
+        if (error.response && error.response.data && error.response.data.statusMessage) {
+            throw new Error(error.response.data.statusMessage);
+        } else {
+            throw new Error("Something went wrong while adding the user.");
+        }
     }
 };
 
@@ -144,9 +150,12 @@ export const ForgetUser = async (email: string) => {
     try {
         const response = await apiUrl.post(`/auth/forgot-password?email=${email}`);
         return response.data;
-    } catch (error) {
-        console.error('Error deleting user:', error);
-        throw error;
+    }  catch (error: any) {
+        if (error.response && error.response.data && error.response.data.statusMessage) {
+            throw new Error(error.response.data.statusMessage);
+        } else {
+            throw new Error("Something went wrong while adding the user.");
+        }
     }
 };
 export const ResetEmail = async (token: string, newPassword: string, confirmPassword: string) => {
@@ -156,24 +165,15 @@ export const ResetEmail = async (token: string, newPassword: string, confirmPass
             confirmPassword,
         });
         return response.data;
-    } catch (error) {
-        console.error('Error deleting user:', error);
-        throw error;
+    }  catch (error: any) {
+        if (error.response && error.response.data && error.response.data.statusMessage) {
+            throw new Error(error.response.data.statusMessage);
+        } else {
+            throw new Error("Something went wrong while adding the user.");
+        }
     }
 };
 
-// export const RefreshToken = async (userId: number, token: string) => {
-//   try {
-//     const response = await apiUrl.post(`/token/refresh-token`, {
-//       userId,
-//       token
-//     });
-//     return response.data;
-//   } catch (error) {
-//     console.error('Error refreshing token:', error);
-//     throw error;
-//   }
-// };
 
 export const RefreshToken = async (userId: number, token: string) => {
     try {

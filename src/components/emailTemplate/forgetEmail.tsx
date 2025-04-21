@@ -73,8 +73,9 @@ const EmailForgetPassword: React.FC = () => {
                 navigate("/");
             }
             return response.data;
-        } catch (error) {
-            setSnackbarMessage("❌ Reset failed");
+        } catch (error:any) {
+            const message = error?.message || "❌ Change Password failed";
+            setSnackbarMessage(`❌ ${message}`);
             setSnackbarSeverity("error");
             console.error("Error logging in:", error);
         } finally {

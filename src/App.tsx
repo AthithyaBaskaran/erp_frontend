@@ -21,26 +21,7 @@ const App = () => {
     setOpenSnackbar(false);
   };
 
-  // const fetchRefreshToken = async (userId: number, token: string) => {
-  //   try {
-  //     const response = await RefreshToken(userId, token);
-  //     const data = response.data;
   
-  //     // Store the new token in localStorage
-  //     localStorage.setItem('token', data.newToken);
-  
-  //     setSnackbarMessage("✅ Token refreshed successfully!");
-  //     setSnackbarSeverity("success");
-  
-  //     return data;
-  //   } catch (error) {
-  //     setSnackbarMessage("❌ Failed to refresh token");
-  //     setSnackbarSeverity("error");
-  //     console.error("Error refreshing token:", error);
-  //   } finally {
-  //     setOpenSnackbar(true);
-  //   }
-  // };
   
   const fetchRefreshToken = async (userId: number, token: string) => {
     try {
@@ -49,8 +30,6 @@ const App = () => {
   
       // ✅ Store new token
       localStorage.setItem('token', data.newToken);
-  
-      setSnackbarMessage("✅ Token refreshed successfully!");
       setSnackbarSeverity("success");
   
       return data;

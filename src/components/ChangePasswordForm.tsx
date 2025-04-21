@@ -75,8 +75,9 @@ const AuthForm: React.FC = () => {
         navigate("/");
       }
       return response.data;
-    } catch (error) {
-      setSnackbarMessage("❌ Change Password failed");
+    } catch (error:any) {
+      const message = error.message || "Change Password failed";
+      setSnackbarMessage(`❌ ${message}`);
       setSnackbarSeverity("error");
       console.error("Error logging in:", error);
     } finally {
