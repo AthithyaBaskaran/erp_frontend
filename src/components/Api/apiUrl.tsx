@@ -1,10 +1,20 @@
 import { apiUrl } from "../Api/BaseUrl";
 
+
+interface RefreshTokenResponse {
+    statusCode: number;
+    statusMessage: string;
+    data: {
+        newToken: string;
+    };
+}
+
+
 export const LoginForm = async (email: string, password: string,) => {
     try {
-        const response = await apiUrl.post(`auth/login`, { email, password }); 
+        const response = await apiUrl.post(`auth/login`, { email, password });
         console.log(response.data);
-        
+
         // ✅ Changed delete to post
         return response.data;
     } catch (error) {
@@ -23,15 +33,15 @@ export const addUsers = async (user: { name: string; email: string; phone?: stri
     } catch (error: any) {
         if (error.response && error.response.data && error.response.data.statusMessage) {
             throw new Error(error.response.data.statusMessage);
-          } else {
+        } else {
             throw new Error("Something went wrong while adding the user.");
-          }
+        }
     }
 };
-export const assignRoleAndDept = async (userId: number,roleId: number,deptId: number) => {
+export const assignRoleAndDept = async (userId: number, roleId: number, deptId: number) => {
     try {
-        const response = await apiUrl.post(`/users/assign-role-department`, {userId,roleId,deptId});
-        console.log("response", userId,deptId,roleId);
+        const response = await apiUrl.post(`/users/assign-role-department`, { userId, roleId, deptId });
+        console.log("response", userId, deptId, roleId);
         return response.data;
     } catch (error) {
         console.error("❌ Error deleting product:", error);
@@ -40,20 +50,20 @@ export const assignRoleAndDept = async (userId: number,roleId: number,deptId: nu
 }
 export const fetchUserForEdit = async (userId: number) => {
     try {
-      const response = await apiUrl.get(`/users/edit-user?userId=${userId}`);
-      console.log("response", userId);
-      return response;
+        const response = await apiUrl.get(`/users/edit-user?userId=${userId}`);
+        console.log("response", userId);
+        return response;
     } catch (error) {
-      console.error("❌ Error fetching user:", error);
-      throw error;
+        console.error("❌ Error fetching user:", error);
+        throw error;
     }
-  };
-  
+};
 
-export const addDepartment = async ( name: string) => {
+
+export const addDepartment = async (name: string) => {
 
     try {
-        const response = await apiUrl.post(`/users/add-department`, {name} );
+        const response = await apiUrl.post(`/users/add-department`, { name });
         console.log("responseDepartment", response);
 
         // ✅ Changed delete to post
@@ -63,10 +73,10 @@ export const addDepartment = async ( name: string) => {
         throw error;
     }
 };
-export const addRole = async ( dept_id: number,roleName: string) => {
+export const addRole = async (dept_id: number, roleName: string) => {
 
     try {
-        const response = await apiUrl.post(`/users/add-role`,{dept_id,roleName});
+        const response = await apiUrl.post(`/users/add-role`, { dept_id, roleName });
         console.log("response", response);
         return response.data;
     } catch (error) {
@@ -76,78 +86,110 @@ export const addRole = async ( dept_id: number,roleName: string) => {
 }
 export const showUsers = async () => {
     try {
-      const response = await apiUrl.get('/admin/users');
- 
-      return response.data;
+        const response = await apiUrl.get('/admin/users');
+
+        return response.data;
     } catch (error) {
-      console.log("❌ Error fetching users:", error);
-      throw error;
+        console.log("❌ Error fetching users:", error);
+        throw error;
     }
 };
 export const AssignRole = async (departmentId: number) => {
     try {
-      const response = await apiUrl.get(`/users/roles?departmentId=${departmentId}`);
-      return response.data;
+        const response = await apiUrl.get(`/users/roles?departmentId=${departmentId}`);
+        return response.data;
     } catch (error) {
-      console.log("❌ Error fetching users:", error);
-      throw error;
+        console.log("❌ Error fetching users:", error);
+        throw error;
     }
 };
 export const showDepartment = async () => {
     try {
-      const response = await apiUrl.get('/users/department');
-      return response.data;
+        const response = await apiUrl.get('/users/department');
+        return response.data;
     } catch (error) {
-      console.log("❌ Error fetching users:", error);
-      throw error;
+        console.log("❌ Error fetching users:", error);
+        throw error;
     }
 };
 export const AddDepartment = async () => {
     try {
-      const response = await apiUrl.get('/users/department');
-      return response.data;
+        const response = await apiUrl.get('/users/department');
+        return response.data;
     } catch (error) {
-      console.log("❌ Error fetching users:", error);
-      throw error;
+        console.log("❌ Error fetching users:", error);
+        throw error;
     }
 };
 export const deleteUser = async (userId: number) => {
-  try {
-    const response = await apiUrl.delete(`/admin/user/delete?userId=${userId}`); // Include userId in the endpoint
-    return response.data;
-  } catch (error) {
-    console.error('Error deleting user:', error);
-    throw error;
-  }
+    try {
+        const response = await apiUrl.delete(`/admin/user/delete?userId=${userId}`); // Include userId in the endpoint
+        return response.data;
+    } catch (error) {
+        console.error('Error deleting user:', error);
+        throw error;
+    }
 };
-export const ChangeUser = async (email:string,oldPassword:string,newPassword:string) => {
+export const ChangeUser = async (email: string, oldPassword: string, newPassword: string) => {
     try {
-      const response = await apiUrl.post(`/auth/change-password`,{email,oldPassword,newPassword}); 
-      return response.data;
+        const response = await apiUrl.post(`/auth/change-password`, { email, oldPassword, newPassword });
+        return response.data;
     } catch (error) {
-      console.error('Error deleting user:', error);
-      throw error;
+        console.error('Error deleting user:', error);
+        throw error;
     }
-  };
+};
 
-export const ForgetUser = async (email:string) => {
+export const ForgetUser = async (email: string) => {
     try {
-      const response = await apiUrl.post(`/auth/forgot-password?email=${email}`); 
+        const response = await apiUrl.post(`/auth/forgot-password?email=${email}`);
+        return response.data;
+    } catch (error) {
+        console.error('Error deleting user:', error);
+        throw error;
+    }
+};
+export const ResetEmail = async (token: string, newPassword: string, confirmPassword: string) => {
+    try {
+        const response = await apiUrl.post(`/auth/reset?token=${token}`, {
+            newPassword,
+            confirmPassword,
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Error deleting user:', error);
+        throw error;
+    }
+};
+
+// export const RefreshToken = async (userId: number, token: string) => {
+//   try {
+//     const response = await apiUrl.post(`/token/refresh-token`, {
+//       userId,
+//       token
+//     });
+//     return response.data;
+//   } catch (error) {
+//     console.error('Error refreshing token:', error);
+//     throw error;
+//   }
+// };
+
+export const RefreshToken = async (userId: number, token: string) => {
+    try {
+      const response = await apiUrl.post(`/token/refresh-token`, {
+        userId,
+        token,
+      }, {
+        headers: {
+          "Content-Type": "application/json",
+        }
+      });
+  
       return response.data;
     } catch (error) {
-      console.error('Error deleting user:', error);
+      console.error("Error refreshing token:", error);
       throw error;
     }
   };
-  export const ResetEmail = async (token:string,newPassword: string, confirmPassword: string) => {
-    try {
-      const response = await apiUrl.post(`/auth/reset?token=${token}`, {
-        newPassword,
-        confirmPassword,
-      }); 
-      return response.data;
-    } catch (error) {
-      console.error('Error deleting user:', error);
-      throw error;
-    }
-  };
+  

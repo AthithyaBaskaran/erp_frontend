@@ -10,8 +10,9 @@ import { Alert, Box, Button, CircularProgress, IconButton, InputAdornment, Snack
 import SendIcon from "@mui/icons-material/Send";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { getRegisterSchema, getLoginSchema } from "./Validations/ValidationSchema";
-import { Visibility, VisibilityOff } from "@mui/icons-material";
-import { LoginForm,addUsers } from "./Api/apiUrl";
+import {  Visibility, VisibilityOff } from "@mui/icons-material";
+import { LoginForm, addUsers } from "./Api/apiUrl";
+import Cookies from "js-cookie";
 import '../styles/Admin.css';
 interface RegisterFormData {
   name: string;
@@ -29,7 +30,7 @@ const AuthForm: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false); // login button loading
   const [pageLoading, setPageLoading] = useState(true); // page initial loading
-
+  const [rememberMe, setRememberMe] = useState(false);
   const {
     register: registerRegister,
     handleSubmit: handleRegisterSubmit,
@@ -72,7 +73,7 @@ const AuthForm: React.FC = () => {
   const handleCloseSnackbar = () => {
     setOpenSnackbar(false);
   };
-  
+
   const handleRegister: SubmitHandler<RegisterFormData> = async (data: RegisterFormData) => {
     try {
       const response = await addUsers({
@@ -81,14 +82,14 @@ const AuthForm: React.FC = () => {
         phone: data.phone,
         address: data.address,
       });
-  
+
       if (response.data) {
         setSnackbarMessage("✅ User Added successfully!");
         setSnackbarSeverity("success");
         resetRegister();
       }
       return response.data;
-    } catch (error:any) {
+    } catch (error: any) {
       const message = error?.message || "❌ Registration failed";
       setSnackbarMessage(`❌ ${message}`);
       setSnackbarSeverity("error");
@@ -101,17 +102,25 @@ const AuthForm: React.FC = () => {
     try {
       setLoading(true);
       const response = await LoginForm(data.email, data.password);
-      const role=response.data.role;
-      const department = response.data.department;
-      console.log("Role:", role);
-      console.log("Department:", department);
+      const userId = response?.data?.userId;
   
-      
-      
-      if (response.data) {
+      if (response?.data) {
+        // Save auth info
         localStorage.setItem("token", response.data.token);
         localStorage.setItem("roles", response.data.role);
-        localStorage.setItem("department", department);
+        localStorage.setItem("UserID", userId);
+        localStorage.setItem("department", response.data.department);
+  
+        // Remember Me
+        if (rememberMe) {
+          Cookies.set("rememberMe", "true", { expires: 7 }); // stores cookie for 7 days
+          Cookies.set("email", data.email);
+          Cookies.set("password", data.password);
+        } else {
+          Cookies.remove("rememberMe", "false"); // or simply remove it
+          Cookies.remove("email");
+          Cookies.remove("password");
+        }
         setSnackbarMessage("✅ Login successfully!");
         setSnackbarSeverity("success");
         resetLogin();
@@ -128,6 +137,21 @@ const AuthForm: React.FC = () => {
       setOpenSnackbar(true);
     }
   };
+  
+  
+  useEffect(() => {
+    const savedRememberMe = Cookies.get("rememberMe") === "true";
+    const savedEmail = Cookies.get("email") || "";
+    const savedPassword = Cookies.get("password") || "";
+  
+    if (savedRememberMe) {
+      setLoginValue("email", savedEmail);
+      setLoginValue("password", savedPassword);
+    }
+  
+    setRememberMe(savedRememberMe);
+  }, []);
+  
   const textFieldProps = {
     sx: {
       '& .MuiOutlinedInput-root': {
@@ -232,16 +256,24 @@ const AuthForm: React.FC = () => {
               {...LogintextFieldProps}
             />
             <Box sx={{ display: "flex", alignItems: "center", mt: 2 }}>
-                <input
-                    type="checkbox"
-                    checked={isStrongPassword}
-                    onChange={() => setIsStrongPassword(!isStrongPassword)}
-                />
-                <Typography variant="body2" sx={{ ml: 1 }}>
-                    Use Strong Password Validation
-                </Typography>
+              <input
+                type="checkbox"
+                checked={isStrongPassword}
+                onChange={() => setIsStrongPassword(!isStrongPassword)}
+              />
+              <Typography variant="body2" sx={{ ml: 1 }}>
+                Use Strong Password Validation
+              </Typography>
+              <input
+                type="checkbox"
+                checked={rememberMe}
+                onChange={(e) => setRememberMe(e.target.checked)}
+              />
+              <Typography variant="body2" sx={{ ml: 1 }}>
+                Remember Me
+              </Typography>
             </Box>
-            <Link to="/forgot-password" className="forgot-password">Forget Password</Link> 
+            <Link to="/forgot-password" className="forgot-password">Forget Password</Link>
 
           </Box>
 

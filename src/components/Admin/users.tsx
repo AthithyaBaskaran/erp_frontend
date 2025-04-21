@@ -285,12 +285,12 @@ const Users: React.FC = () => {
       width: 80,
       renderCell: (params) => params.api.getAllRowIds().indexOf(params.id) + 1,
     },
-    { field: 'name', headerName: 'Name', width: 130,renderCell: (params) => params.value || "N/A", },
-    { field: 'email', headerName: 'Email', width: 130,renderCell: (params) => params.value || "N/A", },
-    { field: 'phone', headerName: 'Phone Number', width: 130,renderCell: (params) => params.value || "N/A", },
-    { field: 'address', headerName: 'Address', width: 130,renderCell: (params) => params.value || "N/A", },
-    { field: 'role', headerName: 'Role', width: 130,renderCell: (params) => params.value || "N/A", },
-    { field: 'department', headerName: 'Department', width: 130,renderCell: (params) => params.value || "N/A", },
+    { field: 'name', headerName: 'Name', width: 130, renderCell: (params) => params.value || "N/A", },
+    { field: 'email', headerName: 'Email', width: 130, renderCell: (params) => params.value || "N/A", },
+    { field: 'phone', headerName: 'Phone Number', width: 130, renderCell: (params) => params.value || "N/A", },
+    { field: 'address', headerName: 'Address', width: 130, renderCell: (params) => params.value || "N/A", },
+    { field: 'role', headerName: 'Role', width: 130, renderCell: (params) => params.value || "N/A", },
+    { field: 'department', headerName: 'Department', width: 130, renderCell: (params) => params.value || "N/A", },
     {
       field: "actions",
       headerName: "Actions",
@@ -337,7 +337,7 @@ const Users: React.FC = () => {
 
       return response.data;
     } catch (error) {
-      setSnackbarMessage("❌ Login failed");
+      setSnackbarMessage("❌ Fetch Department failed");
       setSnackbarSeverity("error");
       console.error("Error logging in:", error);
     } finally {
@@ -358,7 +358,7 @@ const Users: React.FC = () => {
 
       return response.data;
     } catch (error) {
-      setSnackbarMessage("❌ Login failed");
+      setSnackbarMessage("❌ Role failed");
       setSnackbarSeverity("error");
       console.error("Error logging in:", error);
     } finally {
@@ -377,20 +377,20 @@ const Users: React.FC = () => {
 
       <div className="main-container">
         <div className='admin-buttons-container'>
-        <Button
-          variant="outlined"
-          className='admin-action-button'
-          color="success"
-          size="small"
-          onClick={handleaddDepartment}
-        >Add Department</Button>
-        <Button
-          variant="outlined"
-          className='admin-action-button'
-          color="success"
-          size="small"
-          onClick={handleaddRole}
-        >Add Role</Button>
+          <Button
+            variant="outlined"
+            className='admin-action-button'
+            color="success"
+            size="small"
+            onClick={handleaddDepartment}
+          >Add Department</Button>
+          <Button
+            variant="outlined"
+            className='admin-action-button'
+            color="success"
+            size="small"
+            onClick={handleaddRole}
+          >Add Role</Button>
         </div>
         <Button
           variant="outlined"

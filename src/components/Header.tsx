@@ -18,21 +18,22 @@ interface HeaderProps {
 }
 
 const Header: React.FC<HeaderProps> = ({ OpenSidebar }) => {
-    const navigate = useNavigate();
-    const [showLogout, setShowLogout] = useState(false);
-    const { toggleTheme,mode } = useThemeContext();
+  const navigate = useNavigate();
+  const [showLogout, setShowLogout] = useState(false);
+  const { toggleTheme, mode } = useThemeContext();
 
-    const profileRef = useRef<HTMLDivElement>(null);
-    function handleLogout() {
-      localStorage.removeItem("token");
-      localStorage.removeItem("role");
-      localStorage.removeItem("department");
-        navigate("/");
-    }
+  const profileRef = useRef<HTMLDivElement>(null);
+  function handleLogout() {
+    localStorage.removeItem("token");
+    localStorage.removeItem("roles");
+    localStorage.removeItem("UserID");
+    localStorage.removeItem("department");
+    navigate("/");
+  }
 
-    const toggleProfileMenu = () => {
-      setShowLogout(prev => !prev);
-    };
+  const toggleProfileMenu = () => {
+    setShowLogout(prev => !prev);
+  };
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -57,10 +58,10 @@ const Header: React.FC<HeaderProps> = ({ OpenSidebar }) => {
         <BsSearch className="icon" />
       </div>
       <div className="header-right">
-      <BsFillBellFill className="icon" />
-      <BsFillEnvelopeFill className="icon" />
+        <BsFillBellFill className="icon" />
+        <BsFillEnvelopeFill className="icon" />
 
-      <div
+        <div
           className="profile-wrapper"
           ref={profileRef}
           style={{ position: "relative" }}
@@ -95,7 +96,7 @@ const Header: React.FC<HeaderProps> = ({ OpenSidebar }) => {
               </span>
             </div>
           </Tooltip>
- 
+
           {showLogout && (
             <div
               className="profile-menu"
@@ -124,7 +125,7 @@ const Header: React.FC<HeaderProps> = ({ OpenSidebar }) => {
             </div>
           )}
         </div>
- 
+
         <Button onClick={toggleTheme}>
           <DarkModeIcon />
         </Button>

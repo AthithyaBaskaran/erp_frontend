@@ -76,7 +76,7 @@ const AuthForm: React.FC = () => {
       }
       return response.data;
     } catch (error) {
-      setSnackbarMessage("❌ Login failed");
+      setSnackbarMessage("❌ Change Password failed");
       setSnackbarSeverity("error");
       console.error("Error logging in:", error);
     } finally {
@@ -116,7 +116,7 @@ const AuthForm: React.FC = () => {
           <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
             <TextField
               type={showPassword ? "text" : "password"}
-              placeholder="Password"
+              placeholder=" Old Password"
               variant="outlined"
               {...registerchangeUser("oldPassword")}
               error={!!changeUserErrors.oldPassword}
