@@ -22,7 +22,6 @@ const App = () => {
   };
 
   
-  
   const fetchRefreshToken = async (userId: number, token: string) => {
     try {
       const response = await RefreshToken(userId, token);
@@ -30,6 +29,8 @@ const App = () => {
   
       // ✅ Store new token
       localStorage.setItem('token', data.newToken);
+  
+      setSnackbarMessage("✅ Token refreshed successfully!");
       setSnackbarSeverity("success");
   
       return data;

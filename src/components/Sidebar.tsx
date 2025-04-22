@@ -1,4 +1,4 @@
-import React , {useState, useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   BsCart3,
   BsGrid1X2Fill,
@@ -28,8 +28,6 @@ const Sidebar: React.FC<SidebarProps> = ({ openSidebarToggle, OpenSidebar }) => 
     const storedDepartment = localStorage.getItem('department');
     setRole(storedRole);
     setDepartment(storedDepartment);
-    console.log("User Role:", storedRole);
-    console.log("User Department:", storedDepartment);
   }, []);
 
   return (

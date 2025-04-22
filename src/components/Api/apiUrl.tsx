@@ -1,20 +1,11 @@
 import { apiUrl } from "../Api/BaseUrl";
 
-
-interface RefreshTokenResponse {
-    statusCode: number;
-    statusMessage: string;
-    data: {
-        newToken: string;
-    };
-}
-
-
 export const LoginForm = async (email: string, password: string,) => {
     try {
         const response = await apiUrl.post(`auth/login`, { email, password });
-        console.log(response.data.statusMessage);
-
+        if (response.data?.statusMessage) {
+            console.log("✅ Login response:", response.data);
+        }
         // ✅ Changed delete to post
         return response.data;
     } catch (error: any) {
@@ -29,7 +20,9 @@ export const addUsers = async (user: { name: string; email: string; phone?: stri
 
     try {
         const response = await apiUrl.post(`/users/register`, user);
-        console.log("response", response);
+        if (response.data?.statusMessage) {
+            console.log("✅ Login response:", response.data);
+        }
 
         // ✅ Changed delete to post
         return response.data;
@@ -150,7 +143,7 @@ export const ForgetUser = async (email: string) => {
     try {
         const response = await apiUrl.post(`/auth/forgot-password?email=${email}`);
         return response.data;
-    }  catch (error: any) {
+    } catch (error: any) {
         if (error.response && error.response.data && error.response.data.statusMessage) {
             throw new Error(error.response.data.statusMessage);
         } else {
@@ -164,8 +157,11 @@ export const ResetEmail = async (token: string, newPassword: string, confirmPass
             newPassword,
             confirmPassword,
         });
+        if (response.data.statusMessage) {
+            console.log("✅ Reset response:", response.data);
+        }
         return response.data;
-    }  catch (error: any) {
+    } catch (error: any) {
         if (error.response && error.response.data && error.response.data.statusMessage) {
             throw new Error(error.response.data.statusMessage);
         } else {
@@ -177,19 +173,19 @@ export const ResetEmail = async (token: string, newPassword: string, confirmPass
 
 export const RefreshToken = async (userId: number, token: string) => {
     try {
-      const response = await apiUrl.post(`/token/refresh-token`, {
-        userId,
-        token,
-      }, {
-        headers: {
-          "Content-Type": "application/json",
-        }
-      });
-  
-      return response.data;
+        const response = await apiUrl.post(`/token/refresh-token`, {
+            userId,
+            token,
+        }, {
+            headers: {
+                "Content-Type": "application/json",
+            }
+        });
+
+        return response.data;
     } catch (error) {
-      console.error("Error refreshing token:", error);
-      throw error;
+        console.error("Error refreshing token:", error);
+        throw error;
     }
-  };
-  
+};
+

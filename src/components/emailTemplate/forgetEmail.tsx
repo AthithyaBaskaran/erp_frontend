@@ -62,26 +62,31 @@ const EmailForgetPassword: React.FC = () => {
         try {
             const token = searchParams.get("token");
             if (!token) throw new Error("No token found in URL");
-            const response = await ResetEmail(token, data.newPassword, data.confirmPassword);
-            console.log(response.data);
 
-            if (response.data) {
+            const response = await ResetEmail(token, data.newPassword, data.confirmPassword);
+
+            if (response.data && response.data.token) {
                 localStorage.setItem("token", response.data.token);
-                setSnackbarMessage("✅ Change password successfully!");
-                setSnackbarSeverity("success");
-                resetResetUser();
-                navigate("/");
             }
+
+            const message = response.statusMessage || "Reset Password successful!";
+            console.log("✅ message:", message);
+
+            setSnackbarMessage(`✅ ${message}`);
+            setSnackbarSeverity("success");
+            resetResetUser();
+            navigate("/");
             return response.data;
-        } catch (error:any) {
+        } catch (error: any) {
             const message = error?.message || "❌ Change Password failed";
             setSnackbarMessage(`❌ ${message}`);
             setSnackbarSeverity("error");
-            console.error("Error logging in:", error);
+            console.error("❌ Error resetting password:", error);
         } finally {
             setOpenSnackbar(true);
         }
     };
+
     return (
         <div className="signin-signup">
             {/* Sign In Form */}
@@ -92,7 +97,7 @@ const EmailForgetPassword: React.FC = () => {
                     <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
                         <TextField
                             type={showPassword ? "text" : "password"}
-                            placeholder="Password"
+                            placeholder="New Password"
                             variant="outlined"
                             {...registerResetUser("newPassword")}
                             error={!!ResetUserErrors.newPassword}

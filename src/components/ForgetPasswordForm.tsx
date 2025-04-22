@@ -62,13 +62,14 @@ const ForgetPasswordForm: React.FC = () => {
             const response = await ForgetUser(data.email);
             console.log(response.data);
             if (response.data) {
-                setSnackbarMessage("✅ Change password successfully!");
+                const message = response?.statusMessage || "Change password successfully!";
+                setSnackbarMessage(`✅ ${message}`);
                 setSnackbarSeverity("success");
                 resetForgetUser();
                 navigate("/");
             }
             return response.data;
-        } catch (error:any) {
+        } catch (error: any) {
             const message = error?.message || "❌ Forget password failed";
             setSnackbarMessage(`❌ ${message}`);
             setSnackbarSeverity("error");

@@ -69,13 +69,14 @@ const AuthForm: React.FC = () => {
 
       if (response.data) {
         localStorage.setItem("token", response.data.token);
-        setSnackbarMessage("✅ Change password successfully!");
+        const message = response?.statusMessage || "Change password successfully!";
+        setSnackbarMessage(`✅ ${message}`);
         setSnackbarSeverity("success");
         resetchangeUser();
         navigate("/");
       }
       return response.data;
-    } catch (error:any) {
+    } catch (error: any) {
       const message = error.message || "Change Password failed";
       setSnackbarMessage(`❌ ${message}`);
       setSnackbarSeverity("error");

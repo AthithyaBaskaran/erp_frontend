@@ -141,7 +141,8 @@ const Users: React.FC = () => {
       const response = await showUsers();
       const data = response.data;
       SetUsers(Array.isArray(data) ? data : []);
-      setSnackbarMessage("✅ User added successfully!");
+      const message = response?.statusMessage || "User added  successful!";
+      setSnackbarMessage(`✅ ${message}`);
       setSnackbarSeverity("success");
     }
     catch (error) {
@@ -219,7 +220,8 @@ const Users: React.FC = () => {
     try {
       const response = await assignRoleAndDept(selectedUserId, selectedRoleId, selectedDeptId);
       if (response.data) {
-        setSnackbarMessage("✅ Department and Role assigned successfully!");
+        const message = response?.statusMessage || "Department and Role assigned successfully!";
+        setSnackbarMessage(`✅ ${message}`);
         setSnackbarSeverity("success");
         resetRoleAndDept();
         handleCloseEdit();
@@ -238,7 +240,8 @@ const Users: React.FC = () => {
   const handleDeleteUser = async (userId: number) => {
     try {
       const response = await deleteUser(userId);
-      setSnackbarMessage("✅ User deleted successfully!");
+      const message = response?.statusMessage || "User deleted successfully!";
+      setSnackbarMessage(`✅ ${message}`);
       setSnackbarSeverity("success");
       setOpenSnackbar(true);
       setTimeout(() => {
@@ -264,7 +267,8 @@ const Users: React.FC = () => {
       });
 
       if (response.data) {
-        setSnackbarMessage("✅ User Added successfully!");
+        const message = response?.statusMessage || "User Added successfully!";
+        setSnackbarMessage(`✅ ${message}`);
         setSnackbarSeverity("success");
         resetRegister();
         handleCloseUserModal();
@@ -332,7 +336,8 @@ const Users: React.FC = () => {
       console.log(response.data.data);
 
       if (response.data) {
-        setSnackbarMessage("✅ Add Department successfully!");
+        const message = response?.statusMessage || "Add Department successfully!";
+        setSnackbarMessage(`✅ ${message}`);
         setSnackbarSeverity("success");
         resetDepartment();
         handleAddDepartmentClose();
@@ -353,7 +358,8 @@ const Users: React.FC = () => {
       console.log(response.data.data);
 
       if (response.data) {
-        setSnackbarMessage("✅ Add Role successfully!");
+        const message = response?.statusMessage || "Add Role successfully!";
+        setSnackbarMessage(`✅ ${message}`);
         setSnackbarSeverity("success");
         resetRole();
         handleAddRoleClose();
@@ -828,7 +834,8 @@ const Users: React.FC = () => {
         <Alert
           onClose={handleCloseSnackbar}
           severity={snackbarSeverity}
-          sx={{ width: "100%" ,
+          sx={{
+            width: "100%",
             color: snackbarMessage === "✅ User deleted successfully!" ? "red" : undefined
           }}
         >
