@@ -15,7 +15,8 @@ import { useForm, SubmitHandler, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { addDepartment, deleteUser, addUsers } from "../Api/apiUrl";
 import { useNavigate } from "react-router-dom";
-import "../../styles/Admin.css";
+import "../../styles/Admin.css"; 
+
 interface Users {
   id?: string;
   name: string;
@@ -136,23 +137,34 @@ const Users: React.FC = () => {
     setOpenSnackbar(false);
   };
 
+  const handleDownloadExcel = () => {
+    // Implement your Excel download logic here
+    console.log("Excel download initiated");
+  };
 
   const fetchUsers = async () => {
     try {
       const response = await showUsers();
       const data = response.data;
       SetUsers(Array.isArray(data) ? data : []);
-      const message = response?.statusMessage || "User added  successful!";
-      setSnackbarMessage(`✅ ${message}`);
-      setSnackbarSeverity("success");
+
+      const message = response?.statusMessage || "Users fetched successfully";
+      const fullMessage = `✅ ${message}`;
+      if (fullMessage !== "Users fetched successfully") {
+        setSnackbarMessage(fullMessage);
+        setSnackbarSeverity("success");
+        setOpenSnackbar(true);
+      }  else {
+        setSnackbarMessage(fullMessage); 
+        setOpenSnackbar(false);
+      }
     }
     catch (error) {
       setSnackbarMessage("❌ Failed to add user");
       setSnackbarSeverity("error");
-      console.error("Error adding user:", error);
-    } finally {
       setOpenSnackbar(true);
-    }
+      console.error("Error adding user:", error);
+    } 
   };
   useEffect(() => {
     fetchUsers();
@@ -208,10 +220,7 @@ const Users: React.FC = () => {
     }
   };
 
-
-
-
-  const handleRoleAndDepartment: SubmitHandler<assignRoleAndDepartment> = async (data) => {
+const handleRoleAndDepartment: SubmitHandler<assignRoleAndDepartment> = async (data) => {
     if (!selectedUserId || !selectedRoleId || !selectedDeptId) {
       console.log(data.roleId, data.deptId);
       setSnackbarMessage("❌ Please select all fields");
@@ -445,6 +454,14 @@ const Users: React.FC = () => {
             size="small"
             onClick={handleaddRole}
           >Add Role</Button>
+         <Button
+          variant="outlined"
+          style={{ backgroundColor: 'green', color: 'white' }}
+          size="small"
+          onClick={handleDownloadExcel} // Define this function to handle the Excel download
+        >
+        Excel
+        </Button>
         </div>
         <Button
           variant="outlined"
@@ -874,6 +891,7 @@ const Users: React.FC = () => {
         </form>
       </Modal>
 
+      {snackbarMessage !== "✅ Users fetched successfully" && (
       <Snackbar
         open={openSnackbar}
         autoHideDuration={2000}
@@ -891,6 +909,8 @@ const Users: React.FC = () => {
           {snackbarMessage}
         </Alert>
       </Snackbar>
+    )}
+
     </div>
   )
 }
