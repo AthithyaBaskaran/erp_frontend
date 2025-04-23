@@ -9,7 +9,7 @@ import {
   BsBoxArrowRight,
   BsKey,
 } from 'react-icons/bs';
-import { Button, Tooltip } from '@mui/material';
+import { Button, Tooltip, Typography } from '@mui/material';
 import DarkModeIcon from '@mui/icons-material/DarkMode';
 import { useThemeContext } from './ThemeContext';
 import { useNavigate } from 'react-router-dom';
@@ -28,6 +28,7 @@ const Header: React.FC<HeaderProps> = ({ OpenSidebar }) => {
     localStorage.removeItem("roles");
     localStorage.removeItem("UserID");
     localStorage.removeItem("department");
+    localStorage.removeItem("UserName");
     navigate("/");
   }
 
@@ -49,6 +50,9 @@ const Header: React.FC<HeaderProps> = ({ OpenSidebar }) => {
   function handleChangePassword() {
     navigate("/change_password");
   }
+  const Username = localStorage.getItem('UserName');
+  console.log(Username);
+
   return (
     <header className="header">
       <div className="menu-icon">
@@ -84,6 +88,8 @@ const Header: React.FC<HeaderProps> = ({ OpenSidebar }) => {
                   color: showLogout ? "#4dabf5" : undefined
                 }}
               />
+              <Typography variant="body1" className='nav_username' >{Username}</Typography>
+
               <span
                 style={{
                   marginLeft: "5px",
@@ -100,11 +106,6 @@ const Header: React.FC<HeaderProps> = ({ OpenSidebar }) => {
           {showLogout && (
             <div
               className="profile-menu"
-              style={{
-                backgroundColor: mode === 'dark' ? '#333' : '#fff',
-                color: mode === 'dark' ? '#fff' : '#333',
-                boxShadow: '0 4px 10px rgba(0, 0, 0, 0.3)'
-              }}
             >
               <div
                 className="profile-option logout"
@@ -126,9 +127,23 @@ const Header: React.FC<HeaderProps> = ({ OpenSidebar }) => {
           )}
         </div>
 
-        <Button onClick={toggleTheme}>
-          <DarkModeIcon />
-        </Button>
+        <Tooltip title={mode === 'light' ? 'Switch to Dark Mode' : 'Switch to Light Mode'}>
+          <Button 
+            onClick={toggleTheme}
+            sx={{
+              minWidth: '40px',
+              height: '40px',
+              borderRadius: '50%',
+              backgroundColor: mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.05)',
+              color: mode === 'dark' ? '#fff' : '#333',
+              '&:hover': {
+                backgroundColor: mode === 'dark' ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.1)',
+              }
+            }}
+          >
+            <DarkModeIcon />
+          </Button>
+        </Tooltip>
       </div>
     </header>
   );

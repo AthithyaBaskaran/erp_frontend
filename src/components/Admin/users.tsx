@@ -173,6 +173,7 @@ const Users: React.FC = () => {
       const response = await showDepartment();
       const data = response.data;
       SetDepartment(Array.isArray(data) ? data : []);
+      fetchUsers();
     }
     catch (error) {
       setSnackbarMessage("❌ Failed to add user");
@@ -191,6 +192,7 @@ const Users: React.FC = () => {
       const response = await AssignRole(departmentId);
       const data = response.data;
       SetRole(Array.isArray(data) ? data : []);
+      fetchUsers();
     }
     catch (error) {
       setSnackbarMessage("❌ Failed to add user");
@@ -282,6 +284,7 @@ const handleRoleAndDepartment: SubmitHandler<assignRoleAndDepartment> = async (d
         setSnackbarSeverity("success");
         resetRegister();
         handleCloseUserModal();
+        fetchUsers();
       }
       return response.data;
     } catch (error: any) {
@@ -334,6 +337,7 @@ const handleRoleAndDepartment: SubmitHandler<assignRoleAndDepartment> = async (d
       ),
     },
     {
+
       field: 'role', headerName: 'Role', width: 130, renderCell: (params) => (
         <span title={params.value || "N/A"}>
           {params.value || "N/A"}

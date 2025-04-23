@@ -11,7 +11,7 @@ const apiUrl = axios.create({
 });
 
 // Automatically attach token from localStorage (if exists)
-apiUrl.interceptors.request.use(
+apiUrl.interceptors.request.use(  
   (config) => {
     const token = localStorage.getItem("token");
     if (token) {
@@ -23,4 +23,4 @@ apiUrl.interceptors.request.use(
 );
 
 
-export { apiUrl };
+export { apiUrl};
