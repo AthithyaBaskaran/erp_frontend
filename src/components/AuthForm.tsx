@@ -110,6 +110,7 @@ const AuthForm: React.FC = () => {
         localStorage.setItem("roles", response.data.role);
         localStorage.setItem("UserID", userId);
         localStorage.setItem("department", response.data.department);
+        localStorage.setItem("UserName", response.data.name);
   
         // Remember Me
         if (rememberMe) {
