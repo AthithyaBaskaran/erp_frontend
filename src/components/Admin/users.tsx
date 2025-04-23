@@ -9,14 +9,14 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import SendIcon from "@mui/icons-material/Send";
 import CloseIcon from '@mui/icons-material/Close';
-import { addRole, showDepartment, assignRoleAndDept, showUsers, AssignRole, fetchUserForEdit } from '../Api/apiUrl';
+import { addRole, showDepartment, assignRoleAndDept, showUsers, AssignRole, fetchUserForEdit, DownloadUserID } from '../Api/apiUrl';
 import { getRegisterSchema, getRoleSchema } from "../Validations/ValidationSchema";
 import { useForm, SubmitHandler, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { addDepartment, deleteUser, addUsers } from "../Api/apiUrl";
 import { useNavigate } from "react-router-dom";
 import "../../styles/Admin.css"; 
-
+import { saveAs } from "file-saver";
 interface Users {
   id?: string;
   name: string;
@@ -137,10 +137,29 @@ const Users: React.FC = () => {
     setOpenSnackbar(false);
   };
 
-  const handleDownloadExcel = () => {
-    // Implement your Excel download logic here
-    console.log("Excel download initiated");
+  const handleDownloadExcel = async (userIds: string) => {
+    try {
+      const response = await DownloadUserID(userIds);
+  
+      const blob = new Blob([response], {
+        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      });
+  
+      saveAs(blob, `users_${userIds.replace(/,/g, "_")}.xlsx`);
+  
+      setSnackbarMessage("✅ Users downloaded as Excel file!");
+      setSnackbarSeverity("success");
+    } catch (error) {
+      console.error("Failed to download Excel:", error);
+      setSnackbarMessage("❌ Failed to download Excel");
+      setSnackbarSeverity("error");
+    } finally {
+      setOpenSnackbar(true);
+    }
+  
+    console.log("Excel download initiated for users:", userIds);
   };
+  
 
   const fetchUsers = async () => {
     try {
@@ -458,7 +477,14 @@ const handleRoleAndDepartment: SubmitHandler<assignRoleAndDepartment> = async (d
           variant="outlined"
           style={{ backgroundColor: 'green', color: 'white' }}
           size="small"
-          onClick={handleDownloadExcel} // Define this function to handle the Excel download
+          // onClick={handleDownloadExcel} // Define this function to handle the Excel download
+          onClick={() => {
+            if (selectionModel.length > 0) {
+              const selectedIds = selectionModel.join(","); // Convert array to comma-separated string
+              handleDownloadExcel(selectedIds);
+            }
+          }}
+          
         >
         Excel
         </Button>

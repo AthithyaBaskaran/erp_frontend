@@ -189,3 +189,14 @@ export const RefreshToken = async (userId: number, token: string) => {
     }
 };
 
+export const DownloadUserID = async (userId: string) => {
+    try {
+        const response = await apiUrl.get(`users/download/excel?userIds=${userId}`, {
+            responseType: "arraybuffer",
+        });
+        return response.data;
+    } catch (error) {
+        console.error("Error fetching product:", error);
+        return [];
+    }
+};
