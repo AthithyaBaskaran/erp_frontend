@@ -23,21 +23,65 @@ import React, {
   };
   
   export const ThemeProviderCustom: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-    const [mode, setMode] = useState<'light' | 'dark'>('light');
+    // Get saved theme from localStorage or default to 'light'
+    const [mode, setMode] = useState<'light' | 'dark'>(() => {
+      const savedTheme = localStorage.getItem('theme');
+      return (savedTheme === 'dark' || savedTheme === 'light') ? savedTheme : 'light';
+    });
   
     const toggleTheme = () => {
-      setMode((prevMode) => (prevMode === 'light' ? 'dark' : 'light'));
+      setMode((prevMode) => {
+        const newMode = prevMode === 'light' ? 'dark' : 'light';
+        localStorage.setItem('theme', newMode); // Save theme preference
+        return newMode;
+      });
     };
   
-    // Optional: Add class to body for custom CSS overrides
+    // Apply theme class to body for global CSS styling
     useEffect(() => {
-      document.body.className = mode;
+      // Remove both classes first
+      document.body.classList.remove('light', 'dark');
+      // Add the current theme class
+      document.body.classList.add(mode);
+      // Set data attribute for CSS selectors
+      document.documentElement.setAttribute('data-theme', mode);
     }, [mode]);
   
     const theme = useMemo(
       () =>
         createTheme({
-          palette: { mode },
+          palette: { 
+            mode,
+            ...(mode === 'light' 
+              ? {
+                  // Light mode colors
+                  primary: {
+                    main: '#1976d2',
+                  },
+                  background: {
+                    default: '#f5f5f5',
+                    paper: '#ffffff',
+                  },
+                  text: {
+                    primary: '#333333',
+                    secondary: '#555555',
+                  },
+                }
+              : {
+                  // Dark mode colors
+                  primary: {
+                    main: '#90caf9',
+                  },
+                  background: {
+                    default: '#1d2634',
+                    paper: '#263043',
+                  },
+                  text: {
+                    primary: '#ffffff',
+                    secondary: '#9e9ea4',
+                  },
+                }),
+          },
           breakpoints: {
             values: { xs: 0, sm: 600, md: 900, lg: 1200, xl: 1536 },
           },

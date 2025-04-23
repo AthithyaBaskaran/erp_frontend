@@ -100,11 +100,6 @@ const Header: React.FC<HeaderProps> = ({ OpenSidebar }) => {
           {showLogout && (
             <div
               className="profile-menu"
-              style={{
-                backgroundColor: mode === 'dark' ? '#333' : '#fff',
-                color: mode === 'dark' ? '#fff' : '#333',
-                boxShadow: '0 4px 10px rgba(0, 0, 0, 0.3)'
-              }}
             >
               <div
                 className="profile-option logout"
@@ -126,9 +121,23 @@ const Header: React.FC<HeaderProps> = ({ OpenSidebar }) => {
           )}
         </div>
 
-        <Button onClick={toggleTheme}>
-          <DarkModeIcon />
-        </Button>
+        <Tooltip title={mode === 'light' ? 'Switch to Dark Mode' : 'Switch to Light Mode'}>
+          <Button 
+            onClick={toggleTheme}
+            sx={{
+              minWidth: '40px',
+              height: '40px',
+              borderRadius: '50%',
+              backgroundColor: mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.05)',
+              color: mode === 'dark' ? '#fff' : '#333',
+              '&:hover': {
+                backgroundColor: mode === 'dark' ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.1)',
+              }
+            }}
+          >
+            <DarkModeIcon />
+          </Button>
+        </Tooltip>
       </div>
     </header>
   );
