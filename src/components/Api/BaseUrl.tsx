@@ -3,20 +3,20 @@
 import axios from "axios";
 
 const apiUrl = axios.create({
-  baseURL: "http://localhost:8080/api/",
-  headers: {
-    "Content-Type": "application/json",
-  },
-  withCredentials: true,
-});
-
-const SalesapiUrl = axios.create({
   baseURL: "http://localhost:8080/user_management/api/",
   headers: {
     "Content-Type": "application/json",
   },
   withCredentials: true,
 });
+
+// const SalesapiUrl = axios.create({
+//   baseURL: "http://localhost:8080/user_management/api/",
+//   headers: {
+//     "Content-Type": "application/json",
+//   },
+//   withCredentials: true,
+// });
 
 // Automatically attach token from localStorage (if exists)
 apiUrl.interceptors.request.use(  
@@ -31,4 +31,4 @@ apiUrl.interceptors.request.use(
 );
 
 
-export { apiUrl, SalesapiUrl};
+export { apiUrl};

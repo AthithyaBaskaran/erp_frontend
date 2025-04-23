@@ -1,6 +1,6 @@
 
 import React, { useEffect, useState } from 'react'
-import { DataGrid, GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
+import { DataGrid, GridColDef, GridRenderCellParams, GridRowSelectionModel } from '@mui/x-data-grid';
 import Paper from '@mui/material/Paper';
 import Header from '../Header'; // adjust path if needed
 import Sidebar from '../Sidebar'; // if you have one
@@ -17,6 +17,7 @@ import { addDepartment, deleteUser, addUsers } from "../Api/apiUrl";
 import { useNavigate } from "react-router-dom";
 import "../../styles/Admin.css";
 interface Users {
+  id?: string;
   name: string;
   email: string;
   phone: string;
@@ -63,7 +64,7 @@ const Users: React.FC = () => {
   const [selectedRoleId, setSelectedRoleId] = useState<number | null>(null);
   const [user, setUser] = useState<Users | null>(null); // Single user, can be null initially
   const [openUserModal, setOpenUserModal] = useState(false);
-
+  const [selectionModel, setSelectionModel] = useState<GridRowSelectionModel>([]);
 
   const navigate = useNavigate();
 
@@ -468,6 +469,10 @@ const Users: React.FC = () => {
             columns={columns}
             pageSizeOptions={[5, 10]}
             checkboxSelection
+            onRowSelectionModelChange={(newSelection: GridRowSelectionModel) => {
+              setSelectionModel(newSelection);
+            }}
+            getRowId={(row: Users) => row.id ?? `row-${Math.random()}`}
             initialState={{
               pagination: {
                 paginationModel: { page: 0, pageSize: 20 },
