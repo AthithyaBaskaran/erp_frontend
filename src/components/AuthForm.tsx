@@ -110,6 +110,7 @@ const AuthForm: React.FC = () => {
         localStorage.setItem("roles", response.data.role);
         localStorage.setItem("UserID", userId);
         localStorage.setItem("department", response.data.department);
+        localStorage.setItem("UserName", response.data.name);
   
         // Remember Me
         if (rememberMe) {
@@ -129,7 +130,7 @@ const AuthForm: React.FC = () => {
   
       return response.data;
     } catch (error:any) {
-      f
+      
       setSnackbarSeverity("error");
       console.error("Error logging in:", error);
     } finally {

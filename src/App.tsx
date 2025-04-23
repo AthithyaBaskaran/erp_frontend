@@ -9,6 +9,14 @@ import AdminUsers from './components/Admin/users';
 import { Alert, Box, Snackbar } from '@mui/material';
 import { RefreshToken } from './components/Api/apiUrl';
 import { useEffect, useState } from 'react';
+import { jwtDecode } from 'jwt-decode'; // ✅
+
+interface JwtPayload {
+  sub?: string;
+  iat?: number;
+  exp?: number;
+}
+
 
 const App = () => {
 
@@ -22,45 +30,146 @@ const App = () => {
   };
 
   
-  const fetchRefreshToken = async (userId: number, token: string) => {
-    try {
-      const response = await RefreshToken(userId, token);
-      const data = response.data;
+  // const token = localStorage.getItem("token");
+
+  // if (token) {
+  //   const decoded = jwtDecode<JwtPayload>(token);
   
-      // ✅ Store new token
-      localStorage.setItem('token', data.newToken);
+  //   if (decoded.iat && decoded.exp) {
+  //     const issuedAt = new Date(decoded.iat * 1000);
+  //     const expiresAt = new Date(decoded.exp * 1000);
   
-      setSnackbarMessage("✅ Token refreshed successfully!");
-      setSnackbarSeverity("success");
+  //     const formatDateTime = (date: Date) =>
+  //       `${date.toLocaleDateString()} ${date.toLocaleTimeString()}`;
   
-      return data;
-    } catch (error) {
-      setSnackbarMessage("❌ Failed to refresh token");
-      setSnackbarSeverity("error");
-      console.error("Error refreshing token:", error);
-    } finally {
-      setOpenSnackbar(true);
+  //     console.log("Issued At:", formatDateTime(issuedAt));
+  //     console.log("Expires At:", formatDateTime(expiresAt));
+  //   } else {
+  //     console.warn("Token does not contain 'iat' or 'exp'.");
+  //   }
+  // }
+ 
+//   const fetchRefreshToken = async (userId: number, token: string) => {
+//     try {
+//       const response = await RefreshToken(userId, token);
+//       const data = response.data;
+  
+//       // ✅ Store new token
+//       localStorage.setItem('token', data.newToken);
+  
+//       setSnackbarMessage("✅ Token refreshed successfully!");
+//       setSnackbarSeverity("success");
+  
+//       return data;
+//     } catch (error) {
+//       setSnackbarMessage("❌ Failed to refresh token");
+//       setSnackbarSeverity("error");
+//       console.error("Error refreshing token:", error);
+//     } finally {
+//       setOpenSnackbar(true);
+//     }
+//   };
+//   const scheduleTokenRefresh = (token: string, userId: number) => {
+//  const decoded = jwtDecode<JwtPayload>(token);
+  
+//     if (decoded.exp) {
+//       const expTime = decoded.exp * 1000; // convert to ms
+//       const currentTime = Date.now();
+//       const timeLeft = expTime - currentTime;
+//       console.log(expTime, currentTime, timeLeft);
+      
+//       // Set to refresh 10 minutes (600000 ms) before expiration
+//       const refreshIn = timeLeft - 2 * 60 * 1000;
+  
+//       if (refreshIn > 0) {
+//         console.log(`🔄 Refreshing token in ${Math.floor(refreshIn / 1000)} seconds`);
+  
+//         setTimeout(() => {
+//           fetchRefreshToken(userId, token);
+//         }, refreshIn);
+//       } else {
+//         console.log("⏰ Token is near or already expired. Refreshing now.");
+//         fetchRefreshToken(userId, token);
+//       }
+//     } else {
+//       console.warn("❗ Token does not contain 'exp'.");
+//     }
+//   };
+//   useEffect(() => {
+//     const token = localStorage.getItem("token");
+//     console.log("Token from localStorage:", token);
+
+//     const userId = localStorage.getItem("UserID");
+
+//     if (token && userId) {
+//       const numericUserId = parseInt(userId, 10);
+//       const timer = setTimeout(() => {
+//         fetchRefreshToken(numericUserId, token);
+//       }, 5000); // 5000 milliseconds = 5 seconds
+
+//       return () => clearTimeout(timer); // Cleanup the timer if the component unmounts
+//     }
+//   }, []);
+
+const fetchRefreshToken = async (userId: number, token: string) => {
+  try {
+    const response = await RefreshToken(userId, token); // Replace with your actual API
+    const data = response.data;
+
+    // ✅ Store new token
+    localStorage.setItem('token', data.newToken);
+
+    setSnackbarMessage("✅ Token refreshed successfully!");
+    setSnackbarSeverity("success");
+
+    // 🔁 Schedule next refresh
+    scheduleTokenRefresh(data.newToken, userId);
+
+    return data;
+  } catch (error) {
+    setSnackbarMessage("❌ Failed to refresh token");
+    setSnackbarSeverity("error");
+    console.error("Error refreshing token:", error);
+  } finally {
+    setOpenSnackbar(true);
+  }
+};
+
+const scheduleTokenRefresh = (token: string, userId: number) => {
+  const decoded = jwtDecode<JwtPayload>(token);
+
+  if (decoded.exp) {
+    const expTime = decoded.exp * 1000;
+    const currentTime = Date.now();
+    const timeLeft = expTime - currentTime;
+
+    console.log("⏱️ Expiration in:", Math.floor(timeLeft / 1000), "seconds");
+
+    const refreshIn = timeLeft - 2 * 60 * 1000; // 2 minutes before exp
+
+    if (refreshIn > 0) {
+      console.log(`🔄 Token will be refreshed in ${Math.floor(refreshIn / 1000)} seconds`);
+      setTimeout(() => {
+        fetchRefreshToken(userId, token);
+      }, refreshIn);
+    } else {
+      console.log("⚠️ Token is near or already expired. Refreshing now.");
+      fetchRefreshToken(userId, token);
     }
-  };
+  } else {
+    console.warn("❗ Token does not contain 'exp'");
+  }
+};
 
-  
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    console.log("Token from localStorage:", token);
+useEffect(() => {
+  const token = localStorage.getItem("token");
+  const userId = localStorage.getItem("UserID");
 
-    const userId = localStorage.getItem("UserID");
-
-    if (token && userId) {
-      const numericUserId = parseInt(userId, 10);
-      const timer = setTimeout(() => {
-        fetchRefreshToken(numericUserId, token);
-      }, 5000); // 5000 milliseconds = 5 seconds
-
-      return () => clearTimeout(timer); // Cleanup the timer if the component unmounts
-    }
-  }, []);
-
-
+  if (token && userId) {
+    const numericUserId = parseInt(userId, 10);
+    scheduleTokenRefresh(token, numericUserId);
+  }
+}, []);
 
   return (
     <Box

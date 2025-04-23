@@ -42,3 +42,6 @@
   display: flex;
   margin-bottom: 20px;
 }
+.nav_username{
+  color: grey;
+}

@@ -43,48 +43,48 @@ const Sidebar: React.FC<SidebarProps> = ({ openSidebarToggle, OpenSidebar }) => 
 
         {/* Admin-only sidebar */}
         {role === "Admin" && department === "Admin" ? (
-          <li className="sidebar-list-item">
-            <Link to="/admin_users" className="Admin_link_sidebar">
+          <Link to="/admin_users" className="Admin_link_sidebar">
+            <li className="sidebar-list-item">
               <BsGrid1X2Fill className="icon" /> Users
-            </Link>
-          </li>
+            </li>
+          </Link>
         ) : (
           <>
-            <li className="sidebar-list-item">
-              <Link to="/dashboard" className="Dashboard_link_sidebar">
+            <Link to="/dashboard" className="Dashboard_link_sidebar">
+              <li className="sidebar-list-item">
                 <BsGrid1X2Fill className="icon" /> Dashboard
-              </Link>
-            </li>
-            <li className="sidebar-list-item">
-              <Link to="/products">
+              </li>
+            </Link>
+            <Link to="/products" className="Dashboard_link_sidebar">
+              <li className="sidebar-list-item">
                 <BsFillArchiveFill className="icon" /> Products
-              </Link>
-            </li>
-            <li className="sidebar-list-item">
-              <Link to="/categories">
+              </li>
+            </Link>
+            <Link to="/categories" className="Dashboard_link_sidebar">
+              <li className="sidebar-list-item">
                 <BsFillGrid3X3GapFill className="icon" /> Categories
-              </Link>
-            </li>
-            <li className="sidebar-list-item">
-              <Link to="/customers">
+              </li>
+            </Link>
+            <Link to="/customers" className="Dashboard_link_sidebar">
+              <li className="sidebar-list-item">
                 <BsPeopleFill className="icon" /> Customers
-              </Link>
-            </li>
-            <li className="sidebar-list-item">
-              <Link to="/inventory">
+              </li>
+            </Link>
+            <Link to="/inventory" className="Dashboard_link_sidebar">
+              <li className="sidebar-list-item">
                 <BsListCheck className="icon" /> Inventory
-              </Link>
-            </li>
-            <li className="sidebar-list-item">
-              <Link to="/reports">
+              </li>
+            </Link>
+            <Link to="/reports" className="Dashboard_link_sidebar">
+              <li className="sidebar-list-item">
                 <BsMenuButtonWideFill className="icon" /> Reports
-              </Link>
-            </li>
-            <li className="sidebar-list-item">
-              <Link to="/settings">
+              </li>
+            </Link>
+            <Link to="/settings" className="Dashboard_link_sidebar">
+              <li className="sidebar-list-item">
                 <BsFillGearFill className="icon" /> Setting
-              </Link>
-            </li>
+              </li>
+            </Link>
           </>
         )}
 

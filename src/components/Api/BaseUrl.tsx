@@ -10,8 +10,16 @@ const apiUrl = axios.create({
   withCredentials: true,
 });
 
+const SalesapiUrl = axios.create({
+  baseURL: "http://localhost:8080/user_management/api/",
+  headers: {
+    "Content-Type": "application/json",
+  },
+  withCredentials: true,
+});
+
 // Automatically attach token from localStorage (if exists)
-apiUrl.interceptors.request.use(
+apiUrl.interceptors.request.use(  
   (config) => {
     const token = localStorage.getItem("token");
     if (token) {
@@ -23,4 +31,4 @@ apiUrl.interceptors.request.use(
 );
 
 
-export { apiUrl };
+export { apiUrl, SalesapiUrl};
