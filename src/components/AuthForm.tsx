@@ -129,7 +129,7 @@ const AuthForm: React.FC = () => {
   
       return response.data;
     } catch (error:any) {
-      f
+      
       setSnackbarSeverity("error");
       console.error("Error logging in:", error);
     } finally {

@@ -223,6 +223,7 @@ const Users: React.FC = () => {
         const message = response?.statusMessage || "Department and Role assigned successfully!";
         setSnackbarMessage(`✅ ${message}`);
         setSnackbarSeverity("success");
+        fetchUsers();
         resetRoleAndDept();
         handleCloseEdit();
       }
@@ -292,12 +293,51 @@ const Users: React.FC = () => {
       width: 80,
       renderCell: (params) => params.api.getAllRowIds().indexOf(params.id) + 1,
     },
-    { field: 'name', headerName: 'Name', width: 130, renderCell: (params) => params.value || "N/A", },
-    { field: 'email', headerName: 'Email', width: 130, renderCell: (params) => params.value || "N/A", },
-    { field: 'phone', headerName: 'Phone Number', width: 130, renderCell: (params) => params.value || "N/A", },
-    { field: 'address', headerName: 'Address', width: 130, renderCell: (params) => params.value || "N/A", },
-    { field: 'role', headerName: 'Role', width: 130, renderCell: (params) => params.value || "N/A", },
-    { field: 'department', headerName: 'Department', width: 130, renderCell: (params) => params.value || "N/A", },
+    {
+      field: 'name', headerName: 'Name', width: 130, renderCell: (params) => (
+        <span title={params.value || "N/A"}>
+          {params.value || "N/A"}
+        </span>
+      ),
+    },
+    {
+      field: 'email',
+      headerName: 'Email',
+      width: 130,
+      renderCell: (params) => (
+        <span title={params.value || "N/A"}>
+          {params.value || "N/A"}
+        </span>
+      ),
+    },
+    {
+      field: 'phone', headerName: 'Phone Number', width: 130, renderCell: (params) => (
+        <span title={params.value || "N/A"}>
+          {params.value || "N/A"}
+        </span>
+      ),
+    },
+    {
+      field: 'address', headerName: 'Address', width: 130, renderCell: (params) => (
+        <span title={params.value || "N/A"}>
+          {params.value || "N/A"}
+        </span>
+      ),
+    },
+    {
+      field: 'role', headerName: 'Role', width: 130, renderCell: (params) => (
+        <span title={params.value || "N/A"}>
+          {params.value || "N/A"}
+        </span>
+      ),
+    },
+    {
+      field: 'department', headerName: 'Department', width: 130, renderCell: (params) => (
+        <span title={params.value || "N/A"}>
+          {params.value || "N/A"}
+        </span>
+      ),
+    },
     {
       field: "actions",
       headerName: "Actions",
