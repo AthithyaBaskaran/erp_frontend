@@ -15,8 +15,10 @@ import { useForm, SubmitHandler, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { addDepartment, deleteUser, addUsers } from "../Api/apiUrl";
 import { useNavigate } from "react-router-dom";
-import "../../styles/Admin.css"; 
+import "../../styles/Admin.css";
 import { saveAs } from "file-saver";
+import CloudUploadIcon from '@mui/icons-material/CloudUpload';
+import AddIcon from '@mui/icons-material/Add';
 interface Users {
   id?: string;
   name: string;
@@ -66,6 +68,7 @@ const Users: React.FC = () => {
   const [user, setUser] = useState<Users | null>(null); // Single user, can be null initially
   const [openUserModal, setOpenUserModal] = useState(false);
   const [selectionModel, setSelectionModel] = useState<GridRowSelectionModel>([]);
+  const [searchText, setSearchText] = useState('');
 
   const navigate = useNavigate();
 
@@ -102,7 +105,11 @@ const Users: React.FC = () => {
     formState: { errors: registerErrors, isSubmitting: isRegistering },
   } = useForm<RegisterFormData>({ resolver: yupResolver(getRegisterSchema()) });
 
-
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setSearchText(value);
+    fetchUsers(value); // Call API with search
+  };
 
   const OpenSidebar = () => {
     setOpenSidebarToggle(!openSidebarToggle);
@@ -140,13 +147,13 @@ const Users: React.FC = () => {
   const handleDownloadExcel = async (userIds: string) => {
     try {
       const response = await DownloadUserID(userIds);
-  
+
       const blob = new Blob([response], {
         type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
       });
-  
+
       saveAs(blob, `users_${userIds.replace(/,/g, "_")}.xlsx`);
-  
+
       setSnackbarMessage("✅ Users downloaded as Excel file!");
       setSnackbarSeverity("success");
     } catch (error) {
@@ -156,14 +163,14 @@ const Users: React.FC = () => {
     } finally {
       setOpenSnackbar(true);
     }
-  
+
     console.log("Excel download initiated for users:", userIds);
   };
-  
 
-  const fetchUsers = async () => {
+
+  const fetchUsers = async (search: string) => {
     try {
-      const response = await showUsers();
+      const response = await showUsers(search);
       const data = response.data;
       SetUsers(Array.isArray(data) ? data : []);
 
@@ -173,8 +180,8 @@ const Users: React.FC = () => {
         setSnackbarMessage(fullMessage);
         setSnackbarSeverity("success");
         setOpenSnackbar(true);
-      }  else {
-        setSnackbarMessage(fullMessage); 
+      } else {
+        setSnackbarMessage(fullMessage);
         setOpenSnackbar(false);
       }
     }
@@ -183,17 +190,17 @@ const Users: React.FC = () => {
       setSnackbarSeverity("error");
       setOpenSnackbar(true);
       console.error("Error adding user:", error);
-    } 
+    }
   };
   useEffect(() => {
-    fetchUsers();
+    fetchUsers('');
   }, []);
   const fetchDepartment = async () => {
     try {
       const response = await showDepartment();
       const data = response.data;
       SetDepartment(Array.isArray(data) ? data : []);
-      fetchUsers();
+      fetchUsers('');
     }
     catch (error) {
       setSnackbarMessage("❌ Failed to add user");
@@ -212,7 +219,7 @@ const Users: React.FC = () => {
       const response = await AssignRole(departmentId);
       const data = response.data;
       SetRole(Array.isArray(data) ? data : []);
-      fetchUsers();
+      fetchUsers('');
     }
     catch (error) {
       setSnackbarMessage("❌ Failed to add user");
@@ -239,7 +246,7 @@ const Users: React.FC = () => {
     }
   };
 
-const handleRoleAndDepartment: SubmitHandler<assignRoleAndDepartment> = async (data) => {
+  const handleRoleAndDepartment: SubmitHandler<assignRoleAndDepartment> = async (data) => {
     if (!selectedUserId || !selectedRoleId || !selectedDeptId) {
       console.log(data.roleId, data.deptId);
       setSnackbarMessage("❌ Please select all fields");
@@ -254,7 +261,7 @@ const handleRoleAndDepartment: SubmitHandler<assignRoleAndDepartment> = async (d
         const message = response?.statusMessage || "Department and Role assigned successfully!";
         setSnackbarMessage(`✅ ${message}`);
         setSnackbarSeverity("success");
-        fetchUsers();
+        fetchUsers('');
         resetRoleAndDept();
         handleCloseEdit();
       }
@@ -277,7 +284,7 @@ const handleRoleAndDepartment: SubmitHandler<assignRoleAndDepartment> = async (d
       setSnackbarSeverity("success");
       setOpenSnackbar(true);
       setTimeout(() => {
-        fetchUsers();
+        fetchUsers("");
       }, 1000);
     }
     catch (error) {
@@ -304,7 +311,7 @@ const handleRoleAndDepartment: SubmitHandler<assignRoleAndDepartment> = async (d
         setSnackbarSeverity("success");
         resetRegister();
         handleCloseUserModal();
-        fetchUsers();
+        fetchUsers('');
       }
       return response.data;
     } catch (error: any) {
@@ -465,29 +472,31 @@ const handleRoleAndDepartment: SubmitHandler<assignRoleAndDepartment> = async (d
             color="success"
             size="small"
             onClick={handleaddDepartment}
-          >Add Department</Button>
+          ><AddIcon />Add Department</Button>
           <Button
             variant="outlined"
             className='admin-action-button'
             color="success"
             size="small"
             onClick={handleaddRole}
-          >Add Role</Button>
-         <Button
-          variant="outlined"
-          style={{ backgroundColor: 'green', color: 'white' }}
-          size="small"
-          // onClick={handleDownloadExcel} // Define this function to handle the Excel download
-          onClick={() => {
-            if (selectionModel.length > 0) {
-              const selectedIds = selectionModel.join(","); // Convert array to comma-separated string
-              handleDownloadExcel(selectedIds);
-            }
-          }}
-          
-        >
-        Excel
-        </Button>
+          ><AddIcon />Add Role</Button>
+          <Button
+            variant="outlined"
+            // style={{ backgroundColor: 'green', color: 'white' }}
+            startIcon={<CloudUploadIcon />}
+            size="small"
+            color="success"
+            // onClick={handleDownloadExcel} // Define this function to handle the Excel download
+            onClick={() => {
+              if (selectionModel.length > 0) {
+                const selectedIds = selectionModel.join(","); // Convert array to comma-separated string
+                handleDownloadExcel(selectedIds);
+              }
+            }}
+
+          >
+            Excel
+          </Button>
         </div>
         <Button
           variant="outlined"
@@ -501,9 +510,17 @@ const handleRoleAndDepartment: SubmitHandler<assignRoleAndDepartment> = async (d
             top: '80px',
           }}
         >
-          Add User
+          <AddIcon />Add User
         </Button>
-
+        <div style={{ padding: '20px' }}>
+        <input
+          type="text"
+          placeholder="Search..."
+          value={searchText}
+          onChange={handleSearchChange}
+          className="admin-search-field"
+        />
+        </div>
 
         <Paper sx={{ height: 500, width: '100%', p: 2 }}>
 
@@ -918,24 +935,24 @@ const handleRoleAndDepartment: SubmitHandler<assignRoleAndDepartment> = async (d
       </Modal>
 
       {snackbarMessage !== "✅ Users fetched successfully" && (
-      <Snackbar
-        open={openSnackbar}
-        autoHideDuration={2000}
-        onClose={handleCloseSnackbar}
-        anchorOrigin={{ vertical: "top", horizontal: "right" }}
-      >
-        <Alert
+        <Snackbar
+          open={openSnackbar}
+          autoHideDuration={2000}
           onClose={handleCloseSnackbar}
-          severity={snackbarSeverity}
-          sx={{
-            width: "100%",
-            color: snackbarMessage === "✅ User deleted successfully!" ? "red" : undefined
-          }}
+          anchorOrigin={{ vertical: "top", horizontal: "right" }}
         >
-          {snackbarMessage}
-        </Alert>
-      </Snackbar>
-    )}
+          <Alert
+            onClose={handleCloseSnackbar}
+            severity={snackbarSeverity}
+            sx={{
+              width: "100%",
+              color: snackbarMessage === "✅ User deleted successfully!" ? "red" : undefined
+            }}
+          >
+            {snackbarMessage}
+          </Alert>
+        </Snackbar>
+      )}
 
     </div>
   )

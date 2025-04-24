@@ -80,10 +80,9 @@ export const addRole = async (dept_id: number, roleName: string) => {
         throw error;
     }
 }
-export const showUsers = async () => {
+export const showUsers = async (search:string) => {
     try {
-        const response = await apiUrl.get('/admin/users');
-
+        const response = await apiUrl.get(`/admin/users?search=${search}`);
         return response.data;
     } catch (error) {
         console.log("❌ Error fetching users:", error);
