@@ -1,4 +1,4 @@
-import { apiUrl } from "../Api/BaseUrl";
+import { apiUrl,InventoryapiUrl } from "../Api/BaseUrl";
 
 export const LoginForm = async (email: string, password: string,) => {
     try {
@@ -188,4 +188,48 @@ export const RefreshToken = async (userId: number, token: string) => {
         throw error;
     }
 };
+
+export const addInventory = async (user: { name: string; sku: string; price: number | string; categoryId: number ,stockQuantity:number }) => {
+    try {
+      const payload = {
+        ...user,
+        price: typeof user.price === "number" ? user.price.toFixed(2) : user.price, // Format here
+      };
+  
+      const response = await InventoryapiUrl.post(`/product/add`, payload);
+      if (response.data?.statusMessage) {
+        console.log("✅ Inventory Added response:", response.data);
+      }
+  
+      return response.data;
+    } catch (error: any) {
+      if (error.response?.data?.statusMessage) {
+        throw new Error(error.response.data.statusMessage);
+      } else {
+        throw new Error("Something went wrong while adding the inventory.");
+      }
+    }
+  };
+
+  export const showInventory = async () => {
+    try {
+        const response = await InventoryapiUrl.get('/product/getAll');
+        return response.data;
+    } catch (error) {
+        console.log("❌ Error fetching users:", error);
+        throw error;
+    }
+};
+
+export const deleteInventory = async (id: number) => {
+    try {
+        const response = await InventoryapiUrl.delete(`/product/delete/${id}`);
+        return response.data;
+    } catch (error) {
+        console.error('Error deleting inventory:', error);
+        throw error;
+    }
+};
+
+  
 

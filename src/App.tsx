@@ -6,6 +6,7 @@ import ChangePassword from './components/ChangePassword';
 import ForgetPassword from './components/ForgetPassword';
 import EmailForgetPassword from './components/emailTemplate/forgetEmail';
 import AdminUsers from './components/Admin/users';
+import Inventory from './components/Admin/inventory';
 import { Alert, Box, Snackbar } from '@mui/material';
 import { RefreshToken } from './components/Api/apiUrl';
 import { useEffect, useState } from 'react';
@@ -183,6 +184,7 @@ useEffect(() => {
         <Route path="/" element={<Login />} />
         <Route path="/admin_users" element={<AdminUsers />} />
         <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/inventory" element={<Inventory />} />
         <Route path="/change_password" element={<ChangePassword />} />
         <Route path='/forgot-password' element={<ForgetPassword />} />
         <Route path='/email-forgot-password' element={<EmailForgetPassword />} />
