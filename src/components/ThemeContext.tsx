@@ -12,6 +12,7 @@ import React, {
   interface ThemeContextType {
     mode: 'light' | 'dark';
     toggleTheme: () => void;
+    resetTheme: () => void;
   }
   
   const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
@@ -35,6 +36,12 @@ import React, {
         localStorage.setItem('theme', newMode); // Save theme preference
         return newMode;
       });
+    };
+    
+    // Function to reset theme to light mode (can be called from logout)
+    const resetTheme = () => {
+      setMode('light');
+      localStorage.setItem('theme', 'light');
     };
   
     // Apply theme class to body for global CSS styling
@@ -90,7 +97,7 @@ import React, {
     );
   
     return (
-      <ThemeContext.Provider value={{ mode, toggleTheme }}>
+      <ThemeContext.Provider value={{ mode, toggleTheme, resetTheme }}>
         <ThemeProvider theme={theme}>
           <CssBaseline />
           {children}
