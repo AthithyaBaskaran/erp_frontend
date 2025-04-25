@@ -416,11 +416,7 @@ body.dark .profile-menu {
   border-radius: 50%;
   transition: background-color 0.2s ease;
 }
- 
-.profile-icon-container:hover {
-  background-color: rgba(255, 255, 255, 0.1);
-}
- 
+
 @keyframes dropdown-appear {
   from {
     opacity: 0;
@@ -446,9 +442,9 @@ body.dark .profile-menu {
 }
 
 /* Light mode profile option hover */
-body.light .profile-option:hover {
+/* body.light .profile-option:hover {
   background-color: #f0f0f0;
-}
+} */
 
 /* Dark mode profile option hover */
 body.dark .profile-option:hover {
@@ -488,24 +484,73 @@ body.dark .profile-option:hover {
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: 0 4px; /* Reduced from 15px to 4px */
+  margin: 0 6px; 
   position: relative;
 }
  
 .header-icon-container .icon {
   cursor: pointer;
-  transition: color 0.2s ease;
+  transition: all 0.2s ease;
 }
- 
-.header-icon-container .icon:hover {
-  color: #fff;
+
+/* Light mode icon hover
+body.light .header-icon-container .icon:hover {
+  color: #1976d2;
+  transform: scale(1.1);
+} */
+
+/* Dark mode icon hover */
+body.dark .header-icon-container .icon:hover {
+  color: #90caf9;
+  transform: scale(1.1);
 }
  
 .theme-toggle {
-  margin-left: 4px; /* Reduced from 5px to 4px */
+  margin-left: 10px;
 }
  
 /* Adjust profile wrapper to work with header-icon-container */
 .profile-wrapper.header-icon-container {
-  margin-right: 4px; /* Reduced from 15px to 4px */
+  margin-right: 10px;
+}
+
+/* Enhanced profile menu styling */
+.profile-menu {
+  min-width: 200px;
+  border-radius: 8px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  animation: dropdown-appear 0.25s ease forwards;
+}
+
+.profile-info {
+  border-bottom-color: rgba(128, 128, 128, 0.2) !important;
+}
+
+/* Light mode profile info */
+body.light .profile-info {
+  background-color: rgba(0, 0, 0, 0.02);
+}
+
+/* Dark mode profile info */
+body.dark .profile-info {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+/* Enhance header icons with hover effect */
+.header-right .MuiBadge-root {
+  transition: transform 0.2s ease;
+  cursor: pointer;
+}
+
+.header-right .MuiBadge-root:hover {
+  transform: scale(1.1);
+}
+
+/* Ensure all clickable elements in header show pointer cursor */
+.header-right .icon,
+.header-right .MuiButton-root,
+.header-right .profile-icon-container,
+.header-right .MuiBadge-root,
+.profile-option {
+  cursor: pointer !important;
 }

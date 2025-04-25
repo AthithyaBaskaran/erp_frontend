@@ -1,3 +1,120 @@
+
+.sidebar-link {
+  text-decoration: none;
+  outline: none;
+  border: none;
+  display: block;
+  transition: all 0.3s ease;
+}
+
+.sidebar-menu-container {
+  padding: 10px 0;
+}
+
+.sidebar-item-text {
+  font-weight: 700; /* Bold text */
+  font-family: 'Poppins', sans-serif;
+  font-size: 16px; /* Slightly larger font size */
+  letter-spacing: 0.3px; /* Better readability */
+  margin-left: 10px; /* Space between icon and text */
+  position: relative;
+  display: inline-block;
+}
+
+/* Add a subtle underline effect on hover */
+.sidebar-item-text::after {
+  content: '';
+  position: absolute;
+  width: 0;
+  height: 2px;
+  bottom: -2px;
+  left: 0;
+  background-color: #4dabf5;
+  transition: width 0.3s ease;
+}
+
+.sidebar-list-item:hover .sidebar-item-text::after,
+.sidebar-link.active .sidebar-item-text::after {
+  width: 100%;
+}
+
+/* Make icons slightly larger and more prominent */
+.sidebar-list-item .icon {
+  font-size: 20px;
+  vertical-align: middle;
+  transition: all 0.3s ease;
+}
+
+/* Light mode sidebar links */
+body.light .sidebar-link {
+  color: #333333;
+}
+
+/* Dark mode sidebar links */
+body.dark .sidebar-link {
+  color: #9e9ea4;
+}
+
+.sidebar-list-item {
+  transition: all 0.3s ease;
+  padding: 15px 20px; /* Slightly more padding for better clickability */
+  border-left: 4px solid transparent; /* Prepare for active indicator */
+  margin-bottom: 8px; /* Space between items */
+  border-radius: 0 8px 8px 0; /* Rounded corners on the right side */
+  position: relative;
+  overflow: hidden;
+}
+
+/* Add a subtle background effect on hover */
+.sidebar-list-item::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 100%;
+  background-color: rgba(77, 171, 245, 0.1);
+  transition: width 0.3s ease;
+  z-index: -1;
+}
+
+.sidebar-list-item:hover {
+  background-color: rgba(77, 171, 245, 0.2) !important;
+  cursor: pointer;
+  border-left: 4px solid #4dabf5; /* Blue indicator on hover */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Subtle shadow on hover */
+}
+
+.sidebar-list-item:hover::before {
+  width: 100%;
+}
+
+.sidebar-list-item:hover .icon,
+.sidebar-list-item:hover .sidebar-item-text {
+  color: #4dabf5 !important; /* Bright blue on hover */
+  transform: translateX(3px); /* Slight movement on hover */
+}
+
+.sidebar-link.active .sidebar-list-item {
+  background-color: rgba(77, 171, 245, 0.3); /* Slightly more visible */
+  border-left: 4px solid #4dabf5; /* Blue indicator for active state */
+  box-shadow: 0 2px 8px rgba(77, 171, 245, 0.2); /* Glowing effect when active */
+}
+
+.sidebar-link.active .icon,
+.sidebar-link.active .sidebar-item-text {
+  color: #4dabf5;
+  font-weight: 800; /* Extra bold when active */
+}
+
+/* Add transition for the icon and text */
+.sidebar-list-item .icon,
+.sidebar-item-text {
+  transition: all 0.3s ease;
+  display: inline-block; /* Needed for transform to work */
+}
+
+/* Legacy classes for backward compatibility */
 .Admin_link_sidebar {
   text-decoration: none;
   outline: none;
