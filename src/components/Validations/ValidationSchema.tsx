@@ -69,3 +69,11 @@ export const getForgetUserSchema = () => {
       .required("Email is required"),
   });
 }
+export const getInventorySchema = () => {
+  return yup.object().shape({
+    password: yup
+      .string()
+      .required("Password is required")
+      .matches(/\d/, "Must contain at least one number"),
+  });
+};
