@@ -243,3 +243,13 @@ export const DownloadUserID = async (userId: string) => {
         return [];
     }
 };
+
+export const fetchCategoriesApi = async () => {
+    try {
+        const response = await InventoryapiUrl.get("/category/getAll");
+        return response.data;
+    } catch (error) {
+        console.error("Error fetching categories:", error);
+        return [];
+    }
+};

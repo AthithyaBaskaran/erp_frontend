@@ -9,11 +9,11 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import SendIcon from "@mui/icons-material/Send";
 import CloseIcon from '@mui/icons-material/Close';
-import { showUsers, fetchUserForEdit } from '../Api/apiUrl';
+import { showUsers, fetchUserForEdit, fetchCategoriesApi } from '../Api/apiUrl';
 import { getRegisterSchema } from "../Validations/ValidationSchema";
 import { useForm, SubmitHandler, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { deleteUser, addInventory ,showInventory , deleteInventory} from "../Api/apiUrl";
+import { deleteUser, addInventory, showInventory, deleteInventory } from "../Api/apiUrl";
 import { useNavigate } from "react-router-dom";
 import "../../styles/Admin.css";
 
@@ -31,7 +31,7 @@ interface InventoryFormData {
   sku: string;
   price: number;
   categoryId: 1;
-  stockQuantity:number
+  stockQuantity: number
 }
 
 interface InventoryItem {
@@ -42,9 +42,12 @@ interface InventoryItem {
   categoryId: number;
   stockQuantity: number;
 }
+interface Cateogory {
+  id?: string;
+  categoryName: string;
+}
 
-
-const Users: React.FC = () => {
+const Inventory: React.FC = () => {
 
   const [openSidebarToggle, setOpenSidebarToggle] = useState(false);
   const [users, SetUsers] = useState<Users[]>([]);
@@ -55,7 +58,6 @@ const Users: React.FC = () => {
   const [snackbarSeverity, setSnackbarSeverity] = useState<"success" | "error">("success");
   const [openEdit, setOpenEdit] = useState(false);
 
-
   const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
 
 
@@ -64,11 +66,13 @@ const Users: React.FC = () => {
   const [inventoryItems, setInventoryItems] = useState<InventoryItem[]>([]);
   const [openEditModal, setOpenEditModal] = useState(false);
   const [selectedItem, setSelectedItem] = useState<any>(null);
+  const [categories, setCategories] = useState<Cateogory[]>([]);
+
 
 
   const navigate = useNavigate();
 
-console.log("inventoryItems",inventoryItems);
+  console.log("inventoryItems", inventoryItems);
 
 
 
@@ -78,6 +82,7 @@ console.log("inventoryItems",inventoryItems);
     handleSubmit: handleInventorySubmit,
     setValue: setInventoryValue,
     reset: resetInventory,
+    control: controlCategory,
     formState: { errors: InventoryErrors, isSubmitting: isInventory },
   } = useForm<InventoryFormData>();
 
@@ -106,7 +111,7 @@ console.log("inventoryItems",inventoryItems);
   const handleOpenEditModal = (item: any) => {
     setSelectedItem(item);
     setOpenEditModal(true);
-    
+
     // Pre-fill the form with the selected item's data
     setInventoryValue("name", item.name || "");
     setInventoryValue("sku", item.sku || "");
@@ -114,20 +119,20 @@ console.log("inventoryItems",inventoryItems);
     setInventoryValue("stockQuantity", item.stockQuantity || 0);
     setInventoryValue("categoryId", item.categoryId || 1);
   };
-  
+
   const handleCloseEditModal = () => {
     setOpenEditModal(false);
     setSelectedItem(null);
   };
 
- 
+
 
   const fetchInventory = async () => {
     try {
       const response = await showInventory();
       const data = response?.data;
       setInventoryItems(Array.isArray(data) ? data : []);
-  
+
       const message = response?.statusMessage || "Inventory fetched successfully";
       const fullMessage = `✅ ${message}`;
       if (fullMessage !== "Inventory fetched successfully") {
@@ -146,16 +151,29 @@ console.log("inventoryItems",inventoryItems);
       console.error("Error fetching inventory:", error);
     }
   };
-  
-   useEffect(() => {
+
+  useEffect(() => {
     fetchInventory();
-   }, []);
- 
-  
+  }, []);
 
+  const fetchCategories = async () => {
+    try {
+      const response = await fetchCategoriesApi();
+      const data = response.data;
+      setCategories(Array.isArray(data) ? data : []);
+    } catch (error) {
+      setSnackbarMessage("❌ Failed to fetch categories");
+      setSnackbarSeverity("error");
+      console.error("Error fetching categories:", error);
+    } finally {
+      setOpenSnackbar(true);
+    }
+  };
+  useEffect(() => {
+    fetchCategories();
+  }, []);
 
-
-  const handleEditClick = async (userId: number) => {
+const handleEditClick = async (userId: number) => {
     try {
       setSelectedUserId(userId);
       setOpenEdit(true);
@@ -172,7 +190,7 @@ console.log("inventoryItems",inventoryItems);
     }
   };
 
-  
+
   const handleDeleteInventory = async (id: number) => {
     try {
       const response = await deleteInventory(id);
@@ -192,14 +210,14 @@ console.log("inventoryItems",inventoryItems);
       setOpenSnackbar(true);
     }
   };
-const handleInventory: SubmitHandler<InventoryFormData> = async (data) => {
+  const handleInventory: SubmitHandler<InventoryFormData> = async (data) => {
     try {
       const response = await addInventory({
         ...data,
         // price: parseFloat(data.price.toFixed(2)), // or data.price.toFixed(2) if you want to send as string
         price: parseFloat(data.price.toFixed(2)), // or data.price.toFixed(2) if you want to send as string
       });
-  
+
       if (response.data) {
         const message = response?.statusMessage || "User Added successfully!";
         setSnackbarMessage(`✅ ${message}`);
@@ -208,7 +226,7 @@ const handleInventory: SubmitHandler<InventoryFormData> = async (data) => {
         handleCloseUserModal();
         fetchInventory();
       }
-  
+
       return response.data;
     } catch (error: any) {
       const message = error?.message || "❌ Registration failed";
@@ -219,7 +237,7 @@ const handleInventory: SubmitHandler<InventoryFormData> = async (data) => {
       setOpenSnackbar(true);
     }
   };
-  
+
   const columns: GridColDef[] = [
     {
       field: "id",
@@ -236,7 +254,7 @@ const handleInventory: SubmitHandler<InventoryFormData> = async (data) => {
     },
     {
       field: 'sku',
-      headerName: 'sku',
+      
       width: 130,
       renderCell: (params) => (
         <span title={params.value || "N/A"}>
@@ -436,7 +454,7 @@ const handleInventory: SubmitHandler<InventoryFormData> = async (data) => {
               Add User
             </Typography>
             <TextField
-              placeholder="Name"
+              placeholder="Product Name"
               variant="outlined"
               fullWidth
               margin="normal"
@@ -450,7 +468,7 @@ const handleInventory: SubmitHandler<InventoryFormData> = async (data) => {
             />
 
             <TextField
-              placeholder="sku"
+              placeholder="Product Code"
               variant="outlined"
               fullWidth
               margin="normal"
@@ -484,18 +502,36 @@ const handleInventory: SubmitHandler<InventoryFormData> = async (data) => {
             />
 
 
-            <TextField
-              placeholder="category"
-              variant="outlined"
-              fullWidth
-              margin="normal"
-              {...registerInventory("categoryId", {
-                required: "category is required",
-              })}
-              error={!!InventoryErrors.categoryId}
-              helperText={InventoryErrors.categoryId?.message}
-
+            <Controller
+              name="categoryId"
+              control={controlCategory}
+              rules={{ required: "Category is required" }}
+              render={({ field }) => (
+                <Autocomplete
+                  options={categories}
+                  getOptionLabel={(option) => option.categoryName || ''} // ✅ Avoid undefined
+                  value={
+                    field.value
+                      ? categories.find((cat) => Number(cat.id) === field.value) || null
+                      : null
+                  }
+                  onChange={(e, value) => field.onChange(value ? value.id : null)}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      label="Category"
+                      margin="normal"
+                      error={!!InventoryErrors.categoryId}
+                      helperText={InventoryErrors.categoryId?.message}
+                    />
+                  )}
+                  isOptionEqualToValue={(option, value) => option.id === value.id}
+                />
+              )}
             />
+
+
+
             <TextField
               placeholder="stockQuantity"
               variant="outlined"
@@ -523,7 +559,7 @@ const handleInventory: SubmitHandler<InventoryFormData> = async (data) => {
         </form>
       </Modal>
 
-      
+
 
 
       {snackbarMessage !== "✅ Users fetched successfully" && (
@@ -550,4 +586,4 @@ const handleInventory: SubmitHandler<InventoryFormData> = async (data) => {
   )
 }
 
-export default Users;
+export default Inventory;
