@@ -69,6 +69,7 @@ const Inventory: React.FC = () => {
   const [openEditModal, setOpenEditModal] = useState(false);
 const [selectedItem, setSelectedItem] = useState<InventoryItem | null>(null);
 const [selectedCategoryId, setSelectedCategoryId] = useState<string | number>('');
+const [searchText, setSearchText] = useState('');
 
 
 
@@ -130,21 +131,27 @@ const [selectedCategoryId, setSelectedCategoryId] = useState<string | number>(''
 
 
 
-  const fetchInventory = async () => {
+  const fetchInventory = async (categoryId?: number | string) => {
     try {
-      const response = await showInventory();
+      console.log("Fetching inventory with categoryId:", categoryId);
+      const response = await showInventory(categoryId as number);
       const data = response?.data;
       setInventoryItems(Array.isArray(data) ? data : []);
-
-      const message = response?.statusMessage || "Inventory fetched successfully";
-      const fullMessage = `✅ ${message}`;
-      if (fullMessage !== "Inventory fetched successfully") {
+      
+      // If we're filtering by category, update the UI to show which category is selected
+      if (categoryId) {
+        const selectedCategory = categories.find(cat => cat.id === String(categoryId));
+        if (selectedCategory) {
+          setSnackbarMessage(`✅ Showing items from category: ${selectedCategory.categoryName}`);
+          setSnackbarSeverity("success");
+          setOpenSnackbar(true);
+        }
+      } else {
+        const message = response?.statusMessage || "All inventory items fetched successfully";
+        const fullMessage = `✅ ${message}`;
         setSnackbarMessage(fullMessage);
         setSnackbarSeverity("success");
         setOpenSnackbar(true);
-      } else {
-        setSnackbarMessage(fullMessage);
-        setOpenSnackbar(false);
       }
     }
     catch (error) {
@@ -156,6 +163,8 @@ const [selectedCategoryId, setSelectedCategoryId] = useState<string | number>(''
   };
 
   useEffect(() => {
+    // Reset category filter and fetch all inventory items when component mounts
+    setSelectedCategoryId('');
     fetchInventory();
   }, []);
 
@@ -250,6 +259,22 @@ const handleUserEditClick = async (userId: number) => {
     setInventoryValue("price", item.price || 0);
     setInventoryValue("stockQuantity", item.stockQuantity || 0);
     setInventoryValue("categoryId", item.categoryId || 1);
+  };
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setSearchText(value);
+    fetchInventory(value || undefined); // Call API with search or undefined if empty
+  };
+    
+  const handleCategoryChange = (event: any, newValue: Cateogory | null) => {
+    if (newValue) {
+      setSelectedCategoryId(newValue.id || '');
+      fetchInventory(newValue.id);
+    } else {
+      setSelectedCategoryId('');
+      fetchInventory(); // Fetch all inventory when no category is selected
+    }
   };
   
   const handleUpdateInventory: SubmitHandler<InventoryFormData> = async (data) => {
@@ -391,15 +416,24 @@ const handleUserEditClick = async (userId: number) => {
 
             <TextField
               select
-              // label="Category"
-              value={selectedCategoryId} // This should be a state variable to hold the selected category ID
-              onChange={(e) => setSelectedCategoryId(e.target.value)} // Update the state on change
+              label="Filter by Category"
+              value={selectedCategoryId}
+              onChange={(e) => {
+                const categoryId = e.target.value;
+                setSelectedCategoryId(categoryId);
+                fetchInventory(categoryId || undefined);
+              }}
               size="small"
-              sx={{ width: 300 }}
+              sx={{ 
+                width: 300,
+                '& .MuiOutlinedInput-root': {
+                  borderRadius: '8px',
+                }
+              }}
               SelectProps={{ native: true }}
             >
-              <option value="" disabled>
-                -- Choose Category --
+              <option value="">
+                All Categories
               </option>
               {categories.map((category) => (
                 <option key={category.id} value={category.id}>

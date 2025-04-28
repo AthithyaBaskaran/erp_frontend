@@ -210,15 +210,18 @@ export const addInventory = async (user: { name: string; sku: string; price: num
     }
   };
 
-  export const showInventory = async () => {
+  
+  export const showInventory = async (categoryId?: number | string) => {
     try {
-        const response = await InventoryapiUrl.get('/product/getAll');
-        return response.data;
+      const url = categoryId ? `/product/getAll?categoryId=${categoryId}` : '/product/getAll';
+      const response = await InventoryapiUrl.get(url);
+      return response.data;
     } catch (error) {
-        console.log("❌ Error fetching users:", error);
-        throw error;
+      console.log("❌ Error fetching inventory:", error);
+      throw error;
     }
-};
+  };
+
 
 export const deleteInventory = async (id: number) => {
     try {
