@@ -25,7 +25,7 @@ interface HeaderProps {
 const Header: React.FC<HeaderProps> = ({ OpenSidebar }) => {
   const navigate = useNavigate();
   const [showLogout, setShowLogout] = useState(false);
-  const { toggleTheme, mode } = useThemeContext();
+  const { toggleTheme, mode, resetTheme } = useThemeContext();
   const [notificationCount, setNotificationCount] = useState();
   const [messageCount, setMessageCount] = useState(10);
 
@@ -34,11 +34,17 @@ const Header: React.FC<HeaderProps> = ({ OpenSidebar }) => {
   const messageRef = useRef<HTMLDivElement>(null);
   
   function handleLogout() {
+    // Clear all authentication data
     localStorage.removeItem("token");
     localStorage.removeItem("roles");
     localStorage.removeItem("UserID");
     localStorage.removeItem("department");
     localStorage.removeItem("UserName");
+    
+    // Reset theme to light mode when logging out
+    resetTheme();
+    
+    // Navigate to login page
     navigate("/");
   }
 
