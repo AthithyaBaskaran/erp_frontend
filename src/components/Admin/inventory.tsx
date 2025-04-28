@@ -13,7 +13,7 @@ import { showUsers, fetchUserForEdit, fetchCategoriesApi } from '../Api/apiUrl';
 import { getRegisterSchema } from "../Validations/ValidationSchema";
 import { useForm, SubmitHandler, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { deleteUser, addInventory, showInventory, deleteInventory } from "../Api/apiUrl";
+import { deleteUser, addInventory, showInventory, deleteInventory, updateInventoryApi } from "../Api/apiUrl";
 import { useNavigate } from "react-router-dom";
 import "../../styles/Admin.css";
 
@@ -64,9 +64,13 @@ const Inventory: React.FC = () => {
   const [user, setUser] = useState<Users | null>(null); // Single user, can be null initially
   const [openUserModal, setOpenUserModal] = useState(false);
   const [inventoryItems, setInventoryItems] = useState<InventoryItem[]>([]);
-  const [openEditModal, setOpenEditModal] = useState(false);
-  const [selectedItem, setSelectedItem] = useState<any>(null);
+  
   const [categories, setCategories] = useState<Cateogory[]>([]);
+  const [openEditModal, setOpenEditModal] = useState(false);
+const [selectedItem, setSelectedItem] = useState<InventoryItem | null>(null);
+const [selectedCategoryId, setSelectedCategoryId] = useState<string | number>('');
+
+
 
 
 
@@ -108,6 +112,10 @@ const Inventory: React.FC = () => {
     setOpenSnackbar(false);
   };
 
+  const handleCloseEditModal = () => {
+    setOpenEditModal(false);
+    setSelectedItem(null);
+  };
   const handleOpenEditModal = (item: any) => {
     setSelectedItem(item);
     setOpenEditModal(true);
@@ -118,11 +126,6 @@ const Inventory: React.FC = () => {
     setInventoryValue("price", item.price || 0);
     setInventoryValue("stockQuantity", item.stockQuantity || 0);
     setInventoryValue("categoryId", item.categoryId || 1);
-  };
-
-  const handleCloseEditModal = () => {
-    setOpenEditModal(false);
-    setSelectedItem(null);
   };
 
 
@@ -173,7 +176,7 @@ const Inventory: React.FC = () => {
     fetchCategories();
   }, []);
 
-const handleEditClick = async (userId: number) => {
+const handleUserEditClick = async (userId: number) => {
     try {
       setSelectedUserId(userId);
       setOpenEdit(true);
@@ -237,6 +240,46 @@ const handleEditClick = async (userId: number) => {
       setOpenSnackbar(true);
     }
   };
+  const handleEditClick = (item: InventoryItem) => {
+    setSelectedItem(item);
+    setOpenEditModal(true);
+  
+    // Pre-fill the form with the selected item's data
+    setInventoryValue("name", item.name || "");
+    setInventoryValue("sku", item.sku || "");
+    setInventoryValue("price", item.price || 0);
+    setInventoryValue("stockQuantity", item.stockQuantity || 0);
+    setInventoryValue("categoryId", item.categoryId || 1);
+  };
+  
+  const handleUpdateInventory: SubmitHandler<InventoryFormData> = async (data) => {
+    if (!selectedItem) return;
+    
+    try {
+      const response = await updateInventoryApi(selectedItem.id, {
+        ...data,
+        price: parseFloat(data.price.toFixed(2)),
+      });
+
+      if (response) {
+        const message = response?.statusMessage || "Inventory updated successfully!";
+        setSnackbarMessage(`✅ ${message}`);
+        setSnackbarSeverity("success");
+        resetInventory();
+        handleCloseEditModal();
+        fetchInventory();
+      }
+
+      return response;
+    } catch (error: any) {
+      const message = error?.message || "❌ Update failed";
+      setSnackbarMessage(`❌ ${message}`);
+      setSnackbarSeverity("error");
+      console.error("Error updating inventory:", error);
+    } finally {
+      setOpenSnackbar(true);
+    }
+  };
 
   const columns: GridColDef[] = [
     {
@@ -277,7 +320,7 @@ const handleEditClick = async (userId: number) => {
       ),
     },
     {
-      field: 'categoryId', headerName: 'categoryId', width: 130, renderCell: (params) => (
+      field: 'categoryName', headerName: 'categoryName', width: 130, renderCell: (params) => (
         <span title={params.value || "N/A"}>
           {params.value || "N/A"}
         </span>
@@ -294,7 +337,7 @@ const handleEditClick = async (userId: number) => {
             variant="outlined"
             color="success"
             size="small"
-            onClick={() => handleEditClick(params.row.id)}
+            onClick={() => handleEditClick(params.row)}
           >
             <EditIcon />
             Edit
@@ -340,40 +383,30 @@ const handleEditClick = async (userId: number) => {
             <Box display="flex" alignItems="center" gap={2} flexWrap="wrap">
               <Box>
                 <Typography variant="h6" fontWeight="bold">
-                  Inventory <Typography variant="caption" component="span" color="text.secondary">/ (2498)</Typography>
+                  Inventory <Typography variant="caption" component="span" color="text.secondary"></Typography>
                 </Typography>
               </Box>
 
-              <TextField
-                label="Search"
-                placeholder="Search for inventory....."
-                size="small"
-                sx={{ width: 200 }}
-              />
+              
 
-              <TextField
-                select
-                label="Category"
-                value="Notebook"
-                size="small"
-                sx={{ width: 150 }}
-                SelectProps={{ native: true }}
-              >
-                <option value="Notebook">Notebook</option>
-                <option value="Pen">Pen</option>
-              </TextField>
-
-              <TextField
-                select
-                label="Stock alert"
-                value="Shirt"
-                size="small"
-                sx={{ width: 150 }}
-                SelectProps={{ native: true }}
-              >
-                <option value="Shirt">Shirt</option>
-                <option value="Low Stock">Low Stock</option>
-              </TextField>
+            <TextField
+              select
+              // label="Category"
+              value={selectedCategoryId} // This should be a state variable to hold the selected category ID
+              onChange={(e) => setSelectedCategoryId(e.target.value)} // Update the state on change
+              size="small"
+              sx={{ width: 300 }}
+              SelectProps={{ native: true }}
+            >
+              <option value="" disabled>
+                -- Choose Category --
+              </option>
+              {categories.map((category) => (
+                <option key={category.id} value={category.id}>
+                  {category.categoryName}
+                </option>
+              ))}
+            </TextField>
             </Box>
 
             {/* Right section: Add Button */}
@@ -425,7 +458,7 @@ const handleEditClick = async (userId: number) => {
 
 
 
-      {/* Add user */}
+      {/* Add product */}
       <Modal open={openUserModal} onClose={handleCloseUserModal}>
         <form onSubmit={handleInventorySubmit(handleInventory)}>
           <Box
@@ -435,6 +468,7 @@ const handleEditClick = async (userId: number) => {
               left: "50%",
               transform: "translate(-50%, -50%)",
               width: 400,
+              height: 600,
               bgcolor: "background.paper",
               boxShadow: 24,
               p: 4,
@@ -442,6 +476,7 @@ const handleEditClick = async (userId: number) => {
               display: "flex",
               flexDirection: "column",
               gap: 2,
+              overflowY: "auto",
             }}
           >
             <IconButton
@@ -451,7 +486,7 @@ const handleEditClick = async (userId: number) => {
               <CloseIcon />
             </IconButton>
             <Typography variant="h6" mb={2}>
-              Add User
+              Add New Product
             </Typography>
             <TextField
               placeholder="Product Name"
@@ -558,6 +593,135 @@ const handleEditClick = async (userId: number) => {
           </Box>
         </form>
       </Modal>
+
+      <Modal open={openEditModal} onClose={handleCloseEditModal}>
+  <form onSubmit={handleInventorySubmit(handleUpdateInventory)}>
+    <Box
+      sx={{
+        position: "absolute",
+        top: "50%",
+        left: "50%",
+        transform: "translate(-50%, -50%)",
+        width: 400,
+        bgcolor: "background.paper",
+        boxShadow: 24,
+        p: 4,
+        borderRadius: 2,
+        display: "flex",
+        flexDirection: "column",
+        gap: 2,
+      }}
+    >
+      <IconButton
+        onClick={handleCloseEditModal}
+        sx={{ position: 'absolute', top: 8, right: 8 }}
+      >
+        <CloseIcon />
+      </IconButton>
+      <Typography variant="h6" mb={2}>
+        Edit Inventory Item
+      </Typography>
+      <TextField
+        placeholder="Product Name"
+        variant="outlined"
+        fullWidth
+        margin="normal"
+        {...registerInventory("name", { required: "Name is required" })}
+        error={!!InventoryErrors.name}
+        helperText={InventoryErrors.name?.message}
+      />
+      
+      <TextField
+        placeholder="Product Code (SKU)"
+        variant="outlined"
+        fullWidth
+        margin="normal"
+        {...registerInventory("sku", { required: "SKU is required" })}
+        error={!!InventoryErrors.sku}
+        helperText={InventoryErrors.sku?.message}
+      />
+      
+      <TextField
+        placeholder="Price"
+        variant="outlined"
+        fullWidth
+        margin="normal"
+        type="number"
+        inputProps={{ step: "0.01", min: "0" }} // Accept decimals, disallow negative
+        {...registerInventory("price", {
+          required: "Price is required",
+          valueAsNumber: true, // Convert string to number
+          min: {
+            value: 0,
+            message: "Price must be positive",
+          },
+        })}
+        error={!!InventoryErrors.price}
+        helperText={InventoryErrors.price?.message}
+      />
+      
+      <TextField
+        placeholder="Stock Quantity"
+        variant="outlined"
+        fullWidth
+        margin="normal"
+        type="number"
+        inputProps={{ min: "0", step: "1" }} // Only whole numbers, no negative
+        {...registerInventory("stockQuantity", {
+          required: "Stock quantity is required",
+          valueAsNumber: true,
+          min: {
+            value: 0,
+            message: "Stock quantity must be positive",
+          },
+        })}
+        error={!!InventoryErrors.stockQuantity}
+        helperText={InventoryErrors.stockQuantity?.message}
+      />
+      
+      <Controller
+        name="categoryId"
+        control={controlCategory}
+        defaultValue={1}
+        rules={{ required: "Category is required" }}
+        render={({ field }) => (
+          <Autocomplete
+            options={categories}
+            getOptionLabel={(option) => option.categoryName || ""}
+            onChange={(_, newValue) => field.onChange(newValue?.id || 1)}
+            value={categories.find(cat => cat.id === String(field.value)) || null}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                placeholder="Select Category"
+                variant="outlined"
+                fullWidth
+                margin="normal"
+                error={!!InventoryErrors.categoryId}
+                helperText={InventoryErrors.categoryId?.message}
+              />
+            )}
+          />
+        )}
+      />
+      <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
+        <Button
+          type="submit"
+          variant="contained"
+          color="primary"
+          endIcon={<SendIcon />}
+          disabled={isInventory}
+          sx={{
+            backgroundColor: '#2196F3',
+            '&:hover': { backgroundColor: '#1976D2' },
+          }}
+        >
+          {isInventory ? "Updating..." : "Update"}
+        </Button>
+      </Box>
+    </Box>
+  </form>
+</Modal>
 
 
 

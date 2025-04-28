@@ -253,3 +253,23 @@ export const fetchCategoriesApi = async () => {
         return [];
     }
 };
+export const updateInventoryApi = async (id: number, data: { name: string; sku: string; price: number | string; categoryId: number, stockQuantity: number }) => {
+    try {
+        const payload = {
+            ...data,
+            price: typeof data.price === "number" ? data.price.toFixed(2) : data.price, // Format price
+        };
+        
+        const response = await InventoryapiUrl.put(`/product/update/${id}`, payload);
+        if (response.data?.statusMessage) {
+            console.log("✅ Inventory Updated response:", response.data);
+        }
+        return response.data;
+    } catch (error: any) {
+        if (error.response?.data?.statusMessage) {
+            throw new Error(error.response.data.statusMessage);
+        } else {
+            throw new Error("Something went wrong while updating the inventory.");
+        }
+    }
+}
