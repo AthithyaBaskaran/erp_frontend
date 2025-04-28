@@ -36,14 +36,8 @@ const AuthForm: React.FC = () => {
   const [pageLoading, setPageLoading] = useState(true); // page initial loading
   const [rememberMe, setRememberMe] = useState(false);
   
-  const { mode, resetTheme } = useThemeContext();
+  const { mode } = useThemeContext();
   const isDarkMode = mode === 'dark';
-  
-  // Reset theme to light mode when on login page
-  useEffect(() => {
-    // Reset to light mode when on login page
-    resetTheme();
-  }, []);
   
   const {
     register: registerRegister,
@@ -175,8 +169,7 @@ const AuthForm: React.FC = () => {
         border: isDarkMode ? '1px solid #3a4659' : 'none',
       },
       '&:hover fieldset': {
-        border: '1px solid #87CEEB', /* Sky blue color */
-        transition: 'border 0.3s ease',
+        border: isDarkMode ? '1px solid #3a4659' : 'none',
       },
       '&.Mui-focused fieldset': {
         border: isDarkMode ? '1px solid #90caf9' : 'none',
@@ -250,16 +243,7 @@ const AuthForm: React.FC = () => {
                   </InputAdornment>
                 ),
               }}
-              sx={{
-                ...commonTextFieldStyles,
-                '& .MuiOutlinedInput-root': {
-                  ...commonTextFieldStyles['& .MuiOutlinedInput-root'],
-                  '&:hover fieldset': {
-                    border: '1px solid #87CEEB', /* Sky blue color */
-                    transition: 'border 0.3s ease',
-                  },
-                }
-              }}
+              {...LogintextFieldProps}
             />
           </Box>
           
@@ -307,16 +291,7 @@ const AuthForm: React.FC = () => {
                     </InputAdornment>
                   ),
                 }}
-                sx={{
-                  ...commonTextFieldStyles,
-                  '& .MuiOutlinedInput-root': {
-                    ...commonTextFieldStyles['& .MuiOutlinedInput-root'],
-                    '&:hover fieldset': {
-                      border: '1px solid #87CEEB', /* Sky blue color */
-                      transition: 'border 0.3s ease',
-                    },
-                  }
-                }}
+                {...LogintextFieldProps}
               />
             </Box>
             
@@ -401,11 +376,7 @@ const AuthForm: React.FC = () => {
           </Box>
         </Box>
 
-        <p className="social-text" style={{ 
-          color: isDarkMode ? '#ffffff' : '#444',
-          fontFamily: "'Poppins', sans-serif",
-          fontWeight: 500
-        }}>Or Sign up with social platforms</p>
+        <p className="social-text" style={{ color: isDarkMode ? '#ffffff' : '#444' }}>Or Sign up with social platforms</p>
         <div className="social-media">
           {socialIcons.map((item, idx) => (
             <a key={idx} href={item.link} className="social-icon" target="_blank"
