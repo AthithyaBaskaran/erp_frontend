@@ -7,7 +7,8 @@ import {
   BsPeopleFill,
   BsListCheck,
   BsMenuButtonWideFill,
-  BsFillGearFill
+  BsFillGearFill,
+  BsCashCoin
 } from 'react-icons/bs';
 import { Link, NavLink } from 'react-router-dom';
 import '../styles/sidebar.css';
@@ -70,36 +71,35 @@ const Sidebar: React.FC<SidebarProps> = ({ openSidebarToggle, OpenSidebar }) => 
                   <BsGrid1X2Fill className="icon" /> <span className="sidebar-item-text">Dashboard</span>
                 </li>
               </NavLink>
+              {/* <NavLink to="/categories" className={({isActive}) => isActive ? "sidebar-link active" : "sidebar-link"}>
+                <li className="sidebar-list-item">
+                  <BsFillGrid3X3GapFill className="icon" /> <span className="sidebar-item-text">Categories</span>
+                </li>
+              </NavLink> */}
               
-              <NavLink to="/products" className={({isActive}) => isActive ? "sidebar-link active" : "sidebar-link"}>
+            <NavLink to="/inventory" className={({isActive}) => isActive ? "sidebar-link active" : "sidebar-link"}>
+                <li className="sidebar-list-item">
+                  <BsListCheck className="icon" /> <span className="sidebar-item-text">Inventory</span>
+                </li>
+                
+                <NavLink to="/products" className={({isActive}) => isActive ? "sidebar-link active" : "sidebar-link"}>
                 <li className="sidebar-list-item">
                   <BsFillArchiveFill className="icon" /> <span className="sidebar-item-text">Products</span>
                 </li>
               </NavLink>
-              
-              <NavLink to="/categories" className={({isActive}) => isActive ? "sidebar-link active" : "sidebar-link"}>
-                <li className="sidebar-list-item">
-                  <BsFillGrid3X3GapFill className="icon" /> <span className="sidebar-item-text">Categories</span>
-                </li>
+
               </NavLink>
-              
               <NavLink to="/customers" className={({isActive}) => isActive ? "sidebar-link active" : "sidebar-link"}>
                 <li className="sidebar-list-item">
-                  <BsPeopleFill className="icon" /> <span className="sidebar-item-text">Customers</span>
+                  <BsPeopleFill className="icon" /> <span className="sidebar-item-text">Sales</span>
                 </li>
               </NavLink>
-              
-              <NavLink to="/inventory" className={({isActive}) => isActive ? "sidebar-link active" : "sidebar-link"}>
-                <li className="sidebar-list-item">
-                  <BsListCheck className="icon" /> <span className="sidebar-item-text">Inventory</span>
-                </li>
-              </NavLink>
-              
-              <NavLink to="/reports" className={({isActive}) => isActive ? "sidebar-link active" : "sidebar-link"}>
+     
+              {/* <NavLink to="/reports" className={({isActive}) => isActive ? "sidebar-link active" : "sidebar-link"}>
                 <li className="sidebar-list-item">
                   <BsMenuButtonWideFill className="icon" /> <span className="sidebar-item-text">Reports</span>
                 </li>
-              </NavLink>
+              </NavLink> */}
               
               <NavLink to="/settings" className={({isActive}) => isActive ? "sidebar-link active" : "sidebar-link"}>
                 <li className="sidebar-list-item">

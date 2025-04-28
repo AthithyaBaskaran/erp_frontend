@@ -1,4 +1,4 @@
-import { apiUrl,InventoryapiUrl } from "../Api/BaseUrl";
+import { apiUrl, InventoryapiUrl, SalesApiUrl } from "../Api/BaseUrl";
 
 export const LoginForm = async (email: string, password: string,) => {
     try {
@@ -256,6 +256,167 @@ export const fetchCategoriesApi = async () => {
         return [];
     }
 };
+// Sales Management API functions
+export const createCustomer = async (data: { name: string; email: string; phone: string; address: string }) => {
+    try {
+        const response = await SalesApiUrl.post('/customer/create', data);
+        return response.data;
+    } catch (error: any) {
+        if (error.response && error.response.data && error.response.data.statusMessage) {
+            throw new Error(error.response.data.statusMessage);
+        } else {
+                throw new Error("Failed to create customer");
+        }
+    }
+};
+
+export const getAllCustomers = async () => {
+    try {
+        const response = await SalesApiUrl.get('/customer');
+        return response.data;
+    } catch (error) {
+        console.error("❌ Error fetching customers:", error);
+        throw error;
+    }
+};
+
+export const getCustomerById = async (id: number) => {
+    try {
+        const response = await SalesApiUrl.get(`/customer/${id}`);
+        return response.data;
+    } catch (error) {
+        console.error(`❌ Error fetching customer with ID ${id}:`, error);
+        throw error;
+    }
+};
+
+export const updateCustomer = async (id: number, data: { name: string; email: string; phone: string; address: string }) => {
+    try {
+        const response = await SalesApiUrl.put(`/customer/${id}`, data);
+        return response.data;
+    } catch (error: any) {
+        if (error.response && error.response.data && error.response.data.statusMessage) {
+            throw new Error(error.response.data.statusMessage);
+        } else {
+            throw new Error("Failed to update customer");
+        }
+    }
+};
+
+export const deleteCustomer = async (id: number) => {
+    try {
+        const response = await SalesApiUrl.delete(`/customer/${id}`);
+        return response.data;
+    } catch (error) {
+        console.error(`❌ Error deleting customer with ID ${id}:`, error);
+        throw error;
+    }
+};
+
+export const createSalesOrder = async (data: { customerId: number; orderDate: string; totalAmount: number; status: string }) => {
+    try {
+        const response = await SalesApiUrl.post('/sales/orders', data);
+        return response.data;
+    } catch (error: any) {
+        if (error.response && error.response.data && error.response.data.statusMessage) {
+            throw new Error(error.response.data.statusMessage);
+        } else {
+            throw new Error("Failed to create sales order");
+        }
+    }
+};
+
+export const getAllSalesOrders = async () => {
+    try {
+        const response = await SalesApiUrl.get('/sales/orders');
+        return response.data;
+    } catch (error) {
+        console.error("❌ Error fetching sales orders:", error);
+        throw error;
+    }
+};
+
+export const getSalesOrderById = async (id: number) => {
+    try {
+        const response = await SalesApiUrl.get(`/sales/orders/${id}`);
+        return response.data;
+    } catch (error) {
+        console.error(`❌ Error fetching sales order with ID ${id}:`, error);
+        throw error;
+    }
+};
+
+export const updateSalesOrder = async (id: number, data: { customerId: number; orderDate: string; totalAmount: number; status: string }) => {
+    try {
+        const response = await SalesApiUrl.put(`/sales/orders/${id}`, data);
+        return response.data;
+    } catch (error: any) {
+        if (error.response && error.response.data && error.response.data.statusMessage) {
+            throw new Error(error.response.data.statusMessage);
+        } else {
+            throw new Error("Failed to update sales order");
+        }
+    }
+};
+
+export const deleteSalesOrder = async (id: number) => {
+    try {
+        const response = await SalesApiUrl.delete(`/sales/orders/${id}`);
+        return response.data;
+    } catch (error) {
+        console.error(`❌ Error deleting sales order with ID ${id}:`, error);
+        throw error;
+    }
+};
+
+export const createInvoice = async (data: { orderId: number; invoiceDate: string; totalAmount: number }) => {
+    try {
+        const response = await SalesApiUrl.post('/invoices', data);
+        return response.data;
+    } catch (error: any) {
+        if (error.response && error.response.data && error.response.data.statusMessage) {
+            throw new Error(error.response.data.statusMessage);
+        } else {
+            throw new Error("Failed to create invoice");
+        }
+    }
+};
+
+export const getInvoicesByOrderId = async (orderId: number) => {
+    try {
+        const response = await SalesApiUrl.get(`/invoices/by-order/${orderId}`);
+        return response.data;
+    } catch (error) {
+        console.error(`❌ Error fetching invoices for order ID ${orderId}:`, error);
+        throw error;
+    }
+};
+
+export const getPaymentsByOrderId = async (orderId: number) => {
+    try {
+        const response = await SalesApiUrl.get(`/payments/by-order/${orderId}`);
+        return response.data;
+    } catch (error) {
+        console.error(`❌ Error fetching payments for order ID ${orderId}:`, error);
+        throw error;
+    }
+};
+
+export const createPayment = async (data: { orderId: number; paymentDate: string; amount: number; paymentMethod: string }) => {
+    try {
+        const response = await SalesApiUrl.post('/payments', data);
+        return response.data;
+    } catch (error: any) {
+        if (error.response && error.response.data && error.response.data.statusMessage) {
+            throw new Error(error.response.data.statusMessage);
+        } else {
+            throw new Error("Failed to create payment");
+        }
+    }
+};      
+
+
+
 export const updateInventoryApi = async (id: number, data: { name: string; sku: string; price: number | string; categoryId: number, stockQuantity: number }) => {
     try {
         const payload = {

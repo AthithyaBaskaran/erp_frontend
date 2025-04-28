@@ -15,19 +15,19 @@ import { LoginForm, addUsers } from "./Api/apiUrl";
 import Cookies from "js-cookie";
 import '../styles/Admin.css';
 import { useThemeContext } from "./ThemeContext";
-
+ 
 interface RegisterFormData {
   name: string;
   email: string;
   phone: string;
   address: string;
 }
-
+ 
 interface LoginFormData {
   password: string;
   email: string;
 }
-
+ 
 const AuthForm: React.FC = () => {
   const navigate = useNavigate();
   const [isStrongPassword, setIsStrongPassword] = useState(false);
@@ -35,16 +35,16 @@ const AuthForm: React.FC = () => {
   const [loading, setLoading] = useState(false); // login button loading
   const [pageLoading, setPageLoading] = useState(true); // page initial loading
   const [rememberMe, setRememberMe] = useState(false);
-  
+ 
   const { mode, resetTheme } = useThemeContext();
   const isDarkMode = mode === 'dark';
-  
+ 
   // Reset theme to light mode when on login page
   useEffect(() => {
     // Reset to light mode when on login page
     resetTheme();
   }, []);
-  
+ 
   const {
     register: registerRegister,
     handleSubmit: handleRegisterSubmit,
@@ -52,9 +52,9 @@ const AuthForm: React.FC = () => {
     reset: resetRegister,
     formState: { errors: registerErrors, isSubmitting: isRegistering },
   } = useForm<RegisterFormData>({ resolver: yupResolver(getRegisterSchema()) });
-
+ 
   const validationSchema = getLoginSchema(isStrongPassword);
-
+ 
   const {
     register: registerLogin,
     handleSubmit: handleLoginSubmit,
@@ -62,29 +62,29 @@ const AuthForm: React.FC = () => {
     reset: resetLogin,
     formState: { errors: loginErrors, isSubmitting: isLoggingIn },
   } = useForm<LoginFormData>({ resolver: yupResolver(validationSchema) });
-
+ 
   useEffect(() => {
     const timer = setTimeout(() => {
       setPageLoading(false);
     }, 800); // Simulate page loading delay
     return () => clearTimeout(timer);
   }, []);
-
+ 
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
   const [snackbarSeverity, setSnackbarSeverity] = useState<"success" | "error">("success");
-
+ 
   const socialIcons = [
     { icon: <FaFacebookF />, link: "https://www.facebook.com/login" },
     { icon: <FaTwitter />, link: "https://twitter.com/login" },
     { icon: <FaGoogle />, link: "https://accounts.google.com/signin" },
     { icon: <FaLinkedinIn />, link: "https://www.linkedin.com/login" },
   ];
-
+ 
   const handleCloseSnackbar = () => {
     setOpenSnackbar(false);
   };
-
+ 
   const handleRegister: SubmitHandler<RegisterFormData> = async (data: RegisterFormData) => {
     try {
       const response = await addUsers({
@@ -93,7 +93,7 @@ const AuthForm: React.FC = () => {
         phone: data.phone,
         address: data.address,
       });
-
+ 
       if (response.data) {
         setSnackbarMessage("✅ User Added successfully!");
         setSnackbarSeverity("success");
@@ -109,13 +109,13 @@ const AuthForm: React.FC = () => {
       setOpenSnackbar(true);
     }
   };
-  
+ 
   const handleLogin: SubmitHandler<LoginFormData> = async (data: LoginFormData) => {
     try {
       setLoading(true);
       const response = await LoginForm(data.email, data.password);
       const userId = response?.data?.userId;
-  
+ 
       if (response?.data) {
         // Save auth info
         localStorage.setItem("token", response.data.token);
@@ -123,14 +123,14 @@ const AuthForm: React.FC = () => {
         localStorage.setItem("UserID", userId);
         localStorage.setItem("department", response.data.department);
         localStorage.setItem("UserName", response.data.name);
-  
+ 
         // Remember Me
         if (rememberMe) {
           Cookies.set("rememberMe", "true", { expires: 7 }); // stores cookie for 7 days
           Cookies.set("email", data.email);
           Cookies.set("password", data.password);
         } else {
-          Cookies.remove("rememberMe", "false"); // or simply remove it
+          Cookies.remove("rememberMe"); // or simply remove it
           Cookies.remove("email");
           Cookies.remove("password");
         }
@@ -139,7 +139,7 @@ const AuthForm: React.FC = () => {
         resetLogin();
         navigate("/dashboard");
       }
-  
+ 
       return response.data;
     } catch (error:any) {
       setSnackbarSeverity("error");
@@ -149,20 +149,20 @@ const AuthForm: React.FC = () => {
       setOpenSnackbar(true);
     }
   };
-  
+ 
   useEffect(() => {
     const savedRememberMe = Cookies.get("rememberMe") === "true";
     const savedEmail = Cookies.get("email") || "";
     const savedPassword = Cookies.get("password") || "";
-  
+ 
     if (savedRememberMe) {
       setLoginValue("email", savedEmail);
       setLoginValue("password", savedPassword);
     }
-  
+ 
     setRememberMe(savedRememberMe);
   }, []);
-  
+ 
   // Common text field styles for both login and register forms
   const commonTextFieldStyles = {
     '& .MuiOutlinedInput-root': {
@@ -201,15 +201,15 @@ const AuthForm: React.FC = () => {
     width: '100%',
     maxWidth: '380px',
   };
-  
+ 
   const textFieldProps = {
     sx: commonTextFieldStyles,
   };
-  
+ 
   const LogintextFieldProps = {
     sx: commonTextFieldStyles,
   };
-
+ 
   if (pageLoading) {
     return (
       <Box
@@ -222,7 +222,7 @@ const AuthForm: React.FC = () => {
       </Box>
     );
   }
-  
+ 
   return (
     <div className="signin-signup">
       {/* Sign In Form */}
@@ -262,19 +262,19 @@ const AuthForm: React.FC = () => {
               }}
             />
           </Box>
-          
+         
           <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
             {/* Forgot Password - Upper Right */}
-            <Box sx={{ 
-              display: "flex", 
-              justifyContent: "flex-end", 
+            <Box sx={{
+              display: "flex",
+              justifyContent: "flex-end",
               width: "100%",
               mb: 0.5
             }}>
-              <Link 
-                to="/forgot-password" 
-                className="forgot-password" 
-                style={{ 
+              <Link
+                to="/forgot-password"
+                className="forgot-password"
+                style={{
                   color: isDarkMode ? '#90caf9' : '#4481eb',
                   textDecoration: "none",
                   fontSize: "14px"
@@ -283,7 +283,7 @@ const AuthForm: React.FC = () => {
                 Forgot Password?
               </Link>
             </Box>
-            
+           
             <Box sx={{ display: "flex", alignItems: "center", position: "relative" }}>
               <TextField
                 type={showPassword ? "text" : "password"}
@@ -319,12 +319,12 @@ const AuthForm: React.FC = () => {
                 }}
               />
             </Box>
-            
+           
             {/* Strong Password Validation and Remember Me on same line */}
-            <Box sx={{ 
-              display: "flex", 
+            <Box sx={{
+              display: "flex",
               justifyContent: "space-between",
-              alignItems: "center", 
+              alignItems: "center",
               width: "100%",
               mt: 1
             }}>
@@ -334,12 +334,12 @@ const AuthForm: React.FC = () => {
                   type="checkbox"
                   checked={isStrongPassword}
                   onChange={() => setIsStrongPassword(!isStrongPassword)}
-                  style={{ 
+                  style={{
                     accentColor: isDarkMode ? '#90caf9' : '#4481eb',
                     marginRight: "8px"
                   }}
                 />
-                <Typography variant="body2" sx={{ 
+                <Typography variant="body2" sx={{
                   fontSize: "11px",
                   fontFamily: "'Poppins', sans-serif",
                   fontWeight: 500
@@ -347,19 +347,19 @@ const AuthForm: React.FC = () => {
                   Use Strong Password Validation
                 </Typography>
               </Box>
-              
+             
               {/* Remember Me - Right Side */}
               <Box sx={{ display: "flex", alignItems: "center" }}>
                 <input
                   type="checkbox"
                   checked={rememberMe}
                   onChange={(e) => setRememberMe(e.target.checked)}
-                  style={{ 
+                  style={{
                     accentColor: isDarkMode ? '#90caf9' : '#4481eb',
                     marginRight: "8px"
                   }}
                 />
-                <Typography variant="body2" sx={{ 
+                <Typography variant="body2" sx={{
                   fontSize: "11px",
                   fontFamily: "'Poppins', sans-serif",
                   fontWeight: 500
@@ -368,11 +368,11 @@ const AuthForm: React.FC = () => {
                 </Typography>
               </Box>
             </Box>
-            
+           
             {/* Login Button - Center */}
-            <Box sx={{ 
-              display: "flex", 
-              justifyContent: "center", 
+            <Box sx={{
+              display: "flex",
+              justifyContent: "center",
               width: "100%",
               mt: 2
             }}>
@@ -380,7 +380,7 @@ const AuthForm: React.FC = () => {
                 type="submit"
                 variant="contained"
                 color="primary"
-                sx={{ 
+                sx={{
                   borderRadius: '50px',
                   padding: '10px 30px',
                   textTransform: 'none',
@@ -400,8 +400,8 @@ const AuthForm: React.FC = () => {
             </Box>
           </Box>
         </Box>
-
-        <p className="social-text" style={{ 
+ 
+        <p className="social-text" style={{
           color: isDarkMode ? '#ffffff' : '#444',
           fontFamily: "'Poppins', sans-serif",
           fontWeight: 500
@@ -415,7 +415,7 @@ const AuthForm: React.FC = () => {
           ))}
         </div>
       </form>
-
+ 
       {/* Register Sign Up Form */}
       <form className="sign-up-form" onSubmit={handleRegisterSubmit(handleRegister)}>
         <h2 className="title" style={{ color: isDarkMode ? '#ffffff' : '#444' }}>Sign up</h2>
@@ -438,7 +438,7 @@ const AuthForm: React.FC = () => {
               {...textFieldProps}
             />
           </Box>
-
+ 
           <Box sx={{ display: "flex", alignItems: "center", width: "100%", justifyContent: "center" }}>
             <TextField
               placeholder="Email"
@@ -508,7 +508,7 @@ const AuthForm: React.FC = () => {
               type="submit"
               variant="contained"
               color="primary"
-              sx={{ 
+              sx={{
                 borderRadius: '50px',
                 padding: '10px 30px',
                 textTransform: 'none',
@@ -527,7 +527,7 @@ const AuthForm: React.FC = () => {
             </Button>
           </Box>
         </Box>
-
+ 
         <p className="social-text" style={{ color: isDarkMode ? '#ffffff' : '#444' }}>Or Sign in with social platforms</p>
         <div className="social-media">
           {socialIcons.map((item, idx) => (
@@ -538,7 +538,7 @@ const AuthForm: React.FC = () => {
           ))}
         </div>
       </form>
-
+ 
       <Snackbar
         open={openSnackbar}
         autoHideDuration={2000}
@@ -556,5 +556,5 @@ const AuthForm: React.FC = () => {
     </div>
   );
 };
-
+ 
 export default AuthForm;

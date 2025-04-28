@@ -19,6 +19,15 @@ const InventoryapiUrl = axios.create({
   withCredentials: true,
 });
 
+// ✅ Axios instance for sales management
+const SalesApiUrl = axios.create({
+  baseURL: "http://localhost:8080/sales_management/api/",
+  headers: {
+    "Content-Type": "application/json",
+  },
+  withCredentials: true,
+});
+
 // ✅ Function to attach token interceptor
 const attachAuthInterceptor = (instance: typeof apiUrl) => {
   instance.interceptors.request.use(
@@ -33,9 +42,10 @@ const attachAuthInterceptor = (instance: typeof apiUrl) => {
   );
 };
 
-// ✅ Apply token interceptor to both instances
+// ✅ Apply token interceptor to all instances
 attachAuthInterceptor(apiUrl);
 attachAuthInterceptor(InventoryapiUrl);
+attachAuthInterceptor(SalesApiUrl);
 
-// ✅ Export both clients
-export { apiUrl, InventoryapiUrl };
+// ✅ Export all clients
+export { apiUrl, InventoryapiUrl, SalesApiUrl };

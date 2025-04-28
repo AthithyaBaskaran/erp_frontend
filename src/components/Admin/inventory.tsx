@@ -30,7 +30,7 @@ interface InventoryFormData {
   name: string;
   sku: string;
   price: number;
-  categoryId: 1;
+  categoryId: number;
   stockQuantity: number
 }
 
