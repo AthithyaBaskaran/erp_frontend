@@ -7,6 +7,7 @@ import ForgetPassword from './components/ForgetPassword';
 import EmailForgetPassword from './components/emailTemplate/forgetEmail';
 import AdminUsers from './components/Admin/users';
 import Inventory from './components/Admin/inventory';
+import Products from './components/Admin/products_new';
 import SalesManagement from './components/Admin/SalesManagement';
 import { Alert, Box, Snackbar } from '@mui/material';
 import { RefreshToken } from './components/Api/apiUrl';
@@ -105,6 +106,7 @@ useEffect(() => {
         <Route path="/admin_users" element={<AdminUsers />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/inventory" element={<Inventory />} />
+        <Route path="/products" element={<Products />} />
         <Route path="/customers" element={<SalesManagement />} />
         <Route path="/change_password" element={<ChangePassword />} />
         <Route path='/forgot-password' element={<ForgetPassword />} />
