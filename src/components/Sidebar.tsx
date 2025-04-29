@@ -59,11 +59,19 @@ const Sidebar: React.FC<SidebarProps> = ({ openSidebarToggle, OpenSidebar }) => 
         <ul className="sidebar-list">
           {/* Admin-only sidebar */}
           {role === "Admin" && department === "Admin" ? (
-            <NavLink to="/admin_users" className={({isActive}) => isActive ? "sidebar-link active" : "sidebar-link"}>
-              <li className="sidebar-list-item">
-                <BsGrid1X2Fill className="icon" /> <span className="sidebar-item-text">Users</span>
-              </li>
-            </NavLink>
+            <>
+              <NavLink to="/admin_users" className={({isActive}) => isActive ? "sidebar-link active" : "sidebar-link"}>
+                <li className="sidebar-list-item">
+                  <BsGrid1X2Fill className="icon" /> <span className="sidebar-item-text">Users</span>
+                </li>
+              </NavLink>
+              
+              <NavLink to="/inventory" className={({isActive}) => isActive ? "sidebar-link active" : "sidebar-link"}>
+                <li className="sidebar-list-item">
+                  <BsListCheck className="icon" /> <span className="sidebar-item-text">Inventory</span>
+                </li>
+              </NavLink>
+            </>
           ) : (
             <>
               <NavLink to="/dashboard" className={({isActive}) => isActive ? "sidebar-link active" : "sidebar-link"}>
@@ -81,12 +89,12 @@ const Sidebar: React.FC<SidebarProps> = ({ openSidebarToggle, OpenSidebar }) => 
                 <li className="sidebar-list-item">
                   <BsListCheck className="icon" /> <span className="sidebar-item-text">Inventory</span>
                 </li>
-                
+                </NavLink>   
                 <NavLink to="/products" className={({isActive}) => isActive ? "sidebar-link active" : "sidebar-link"}>
                 <li className="sidebar-list-item">
                   <BsFillArchiveFill className="icon" /> <span className="sidebar-item-text">Products</span>
                 </li>
-              </NavLink>
+              
 
               </NavLink>
               <NavLink to="/customers" className={({isActive}) => isActive ? "sidebar-link active" : "sidebar-link"}>

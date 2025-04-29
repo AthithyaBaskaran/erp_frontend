@@ -14,7 +14,7 @@ import { getRegisterSchema } from "../Validations/ValidationSchema";
 import { useForm, SubmitHandler, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { deleteUser, addInventory, showInventory, deleteInventory, updateInventoryApi } from "../Api/apiUrl";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import "../../styles/Admin.css";
 
 interface Users {
@@ -76,6 +76,8 @@ const [searchText, setSearchText] = useState('');
 
 
   const navigate = useNavigate();
+  const location = useLocation();
+  const isProductsPage = location.pathname === '/products';
 
   console.log("inventoryItems", inventoryItems);
 
@@ -408,7 +410,7 @@ const handleUserEditClick = async (userId: number) => {
             <Box display="flex" alignItems="center" gap={2} flexWrap="wrap">
               <Box>
                 <Typography variant="h6" fontWeight="bold">
-                  Inventory <Typography variant="caption" component="span" color="text.secondary"></Typography>
+                  {isProductsPage ? 'Products' : 'Inventory'} <Typography variant="caption" component="span" color="text.secondary"></Typography>
                 </Typography>
               </Box>
 
@@ -416,7 +418,7 @@ const handleUserEditClick = async (userId: number) => {
 
             <TextField
               select
-              label="Filter by Category"
+              // label="Filter by Category"
               value={selectedCategoryId}
               onChange={(e) => {
                 const categoryId = e.target.value;
@@ -460,7 +462,7 @@ const handleUserEditClick = async (userId: number) => {
               }}
               onClick={handleAddUser}
             >
-              + Add Product
+              + Add {isProductsPage ? 'Product' : 'Inventory Item'}
             </Button>
           </Box>
         </div>
@@ -502,7 +504,7 @@ const handleUserEditClick = async (userId: number) => {
               left: "50%",
               transform: "translate(-50%, -50%)",
               width: 400,
-              height: 600,
+              height: 450,
               bgcolor: "background.paper",
               boxShadow: 24,
               p: 4,
@@ -520,10 +522,10 @@ const handleUserEditClick = async (userId: number) => {
               <CloseIcon />
             </IconButton>
             <Typography variant="h6" mb={2}>
-              Add New Product
+              Add New {isProductsPage ? 'Product' : 'Inventory Item'}
             </Typography>
             <TextField
-              placeholder="Product Name"
+              placeholder={isProductsPage ? "Product Name" : "Inventory Item Name"}
               variant="outlined"
               fullWidth
               margin="normal"
@@ -653,10 +655,10 @@ const handleUserEditClick = async (userId: number) => {
         <CloseIcon />
       </IconButton>
       <Typography variant="h6" mb={2}>
-        Edit Inventory Item
+        Edit {isProductsPage ? 'Product' : 'Inventory Item'}
       </Typography>
       <TextField
-        placeholder="Product Name"
+        placeholder={isProductsPage ? "Product Name" : "Inventory Item Name"}
         variant="outlined"
         fullWidth
         margin="normal"
