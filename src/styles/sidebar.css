@@ -95,14 +95,17 @@ body.dark .sidebar-link {
   transform: translateX(3px); /* Slight movement on hover */
 }
 
-.sidebar-link.active .sidebar-list-item {
+.sidebar-link.active .sidebar-list-item,
+.sidebar-list-item.active {
   background-color: rgba(77, 171, 245, 0.3); /* Slightly more visible */
   border-left: 4px solid #4dabf5; /* Blue indicator for active state */
   box-shadow: 0 2px 8px rgba(77, 171, 245, 0.2); /* Glowing effect when active */
 }
 
 .sidebar-link.active .icon,
-.sidebar-link.active .sidebar-item-text {
+.sidebar-link.active .sidebar-item-text,
+.sidebar-list-item.active .icon,
+.sidebar-list-item.active .sidebar-item-text {
   color: #4dabf5;
   font-weight: 800; /* Extra bold when active */
 }
