@@ -1,0 +1,662 @@
+/* Inventory Management Styles */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Cabin:wght@400;500;600;700&display=swap');
+ 
+/* Main Layout */
+.inventory-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: #f8f9fa;
+  font-family: 'Cabin', sans-serif;
+}
+ 
+.inventory-content {
+  padding: 2rem;
+  flex: 1;
+}
+ 
+.inventory-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+ 
+.inventory-title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #2c3e50;
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+  letter-spacing: -0.5px;
+}
+ 
+/* Dashboard Cards */
+.dashboard-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1.0rem;
+  margin-bottom: 2rem;
+}
+ 
+.dashboard-card {
+  background-color: #fff;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+  padding: 1.0rem;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+ 
+.dashboard-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+}
+ 
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+}
+ 
+.card-title {
+  font-size: 0.875rem;
+  color: #6c757d;
+  margin-bottom: 0.5rem;
+}
+ 
+.card-value {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #2c3e50;
+}
+ 
+.card-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 48px;
+  border-radius: 50%;
+}
+ 
+.card-icon-products {
+  background-color: rgba(0, 200, 83, 0.1);
+  color: #00C853;
+}
+ 
+.card-icon-stock {
+  background-color: rgba(33, 150, 243, 0.1);
+  color: #2196F3;
+}
+ 
+.card-icon-value {
+  background-color: rgba(255, 193, 7, 0.1);
+  color: #FFC107;
+}
+ 
+.card-icon-warning {
+  background-color: rgba(244, 67, 54, 0.1);
+  color: #F44336;
+}
+ 
+/* Charts Section */
+.charts-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+ 
+.chart-card {
+  background-color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  padding: 1.5rem;
+  height: 100%;
+}
+ 
+.chart-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #2c3e50;
+  margin-bottom: 1rem;
+}
+ 
+.chart-container {
+  height: 300px;
+  width: 100%;
+}
+ 
+/* Inventory List Section */
+.inventory-list-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+ 
+.list-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #2c3e50;
+}
+ 
+.filter-container {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+ 
+.add-button {
+  background-color: #00C853;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 0.75rem 1.5rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0, 200, 83, 0.2);
+  position: relative;
+  overflow: hidden;
+  z-index: 1;
+  font-family: 'Poppins', sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-size: 0.85rem;
+}
+ 
+.add-button:before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 100%;
+  background-color: rgba(255, 255, 255, 0.1);
+  transition: width 0.3s ease;
+  z-index: -1;
+}
+ 
+.add-button:hover:before {
+  width: 100%;
+}
+ 
+.add-button:hover {
+  background-color: #00B34E;
+  transform: translateY(-3px);
+  box-shadow: 0 6px 15px rgba(0, 200, 83, 0.3);
+}
+ 
+.inventory-table-container {
+  background-color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  padding: 1.5rem;
+  overflow: hidden;
+}
+ 
+/* Table Headers and Data */
+.MuiDataGrid-columnHeaders {
+  background-color: #f5f7fa !important;
+  border-radius: 8px 8px 0 0 !important;
+}
+ 
+.MuiDataGrid-columnHeaderTitle {
+  font-family: 'Poppins', sans-serif !important;
+  font-weight: 600 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.5px !important;
+  color: #2c3e50 !important;
+  font-size: 0.8rem !important;
+}
+ 
+.MuiDataGrid-cellContent {
+  font-family: 'Cabin', sans-serif !important;
+  font-weight: 500 !important;
+  color: #3a3a3a !important;
+}
+ 
+/* Action Buttons */
+.action-button {
+  min-width: 32px !important;
+  height: 32px !important;
+  border-radius: 8px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  transition: all 0.2s ease !important;
+}
+ 
+.edit-button {
+  background-color: rgba(33, 150, 243, 0.1) !important;
+  color: #2196F3 !important;
+}
+ 
+.edit-button:hover {
+  background-color: rgba(33, 150, 243, 0.2) !important;
+  transform: translateY(-2px) !important;
+}
+ 
+.delete-button {
+  background-color: rgba(244, 67, 54, 0.1) !important;
+  color: #F44336 !important;
+}
+ 
+.delete-button:hover {
+  background-color: rgba(244, 67, 54, 0.2) !important;
+  transform: translateY(-2px) !important;
+}
+ 
+.view-button {
+  background-color: rgba(0, 200, 83, 0.1) !important;
+  color: #00C853 !important;
+}
+ 
+.view-button:hover {
+  background-color: rgba(0, 200, 83, 0.2) !important;
+  transform: translateY(-2px) !important;
+}
+ 
+/* DataGrid Action Column */
+.MuiDataGrid-cell--withRenderer.MuiDataGrid-cell {
+  overflow: visible !important;
+  padding: 8px !important;
+}
+ 
+.MuiDataGrid-row {
+  min-height: 60px !important;
+}
+ 
+.MuiDataGrid-actionsCell {
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+}
+ 
+/* Status Badges */
+.status-badge {
+  padding: 0.25rem 0.75rem;
+  border-radius: 50px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  display: inline-block;
+}
+ 
+.status-low {
+  background-color: rgba(244, 67, 54, 0.1);
+  color: #F44336;
+}
+ 
+.status-medium {
+  background-color: rgba(255, 193, 7, 0.1);
+  color: #FFC107;
+}
+ 
+.status-high {
+  background-color: rgba(0, 200, 83, 0.1);
+  color: #00C853;
+}
+ 
+/* Modal Styles */
+.inventory-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.3s ease;
+  backdrop-filter: blur(3px);
+}
+ 
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+ 
+.modal-content {
+  background-color: #fff;
+  border-radius: 16px;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.25);
+  width: 100%;
+  max-width: 550px;
+  max-height: 90vh;
+  overflow-y: auto;
+  padding: 2.5rem;
+  animation: slideUp 0.4s ease;
+  position: relative;
+  transform: translateY(0);
+}
+ 
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+ 
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+ 
+.modal-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #2c3e50;
+}
+ 
+.close-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #6c757d;
+  font-size: 1.5rem;
+  transition: color 0.3s ease;
+}
+ 
+.close-button:hover {
+  color: #343a40;
+}
+ 
+.form-divider {
+  margin: 1rem 0;
+  border-top: 1px solid #e9ecef;
+}
+ 
+.form-group {
+  margin-bottom: 1.8rem;
+  position: relative;
+}
+ 
+.form-group:last-of-type {
+  margin-bottom: 2.5rem;
+}
+ 
+.form-label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  color: #495057;
+  font-family: 'Poppins', sans-serif;
+  font-size: 0.9rem;
+  letter-spacing: 0.3px;
+}
+ 
+.form-input {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #ced4da;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: border-color 0.3s ease;
+  font-family: 'Cabin', sans-serif;
+}
+ 
+.form-input:focus {
+  outline: none;
+  border-color: #2196F3;
+}
+ 
+/* MUI Input Overrides */
+.MuiInputBase-root {
+  font-family: 'Cabin', sans-serif !important;
+}
+ 
+.MuiInputLabel-root {
+  font-family: 'Cabin', sans-serif !important;
+}
+ 
+.MuiFormHelperText-root {
+  font-family: 'Cabin', sans-serif !important;
+  font-size: 0.75rem !important;
+  margin-left: 0 !important;
+}
+ 
+/* Price Input Styling */
+.price-input .MuiInputBase-input {
+  padding-left: 24px !important;
+  position: relative !important;
+}
+ 
+.price-input .MuiInputAdornment-root {
+  position: absolute !important;
+  left: 14px !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  pointer-events: none !important;
+}
+ 
+.price-input .MuiOutlinedInput-root {
+  border-radius: 8px !important;
+}
+ 
+.form-error {
+  color: #F44336;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+}
+ 
+.form-actions {
+  display: flex;
+  justify-content: center;
+  gap: 1.5rem;
+  margin-top: 2.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #f0f0f0;
+}
+ 
+.cancel-button {
+  background-color: #f8f9fa;
+  color: #495057;
+  border: 1px solid #ced4da;
+  border-radius: 8px;
+  padding: 0.75rem 1.5rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: 'Poppins', sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-size: 0.85rem;
+}
+ 
+.cancel-button:hover {
+  background-color: #e9ecef;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+}
+ 
+.submit-button {
+  background-color: #2196F3;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 0.75rem 1.5rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: 'Poppins', sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-size: 0.85rem;
+  box-shadow: 0 4px 12px rgba(33, 150, 243, 0.2);
+}
+ 
+.submit-button:hover {
+  background-color: #1976D2;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(33, 150, 243, 0.3);
+}
+ 
+.submit-button.green {
+  background-color: #00C853;
+  box-shadow: 0 4px 12px rgba(0, 200, 83, 0.2);
+}
+ 
+.submit-button.green:hover {
+  background-color: #00B34E;
+  box-shadow: 0 6px 15px rgba(0, 200, 83, 0.3);
+}
+ 
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+  .inventory-content {
+    padding: 1rem;
+  }
+ 
+  .dashboard-cards {
+    grid-template-columns: 1fr;
+  }
+ 
+  .charts-container {
+    grid-template-columns: 1fr;
+  }
+ 
+  .inventory-list-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+ 
+  .filter-container {
+    width: 100%;
+  }
+ 
+  .modal-content {
+    width: 90%;
+    padding: 1.5rem;
+  }
+}
+ 
+/* Loading Spinner */
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
+}
+ 
+.spinner {
+  border: 4px solid rgba(0, 0, 0, 0.1);
+  border-radius: 50%;
+  border-top: 4px solid #2196F3;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+}
+ 
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+ 
+/* Notification */
+.notification {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  padding: 1rem 1.5rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  z-index: 1000;
+  animation: slideIn 0.3s ease;
+}
+ 
+.notification-success {
+  background-color: #00C853;
+  color: white;
+}
+ 
+.notification-error {
+  background-color: #F44336;
+  color: white;
+}
+ 
+@keyframes slideIn {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+ 
+/* SweetAlert Custom Styling */
+.swal2-popup {
+  font-family: 'Poppins', sans-serif !important;
+  border-radius: 16px !important;
+  padding: 2rem !important;
+}
+ 
+.swal2-title {
+  font-family: 'Poppins', sans-serif !important;
+  font-weight: 600 !important;
+  color: #2c3e50 !important;
+}
+ 
+.swal2-html-container {
+  font-family: 'Cabin', sans-serif !important;
+  font-size: 1rem !important;
+}
+ 
+.swal2-confirm {
+  background-color: #00C853 !important;
+  border-radius: 8px !important;
+  font-family: 'Poppins', sans-serif !important;
+  font-weight: 500 !important;
+  padding: 0.75rem 1.5rem !important;
+  box-shadow: 0 4px 12px rgba(0, 200, 83, 0.2) !important;
+}
+ 
+.swal2-confirm:hover {
+  background-color: #00B34E !important;
+  transform: translateY(-2px) !important;
+}
+ 
+.swal2-cancel {
+  background-color: #f5f5f5 !important;
+  color: #5a5a5a !important;
+  border-radius: 8px !important;
+  font-family: 'Poppins', sans-serif !important;
+  font-weight: 500 !important;
+  padding: 0.75rem 1.5rem !important;
+}
+ 
+.swal2-cancel:hover {
+  background-color: #e9e9e9 !important;
+  transform: translateY(-2px) !important;
+}
+ 
+.swal2-icon {
+  border-width: 3px !important;
+}
+ 
+.swal2-success-circular-line-left,
+.swal2-success-circular-line-right,
+.swal2-success-fix {
+  background-color: transparent !important;
+}
+ 

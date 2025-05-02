@@ -20,13 +20,14 @@ import LightModeIcon from '@mui/icons-material/LightMode';
 
 interface HeaderProps {
   OpenSidebar: () => void;
+  onNotificationClick?: (event: React.MouseEvent<HTMLElement>) => void;
 }
 
-const Header: React.FC<HeaderProps> = ({ OpenSidebar }) => {
+const Header: React.FC<HeaderProps> = ({ OpenSidebar, onNotificationClick }) => {
   const navigate = useNavigate();
   const [showLogout, setShowLogout] = useState(false);
   const { toggleTheme, mode } = useThemeContext();
-  const [notificationCount, setNotificationCount] = useState();
+  const [notificationCount, setNotificationCount] = useState(4);
   const [messageCount, setMessageCount] = useState(10);
 
   const profileRef = useRef<HTMLDivElement>(null);
@@ -97,7 +98,11 @@ const Header: React.FC<HeaderProps> = ({ OpenSidebar }) => {
       <div className="header-right">
         {/* Notification Icon */}
         <Tooltip title="Notifications">
-          <div className="header-icon-container" ref={notificationRef}>
+          <div 
+            className="header-icon-container" 
+            ref={notificationRef} 
+            onClick={onNotificationClick}
+          >
             <Badge badgeContent={notificationCount} color="error" sx={{ cursor: 'pointer' }}>
               <BsFillBellFill className="icon" style={{ fontSize: '20px' }} />
             </Badge>

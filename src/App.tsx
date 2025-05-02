@@ -1,5 +1,5 @@
 
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import Login from './components/login';
 import Dashboard from './components/Dashboard';
 import ChangePassword from './components/ChangePassword';
@@ -9,6 +9,10 @@ import AdminUsers from './components/Admin/users';
 import Inventory from './components/Admin/inventory';
 import Products from './components/Admin/products_new';
 import SalesManagement from './components/Admin/SalesManagement';
+import SupplierDashboard from './components/Supplier/SupplierDashboard';
+
+
+import RootRedirect from './components/RootRedirect';
 import { Alert, Box, Snackbar } from '@mui/material';
 import { RefreshToken } from './components/Api/apiUrl';
 import { useEffect, useState } from 'react';
@@ -86,10 +90,14 @@ const scheduleTokenRefresh = (token: string, userId: number) => {
 useEffect(() => {
   const token = localStorage.getItem("token");
   const userId = localStorage.getItem("UserID");
+  const role = localStorage.getItem("roles");
 
   if (token && userId) {
     const numericUserId = parseInt(userId, 10);
     scheduleTokenRefresh(token, numericUserId);
+    
+    // Log the user role for debugging
+    console.log("Current user role:", role);
   }
 }, []);
 
@@ -103,6 +111,8 @@ useEffect(() => {
     >
       <Routes>
         <Route path="/" element={<Login />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/home" element={<RootRedirect />} />
         <Route path="/admin_users" element={<AdminUsers />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/inventory" element={<Inventory />} />
@@ -111,6 +121,9 @@ useEffect(() => {
         <Route path="/change_password" element={<ChangePassword />} />
         <Route path='/forgot-password' element={<ForgetPassword />} />
         <Route path='/email-forgot-password' element={<EmailForgetPassword />} />
+        <Route path='/supplier-dashboard' element={<SupplierDashboard />} />
+        <Route path='/salesman-dashboard' element={<SalesmanDashboard />} />
+        
       </Routes>
       <Snackbar
         open={openSnackbar}

@@ -137,7 +137,29 @@ const AuthForm: React.FC = () => {
         setSnackbarMessage("✅ Login successfully!");
         setSnackbarSeverity("success");
         resetLogin();
-        navigate("/dashboard");
+        
+        // Redirect based on user role
+        const userRole = response.data.role;
+        console.log("User role:", userRole); // Debug log
+        
+        // Redirect based on user role (case-insensitive)
+        if (userRole && typeof userRole === 'string') {
+          const role = userRole.toLowerCase();
+          
+          if (role === "supplier") {
+            console.log("Redirecting to supplier dashboard");
+            navigate("/supplier-dashboard");
+          } else if (role === "salesman") {
+            console.log("Redirecting to salesman dashboard");
+            navigate("/salesman-dashboard");
+          } else {
+            console.log("Redirecting to regular dashboard");
+            navigate("/dashboard");
+          }
+        } else {
+          console.log("No role found, redirecting to regular dashboard");
+          navigate("/dashboard");
+        }
       }
  
       return response.data;
