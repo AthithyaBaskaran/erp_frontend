@@ -71,9 +71,37 @@ export const getForgetUserSchema = () => {
 }
 export const getInventorySchema = () => {
   return yup.object().shape({
-    password: yup
+    name: yup
       .string()
-      .required("Password is required")
-      .matches(/\d/, "Must contain at least one number"),
+      .required("Product name is required")
+      .min(2, "Product name must be at least 2 characters"),
+    sku: yup
+      .string()
+      .required("SKU is required")
+      .matches(/^[A-Za-z0-9-_]+$/, "SKU must contain only letters, numbers, hyphens, and underscores"),
+    price: yup
+      .number()
+      .required("Price is required")
+      .typeError("Price must be a number")
+      .positive("Price must be positive")
+      .test(
+        'is-decimal',
+        'Price can have maximum 2 decimal places',
+        (value) => {
+          if (!value) return true;
+          return /^\d+(\.\d{1,2})?$/.test(value.toString());
+        }
+      ),
+    categoryId: yup
+      .number()
+      .required("Category is required")
+      .typeError("Please select a category"),
+    stockQuantity: yup
+      .number()
+      .required("Stock quantity is required")
+      .typeError("Stock quantity must be a number")
+      .integer("Stock quantity must be a whole number")
+      .min(0, "Stock quantity cannot be negative"),
   });
 };
+

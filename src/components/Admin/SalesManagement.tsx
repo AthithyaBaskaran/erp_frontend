@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Header from '../Header';
 import Sidebar from '../Sidebar';
-import Swal from 'sweetalert2';
 import { 
   createCustomer, 
   getAllCustomers, 
@@ -317,42 +316,8 @@ const SalesManagement: React.FC = () => {
       let response;
       if (editMode && currentCustomerId) {
         response = await updateCustomer(currentCustomerId, customerForm);
-        
-        // Show success message
-        Swal.fire({
-          title: 'Success!',
-          text: 'Customer updated successfully!',
-          icon: 'success',
-          confirmButtonColor: '#3085d6',
-          background: '#fff',
-          iconColor: '#2ecc71',
-          timer: 2000,
-          timerProgressBar: true,
-          customClass: {
-            title: 'swal-title',
-            htmlContainer: 'swal-text',
-            confirmButton: 'swal-confirm'
-          }
-        });
       } else {
         response = await createCustomer(customerForm);
-        
-        // Show success message
-        Swal.fire({
-          title: 'Success!',
-          text: 'Customer created successfully!',
-          icon: 'success',
-          confirmButtonColor: '#3085d6',
-          background: '#fff',
-          iconColor: '#2ecc71',
-          timer: 2000,
-          timerProgressBar: true,
-          customClass: {
-            title: 'swal-title',
-            htmlContainer: 'swal-text',
-            confirmButton: 'swal-confirm'
-          }
-        });
       }
       
       // Reset form and refresh data
@@ -362,19 +327,6 @@ const SalesManagement: React.FC = () => {
       setCurrentCustomerId(null);
       fetchData();
     } catch (err: any) {
-      Swal.fire({
-        title: 'Error!',
-        text: err.message || 'Failed to save customer. Please try again.',
-        icon: 'error',
-        confirmButtonColor: '#3085d6',
-        background: '#fff',
-        iconColor: '#e74c3c',
-        customClass: {
-          title: 'swal-title',
-          htmlContainer: 'swal-text',
-          confirmButton: 'swal-confirm'
-        }
-      });
       setError(err.message || 'Failed to save customer. Please try again.');
     } finally {
       setLoading(false);
@@ -398,42 +350,8 @@ const SalesManagement: React.FC = () => {
       let response;
       if (editMode && currentOrderId) {
         response = await updateSalesOrder(currentOrderId, orderForm);
-        
-        // Show success message
-        Swal.fire({
-          title: 'Success!',
-          text: 'Order updated successfully!',
-          icon: 'success',
-          confirmButtonColor: '#3085d6',
-          background: '#fff',
-          iconColor: '#2ecc71',
-          timer: 2000,
-          timerProgressBar: true,
-          customClass: {
-            title: 'swal-title',
-            content: 'swal-text',
-            confirmButton: 'swal-confirm'
-          }
-        });
       } else {
         response = await createSalesOrder(orderForm);
-        
-        // Show success message
-        Swal.fire({
-          title: 'Success!',
-          text: 'Order created successfully!',
-          icon: 'success',
-          confirmButtonColor: '#3085d6',
-          background: '#fff',
-          iconColor: '#2ecc71',
-          timer: 2000,
-          timerProgressBar: true,
-          customClass: {
-            title: 'swal-title',
-            content: 'swal-text',
-            confirmButton: 'swal-confirm'
-          }
-        });
       }
       
       // Reset form and refresh data
@@ -448,19 +366,6 @@ const SalesManagement: React.FC = () => {
       setCurrentOrderId(null);
       fetchData();
     } catch (err: any) {
-      Swal.fire({
-        title: 'Error!',
-        text: err.message || 'Failed to save order. Please try again.',
-        icon: 'error',
-        confirmButtonColor: '#3085d6',
-        background: '#fff',
-        iconColor: '#e74c3c',
-        customClass: {
-          title: 'swal-title',
-          content: 'swal-text',
-          confirmButton: 'swal-confirm'
-        }
-      });
       setError(err.message || 'Failed to save order. Please try again.');
     } finally {
       setLoading(false);
@@ -483,23 +388,6 @@ const SalesManagement: React.FC = () => {
     try {
       await createInvoice(invoiceForm);
       
-      // Show success message
-      Swal.fire({
-        title: 'Success!',
-        text: 'Invoice created successfully!',
-        icon: 'success',
-        confirmButtonColor: '#3085d6',
-        background: '#fff',
-        iconColor: '#2ecc71',
-        timer: 2000,
-        timerProgressBar: true,
-        customClass: {
-          title: 'swal-title',
-          content: 'swal-text',
-          confirmButton: 'swal-confirm'
-        }
-      });
-      
       // Reset form and refresh data
       setInvoiceForm({
         orderId: 0,
@@ -509,19 +397,6 @@ const SalesManagement: React.FC = () => {
       setShowInvoiceModal(false);
       fetchData();
     } catch (err: any) {
-      Swal.fire({
-        title: 'Error!',
-        text: err.message || 'Failed to create invoice. Please try again.',
-        icon: 'error',
-        confirmButtonColor: '#3085d6',
-        background: '#fff',
-        iconColor: '#e74c3c',
-        customClass: {
-          title: 'swal-title',
-          content: 'swal-text',
-          confirmButton: 'swal-confirm'
-        }
-      });
       setError(err.message || 'Failed to create invoice. Please try again.');
     } finally {
       setLoading(false);
@@ -544,23 +419,6 @@ const SalesManagement: React.FC = () => {
     try {
       await createPayment(paymentForm);
       
-      // Show success message
-      Swal.fire({
-        title: 'Success!',
-        text: 'Payment recorded successfully!',
-        icon: 'success',
-        confirmButtonColor: '#3085d6',
-        background: '#fff',
-        iconColor: '#2ecc71',
-        timer: 2000,
-        timerProgressBar: true,
-        customClass: {
-          title: 'swal-title',
-          content: 'swal-text',
-          confirmButton: 'swal-confirm'
-        }
-      });
-      
       // Reset form and refresh data
       setPaymentForm({
         orderId: 0,
@@ -571,19 +429,6 @@ const SalesManagement: React.FC = () => {
       setShowPaymentModal(false);
       fetchData();
     } catch (err: any) {
-      Swal.fire({
-        title: 'Error!',
-        text: err.message || 'Failed to create payment. Please try again.',
-        icon: 'error',
-        confirmButtonColor: '#3085d6',
-        background: '#fff',
-        iconColor: '#e74c3c',
-        customClass: {
-          title: 'swal-title',
-          content: 'swal-text',
-          confirmButton: 'swal-confirm'
-        }
-      });
       setError(err.message || 'Failed to create payment. Please try again.');
     } finally {
       setLoading(false);
@@ -617,123 +462,33 @@ const SalesManagement: React.FC = () => {
   
   // Delete handlers
   const handleDeleteCustomer = async (id: number) => {
-    Swal.fire({
-      title: 'Are you sure?',
-      text: "You won't be able to revert this!",
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#3085d6',
-      cancelButtonColor: '#d33',
-      confirmButtonText: 'Yes, delete it!',
-      background: '#fff',
-      borderRadius: '12px',
-      iconColor: '#ff6b6b',
-      customClass: {
-        title: 'swal-title',
-        content: 'swal-text',
-        confirmButton: 'swal-confirm',
-        cancelButton: 'swal-cancel'
+    if (window.confirm('Are you sure you want to delete this customer?')) {
+      setLoading(true);
+      
+      try {
+        await deleteCustomer(id);
+        fetchData();
+      } catch (err: any) {
+        setError(err.message || 'Failed to delete customer. Please try again.');
+      } finally {
+        setLoading(false);
       }
-    }).then(async (result) => {
-      if (result.isConfirmed) {
-        setLoading(true);
-        
-        try {
-          await deleteCustomer(id);
-          fetchData();
-          Swal.fire({
-            title: 'Deleted!',
-            text: 'Customer has been deleted successfully.',
-            icon: 'success',
-            confirmButtonColor: '#3085d6',
-            background: '#fff',
-            iconColor: '#2ecc71',
-            customClass: {
-              title: 'swal-title',
-              content: 'swal-text',
-              confirmButton: 'swal-confirm'
-            }
-          });
-        } catch (err: any) {
-          Swal.fire({
-            title: 'Error!',
-            text: err.message || 'Failed to delete customer. Please try again.',
-            icon: 'error',
-            confirmButtonColor: '#3085d6',
-            background: '#fff',
-            iconColor: '#e74c3c',
-            customClass: {
-              title: 'swal-title',
-              content: 'swal-text',
-              confirmButton: 'swal-confirm'
-            }
-          });
-          setError(err.message || 'Failed to delete customer. Please try again.');
-        } finally {
-          setLoading(false);
-        }
-      }
-    });
+    }
   };
   
   const handleDeleteOrder = async (id: number) => {
-    Swal.fire({
-      title: 'Are you sure?',
-      text: "You won't be able to revert this!",
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#3085d6',
-      cancelButtonColor: '#d33',
-      confirmButtonText: 'Yes, delete it!',
-      background: '#fff',
-      borderRadius: '12px',
-      iconColor: '#ff6b6b',
-      customClass: {
-        title: 'swal-title',
-        content: 'swal-text',
-        confirmButton: 'swal-confirm',
-        cancelButton: 'swal-cancel'
+    if (window.confirm('Are you sure you want to delete this order?')) {
+      setLoading(true);
+      
+      try {
+        await deleteSalesOrder(id);
+        fetchData();
+      } catch (err: any) {
+        setError(err.message || 'Failed to delete order. Please try again.');
+      } finally {
+        setLoading(false);
       }
-    }).then(async (result) => {
-      if (result.isConfirmed) {
-        setLoading(true);
-        
-        try {
-          await deleteSalesOrder(id);
-          fetchData();
-          Swal.fire({
-            title: 'Deleted!',
-            text: 'Order has been deleted successfully.',
-            icon: 'success',
-            confirmButtonColor: '#3085d6',
-            background: '#fff',
-            iconColor: '#2ecc71',
-            customClass: {
-              title: 'swal-title',
-              content: 'swal-text',
-              confirmButton: 'swal-confirm'
-            }
-          });
-        } catch (err: any) {
-          Swal.fire({
-            title: 'Error!',
-            text: err.message || 'Failed to delete order. Please try again.',
-            icon: 'error',
-            confirmButtonColor: '#3085d6',
-            background: '#fff',
-            iconColor: '#e74c3c',
-            customClass: {
-              title: 'swal-title',
-              content: 'swal-text',
-              confirmButton: 'swal-confirm'
-            }
-          });
-          setError(err.message || 'Failed to delete order. Please try again.');
-        } finally {
-          setLoading(false);
-        }
-      }
-    });
+    }
   };
   
   // View details handlers
@@ -763,9 +518,8 @@ const SalesManagement: React.FC = () => {
   
   // Filter functions
   const filteredOrders = salesOrders.filter(order => {
-    const matchesSearch = (order.customerName?.toLowerCase() || '').includes(searchTerm.toLowerCase()) || 
-                         order.orderId.toString().includes(searchTerm) ||
-                         order.status.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSearch = order.customerName?.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                         order.orderId.toString().includes(searchTerm);
     const matchesStatus = statusFilter === 'all' || order.status.toLowerCase() === statusFilter.toLowerCase();
     
     return matchesSearch && matchesStatus;
@@ -1099,63 +853,31 @@ const SalesManagement: React.FC = () => {
   );
   
   const renderOrderDetails = () => {
-    if (!detailsData) return <div>Loading details...</div>;
+    if (!detailsData) return null;
     
     const { order, customer, invoices, payments } = detailsData;
-    const totalPaid = payments.reduce((sum: number, payment: Payment) => sum + payment.amount, 0);
-    const balance = order.totalAmount - totalPaid;
     
     return (
-      <div className="order-details">
-        <div className="details-section">
-          <h4 className="details-title">Order Information</h4>
-          <div className="details-grid">
-            <div className="details-item">
-              <span className="details-label">Order ID:</span>
-              <span className="details-value">#{order.orderId}</span>
-            </div>
-            <div className="details-item">
-              <span className="details-label">Date:</span>
-              <span className="details-value">{new Date(order.orderDate).toLocaleDateString()}</span>
-            </div>
-            <div className="details-item">
-              <span className="details-label">Status:</span>
-              <span className="details-value"><StatusBadge status={order.status} /></span>
-            </div>
-            <div className="details-item">
-              <span className="details-label">Total Amount:</span>
-              <span className="details-value">${order.totalAmount.toFixed(2)}</span>
-            </div>
-          </div>
+      <div className="sales-details">
+        <div className="sales-card">
+          <h3 className="sales-subheading">Order Information</h3>
+          <p><span className="sales-text-bold">Order ID:</span> {order.orderId}</p>
+          <p><span className="sales-text-bold">Date:</span> {new Date(order.orderDate).toLocaleDateString()}</p>
+          <p><span className="sales-text-bold">Total Amount:</span> ${order.totalAmount.toFixed(2)}</p>
+          <p><span className="sales-text-bold">Status:</span> <StatusBadge status={order.status} /></p>
         </div>
         
-        <div className="details-section">
-          <h4 className="details-title">Customer Information</h4>
-          <div className="details-grid">
-            <div className="details-item">
-              <span className="details-label">Name:</span>
-              <span className="details-value">{customer.name}</span>
-            </div>
-            <div className="details-item">
-              <span className="details-label">Email:</span>
-              <span className="details-value">{customer.email}</span>
-            </div>
-            <div className="details-item">
-              <span className="details-label">Phone:</span>
-              <span className="details-value">{customer.phone}</span>
-            </div>
-            <div className="details-item">
-              <span className="details-label">Address:</span>
-              <span className="details-value">{customer.address}</span>
-            </div>
-          </div>
+        <div className="sales-card">
+          <h3 className="sales-subheading">Customer Information</h3>
+          <p><span className="sales-text-bold">Name:</span> {customer.name}</p>
+          <p><span className="sales-text-bold">Email:</span> {customer.email}</p>
+          <p><span className="sales-text-bold">Phone:</span> {customer.phone}</p>
+          <p><span className="sales-text-bold">Address:</span> {customer.address}</p>
         </div>
         
-        <div className="details-section">
-          <h4 className="details-title">Invoices</h4>
-          {invoices.length === 0 ? (
-            <p>No invoices found for this order.</p>
-          ) : (
+        {invoices.length > 0 && (
+          <div className="sales-card">
+            <h3 className="sales-subheading">Invoices</h3>
             <table className="sales-table">
               <thead>
                 <tr>
@@ -1167,21 +889,19 @@ const SalesManagement: React.FC = () => {
               <tbody>
                 {invoices.map((invoice: Invoice) => (
                   <tr key={invoice.invoiceId}>
-                    <td>#{invoice.invoiceId}</td>
+                    <td>{invoice.invoiceId}</td>
                     <td>{new Date(invoice.invoiceDate).toLocaleDateString()}</td>
                     <td>${invoice.totalAmount.toFixed(2)}</td>
                   </tr>
                 ))}
               </tbody>
             </table>
-          )}
-        </div>
+          </div>
+        )}
         
-        <div className="details-section">
-          <h4 className="details-title">Payments</h4>
-          {payments.length === 0 ? (
-            <p>No payments recorded for this order.</p>
-          ) : (
+        {payments.length > 0 && (
+          <div className="sales-card">
+            <h3 className="sales-subheading">Payments</h3>
             <table className="sales-table">
               <thead>
                 <tr>
@@ -1194,7 +914,7 @@ const SalesManagement: React.FC = () => {
               <tbody>
                 {payments.map((payment: Payment) => (
                   <tr key={payment.paymentId}>
-                    <td>#{payment.paymentId}</td>
+                    <td>{payment.paymentId}</td>
                     <td>{new Date(payment.paymentDate).toLocaleDateString()}</td>
                     <td>${payment.amount.toFixed(2)}</td>
                     <td>{payment.paymentMethod}</td>
@@ -1202,43 +922,10 @@ const SalesManagement: React.FC = () => {
                 ))}
               </tbody>
             </table>
-          )}
-        </div>
-        
-        <div className="details-summary">
-          <div className="details-item">
-            <span className="details-label">Total Amount:</span>
-            <span className="details-value">${order.totalAmount.toFixed(2)}</span>
           </div>
-          <div className="details-item">
-            <span className="details-label">Total Paid:</span>
-            <span className="details-value">${totalPaid.toFixed(2)}</span>
-          </div>
-          <div className="details-item">
-            <span className="details-label">Balance:</span>
-            <span className={`details-value ${balance > 0 ? 'text-danger' : 'text-success'}`}>
-              ${balance.toFixed(2)}
-            </span>
-          </div>
-        </div>
+        )}
         
         <div className="sales-modal-footer">
-          {balance > 0 && (
-            <button 
-              className="sales-btn sales-btn-primary"
-              onClick={() => {
-                setPaymentForm({
-                  ...paymentForm,
-                  orderId: order.orderId,
-                  amount: balance
-                });
-                setShowDetailsModal(false);
-                setShowPaymentModal(true);
-              }}
-            >
-              Record Payment
-            </button>
-          )}
           <button 
             type="button" 
             className="sales-btn sales-btn-secondary"
@@ -1253,202 +940,189 @@ const SalesManagement: React.FC = () => {
   
   const renderCustomersTab = () => (
     <div className="sales-content fade-in">
-      <div className="sales-card">
-        <div className="sales-card-header">
-          <h2 className="sales-card-title">Customer Management</h2>
-          <div className="search-filter-container">
-            <div className="search-box">
-              <input
-                type="text"
-                placeholder="Search customers..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="form-input"
-              />
-              <span className="search-icon"><Icons.Search /></span>
-            </div>
-            <button 
-              className="sales-btn sales-btn-primary"
-              onClick={() => {
-                setEditMode(false);
-                setCustomerForm({ name: '', email: '', phone: '', address: '' });
-                setShowCustomerModal(true);
-              }}
-            >
-              <Icons.Add /> Add Customer
-            </button>
+      <div className="sales-card-header">
+        <div className="search-filter-container">
+          <div className="search-box">
+            <input
+              type="text"
+              placeholder="Search customers..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="form-input"
+            />
+            <span className="search-icon"><Icons.Search /></span>
           </div>
-        </div>
-        <div className="sales-card-body">
-          {loading ? (
-            <div className="sales-loading">Loading customers...</div>
-          ) : error ? (
-            <div className="sales-error">{error}</div>
-          ) : filteredCustomers.length === 0 ? (
-            <div className="empty-state">
-              <div className="empty-state-icon"><Icons.User /></div>
-              <p className="empty-state-text">No customers found. Add your first customer to get started.</p>
-            </div>
-          ) : (
-            <div className="table-container">
-              <table className="sales-table">
-                <thead>
-                  <tr>
-                    <th>ID</th>
-                    <th>Name</th>
-                    <th>Email</th>
-                    <th>Phone</th>
-                    <th>Address</th>
-                    <th>Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filteredCustomers.map(customer => (
-                    <tr key={customer.id} className="slide-in">
-                      <td>{customer.id}</td>
-                      <td><span className="sales-text-bold">{customer.name}</span></td>
-                      <td>{customer.email}</td>
-                      <td>{customer.phone}</td>
-                      <td>{customer.address}</td>
-                      <td>
-                        <div className="btn-container">
-                          <button 
-                            className="sales-btn sales-btn-icon sales-btn-secondary"
-                            onClick={() => handleEditCustomer(customer)}
-                            title="Edit Customer"
-                          >
-                            <Icons.Edit />
-                          </button>
-                          <button 
-                            className="sales-btn sales-btn-icon sales-btn-danger"
-                            onClick={() => handleDeleteCustomer(customer.id)}
-                            title="Delete Customer"
-                          >
-                            <Icons.Delete />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
+          <button 
+            className="sales-btn sales-btn-primary"
+            onClick={() => {
+              setEditMode(false);
+              setCustomerForm({ name: '', email: '', phone: '', address: '' });
+              setShowCustomerModal(true);
+            }}
+          >
+            <Icons.Add /> Add Customer
+          </button>
         </div>
       </div>
+      
+      {loading ? (
+        <div className="sales-loading">Loading customers...</div>
+      ) : error ? (
+        <div className="sales-error">{error}</div>
+      ) : filteredCustomers.length === 0 ? (
+        <div className="empty-state">
+          <div className="empty-state-icon"><Icons.User /></div>
+          <p className="empty-state-text">No customers found. Add your first customer to get started.</p>
+        </div>
+      ) : (
+        <table className="sales-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Phone</th>
+              <th>Address</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {filteredCustomers.map(customer => (
+              <tr key={customer.id} className="slide-in">
+                <td>{customer.id}</td>
+                <td><span className="sales-text-bold">{customer.name}</span></td>
+                <td>{customer.email}</td>
+                <td>{customer.phone}</td>
+                <td>{customer.address}</td>
+                <td>
+                  <div className="btn-container">
+                    <button 
+                      className="sales-btn sales-btn-icon sales-btn-secondary"
+                      onClick={() => handleEditCustomer(customer)}
+                      title="Edit Customer"
+                    >
+                      <Icons.Edit />
+                    </button>
+                    <button 
+                      className="sales-btn sales-btn-icon sales-btn-danger"
+                      onClick={() => handleDeleteCustomer(customer.id)}
+                      title="Delete Customer"
+                    >
+                      <Icons.Delete />
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
     </div>
   );
   
   const renderOrdersTab = () => (
     <div className="sales-content fade-in">
-      <div className="sales-card">
-        <div className="sales-card-header">
-          <h2 className="sales-card-title">Order Management</h2>
-          <div className="search-filter-container">
-            <div className="search-box">
-              <input
-                type="text"
-                placeholder="Search orders..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="form-input"
-              />
-              <span className="search-icon"><Icons.Search /></span>
-            </div>
-            <select
-              className="form-select"
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-            >
-              <option value="all">All Statuses</option>
-              <option value="new">New</option>
-              <option value="pending">Pending</option>
-              <option value="shipped">Shipped</option>
-              <option value="delivered">Delivered</option>
-              <option value="cancelled">Cancelled</option>
-            </select>
-            <button 
-              className="sales-btn sales-btn-primary"
-              onClick={() => {
-                setEditMode(false);
-                setOrderForm({
-                  customerId: 0,
-                  orderDate: new Date().toISOString().split('T')[0],
-                  totalAmount: 0,
-                  status: 'NEW'
-                });
-                setShowOrderModal(true);
-              }}
-            >
-              <Icons.Add /> Create Order
-            </button>
+      <div className="sales-card-header">
+        <div className="search-filter-container">
+          <div className="search-box">
+            <input
+              type="text"
+              placeholder="Search orders..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="form-input"
+            />
+            <span className="search-icon"><Icons.Search /></span>
           </div>
-        </div>
-        
-        <div className="sales-card-body">
-          {loading ? (
-            <div className="sales-loading">Loading orders...</div>
-          ) : error ? (
-            <div className="sales-error">{error}</div>
-          ) : filteredOrders.length === 0 ? (
-            <div className="empty-state">
-              <div className="empty-state-icon"><Icons.Order /></div>
-              <p className="empty-state-text">No orders found. Create your first order to get started.</p>
-            </div>
-          ) : (
-            <div className="table-container">
-              <table className="sales-table">
-                <thead>
-                  <tr>
-                    <th>Order ID</th>
-                    <th>Customer</th>
-                    <th>Date</th>
-                    <th>Amount</th>
-                    <th>Status</th>
-                    <th>Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filteredOrders.map(order => (
-                    <tr key={order.orderId} className="slide-in">
-                      <td>{order.orderId}</td>
-                      <td><span className="sales-text-bold">{order.customerName}</span></td>
-                      <td>{new Date(order.orderDate).toLocaleDateString()}</td>
-                      <td>${order.totalAmount.toFixed(2)}</td>
-                      <td><StatusBadge status={order.status} /></td>
-                      <td>
-                        <div className="btn-container">
-                          <button 
-                            className="sales-btn sales-btn-icon sales-btn-secondary"
-                            onClick={() => handleViewOrderDetails(order.orderId)}
-                            title="View Details"
-                          >
-                            <Icons.View />
-                          </button>
-                          <button 
-                            className="sales-btn sales-btn-icon sales-btn-secondary"
-                            onClick={() => handleEditOrder(order)}
-                            title="Edit Order"
-                          >
-                            <Icons.Edit />
-                          </button>
-                          <button 
-                            className="sales-btn sales-btn-icon sales-btn-danger"
-                            onClick={() => handleDeleteOrder(order.orderId)}
-                            title="Delete Order"
-                          >
-                            <Icons.Delete />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
+          <select
+            className="form-select"
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+          >
+            <option value="all">All Statuses</option>
+            <option value="new">New</option>
+            <option value="pending">Pending</option>
+            <option value="shipped">Shipped</option>
+            <option value="delivered">Delivered</option>
+            <option value="cancelled">Cancelled</option>
+          </select>
+          <button 
+            className="sales-btn sales-btn-primary"
+            onClick={() => {
+              setEditMode(false);
+              setOrderForm({
+                customerId: 0,
+                orderDate: new Date().toISOString().split('T')[0],
+                totalAmount: 0,
+                status: 'NEW'
+              });
+              setShowOrderModal(true);
+            }}
+          >
+            <Icons.Add /> Create Order
+          </button>
         </div>
       </div>
+      
+      {loading ? (
+        <div className="sales-loading">Loading orders...</div>
+      ) : error ? (
+        <div className="sales-error">{error}</div>
+      ) : filteredOrders.length === 0 ? (
+        <div className="empty-state">
+          <div className="empty-state-icon"><Icons.Order /></div>
+          <p className="empty-state-text">No orders found. Create your first order to get started.</p>
+        </div>
+      ) : (
+        <table className="sales-table">
+          <thead>
+            <tr>
+              <th>Order ID</th>
+              <th>Customer</th>
+              <th>Date</th>
+              <th>Amount</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {filteredOrders.map(order => (
+              <tr key={order.orderId} className="slide-in">
+                <td>{order.orderId}</td>
+                <td><span className="sales-text-bold">{order.customerName}</span></td>
+                <td>{new Date(order.orderDate).toLocaleDateString()}</td>
+                <td>${order.totalAmount.toFixed(2)}</td>
+                <td><StatusBadge status={order.status} /></td>
+                <td>
+                  <div className="btn-container">
+                    <button 
+                      className="sales-btn sales-btn-icon sales-btn-secondary"
+                      onClick={() => handleViewOrderDetails(order.orderId)}
+                      title="View Details"
+                    >
+                      <Icons.View />
+                    </button>
+                    <button 
+                      className="sales-btn sales-btn-icon sales-btn-secondary"
+                      onClick={() => handleEditOrder(order)}
+                      title="Edit Order"
+                    >
+                      <Icons.Edit />
+                    </button>
+                    <button 
+                      className="sales-btn sales-btn-icon sales-btn-danger"
+                      onClick={() => handleDeleteOrder(order.orderId)}
+                      title="Delete Order"
+                    >
+                      <Icons.Delete />
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
     </div>
   );
   
@@ -1461,84 +1135,66 @@ const SalesManagement: React.FC = () => {
     
     return (
       <div className="sales-content fade-in">
-        <div className="sales-card">
-          <div className="sales-card-header">
-            <h2 className="sales-card-title">Sales Dashboard</h2>
+        <h2 className="sales-subheading">Sales Dashboard</h2>
+        
+        <div className="sales-dashboard">
+          <div className="sales-stat-card">
+            <div className="sales-stat-title">Total Customers</div>
+            <div className="sales-stat-value">{totalCustomers}</div>
+            <div className="sales-stat-change sales-stat-positive">
+              <Icons.ArrowUp /> Growing
+            </div>
           </div>
-          <div className="sales-card-body">
-            <div className="sales-dashboard">
-              <div className="sales-stat-card">
-                <div className="sales-stat-title">Total Customers</div>
-                <div className="sales-stat-value">{totalCustomers}</div>
-                <div className="sales-stat-change sales-stat-positive">
-                  <Icons.ArrowUp /> Growing
-                </div>
-              </div>
-              
-              <div className="sales-stat-card">
-                <div className="sales-stat-title">Total Orders</div>
-                <div className="sales-stat-value">{totalOrders}</div>
-                <div className="sales-stat-change sales-stat-positive">
-                  <Icons.ArrowUp /> Active
-                </div>
-              </div>
-              
-              <div className="sales-stat-card">
-                <div className="sales-stat-title">Total Revenue</div>
-                <div className="sales-stat-value">${totalRevenue.toFixed(2)}</div>
-                <div className="sales-stat-change sales-stat-positive">
-                  <Icons.ArrowUp /> Increasing
-                </div>
-              </div>
-              
-              <div className="sales-stat-card">
-                <div className="sales-stat-title">Pending Orders</div>
-                <div className="sales-stat-value">{pendingOrders}</div>
-                <div className="sales-stat-change sales-stat-negative">
-                  <Icons.ArrowDown /> Needs Attention
-                </div>
-              </div>
+          
+          <div className="sales-stat-card">
+            <div className="sales-stat-title">Total Orders</div>
+            <div className="sales-stat-value">{totalOrders}</div>
+            <div className="sales-stat-change sales-stat-positive">
+              <Icons.ArrowUp /> Active
+            </div>
+          </div>
+          
+          <div className="sales-stat-card">
+            <div className="sales-stat-title">Total Revenue</div>
+            <div className="sales-stat-value">${totalRevenue.toFixed(2)}</div>
+            <div className="sales-stat-change sales-stat-positive">
+              <Icons.ArrowUp /> Increasing
+            </div>
+          </div>
+          
+          <div className="sales-stat-card">
+            <div className="sales-stat-title">Pending Orders</div>
+            <div className="sales-stat-value">{pendingOrders}</div>
+            <div className="sales-stat-change">
+              Needs Attention
             </div>
           </div>
         </div>
         
         <div className="sales-card">
-          <div className="sales-card-header">
-            <h3 className="sales-card-title">Recent Orders</h3>
-          </div>
-          <div className="sales-card-body">
-            {salesOrders.length === 0 ? (
-              <div className="empty-state">
-                <div className="empty-state-icon"><Icons.Order /></div>
-                <p className="empty-state-text">No orders found. Create your first order to get started.</p>
-              </div>
-            ) : (
-              <div className="table-container">
-                <table className="sales-table">
-                  <thead>
-                    <tr>
-                      <th>Order ID</th>
-                      <th>Customer</th>
-                      <th>Date</th>
-                      <th>Amount</th>
-                      <th>Status</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {salesOrders.slice(0, 5).map(order => (
-                      <tr key={order.orderId} className="slide-in">
-                        <td>{order.orderId}</td>
-                        <td>{order.customerName}</td>
-                        <td>{new Date(order.orderDate).toLocaleDateString()}</td>
-                        <td>${order.totalAmount.toFixed(2)}</td>
-                        <td><StatusBadge status={order.status} /></td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
-          </div>
+          <h3 className="sales-card-title">Recent Orders</h3>
+          <table className="sales-table">
+            <thead>
+              <tr>
+                <th>Order ID</th>
+                <th>Customer</th>
+                <th>Date</th>
+                <th>Amount</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {salesOrders.slice(0, 5).map(order => (
+                <tr key={order.orderId}>
+                  <td>{order.orderId}</td>
+                  <td>{order.customerName}</td>
+                  <td>{new Date(order.orderDate).toLocaleDateString()}</td>
+                  <td>${order.totalAmount.toFixed(2)}</td>
+                  <td><StatusBadge status={order.status} /></td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       </div>
     );
@@ -1549,54 +1205,51 @@ const SalesManagement: React.FC = () => {
       <Header OpenSidebar={OpenSidebar} />
       <Sidebar openSidebarToggle={openSidebarToggle} OpenSidebar={OpenSidebar} />
       
-      <div className="main-container">
-        <div className="sales-container">
-          <h1 className="sales-heading">Sales Management</h1>
-          
-          <div className="sales-card">
-            <div className="sales-tabs">
-              <div 
-                className={`sales-tab ${activeTab === 'dashboard' ? 'active' : ''}`}
-                onClick={() => setActiveTab('dashboard')}
-              >
-                Dashboard
-              </div>
-              <div 
-                className={`sales-tab ${activeTab === 'customers' ? 'active' : ''}`}
-                onClick={() => setActiveTab('customers')}
-              >
-                Customers
-              </div>
-              <div 
-                className={`sales-tab ${activeTab === 'orders' ? 'active' : ''}`}
-                onClick={() => setActiveTab('orders')}
-              >
-                Orders
-              </div>
-              <div 
-                className={`sales-tab ${activeTab === 'invoices' ? 'active' : ''}`}
-                onClick={() => {
-                  setActiveTab('invoices');
-                  setShowInvoiceModal(true);
-                }}
-              >
-                Create Invoice
-              </div>
-              <div 
-                className={`sales-tab ${activeTab === 'payments' ? 'active' : ''}`}
-                onClick={() => {
-                  setActiveTab('payments');
-                  setShowPaymentModal(true);
-                }}
-              >
-                Record Payment
-              </div>
-            </div>
-            
-            <div className="sales-content-container">
-              {activeTab === 'dashboard' && renderDashboard()}
-              {activeTab === 'customers' && renderCustomersTab()}
-              {activeTab === 'orders' && renderOrdersTab()}
+      <div className="sales-container">
+        <h1 className="sales-heading">Sales Management</h1>
+        
+        <div className="sales-tabs">
+          <div 
+            className={`sales-tab ${activeTab === 'dashboard' ? 'active' : ''}`}
+            onClick={() => setActiveTab('dashboard')}
+          >
+            Dashboard
+          </div>
+          <div 
+            className={`sales-tab ${activeTab === 'customers' ? 'active' : ''}`}
+            onClick={() => setActiveTab('customers')}
+          >
+            Customers
+          </div>
+          <div 
+            className={`sales-tab ${activeTab === 'orders' ? 'active' : ''}`}
+            onClick={() => setActiveTab('orders')}
+          >
+            Orders
+          </div>
+          <div 
+            className={`sales-tab ${activeTab === 'invoices' ? 'active' : ''}`}
+            onClick={() => {
+              setActiveTab('invoices');
+              setShowInvoiceModal(true);
+            }}
+          >
+            Create Invoice
+          </div>
+          <div 
+            className={`sales-tab ${activeTab === 'payments' ? 'active' : ''}`}
+            onClick={() => {
+              setActiveTab('payments');
+              setShowPaymentModal(true);
+            }}
+          >
+            Record Payment
+          </div>
+        </div>
+        
+        {activeTab === 'dashboard' && renderDashboard()}
+        {activeTab === 'customers' && renderCustomersTab()}
+        {activeTab === 'orders' && renderOrdersTab()}
         
         {/* Modals */}
         <Modal 
@@ -1638,9 +1291,6 @@ const SalesManagement: React.FC = () => {
         >
           {renderOrderDetails()}
         </Modal>
-            </div>
-          </div>
-        </div>
       </div>
     </div>
   );
