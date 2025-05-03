@@ -12,6 +12,7 @@ import SalesManagement from './components/Admin/SalesManagement';
 import SupplierDashboard from './components/Supplier/SupplierDashboard';
 
 
+
 import RootRedirect from './components/RootRedirect';
 import { Alert, Box, Snackbar } from '@mui/material';
 import { RefreshToken } from './components/Api/apiUrl';
@@ -122,7 +123,8 @@ useEffect(() => {
         <Route path='/forgot-password' element={<ForgetPassword />} />
         <Route path='/email-forgot-password' element={<EmailForgetPassword />} />
         <Route path='/supplier-dashboard' element={<SupplierDashboard />} />
-        <Route path='/salesman-dashboard' element={<SalesmanDashboard />} />
+        {/* <Route path='/inventory-dashboard' element={<InventoryDashboard />} /> */}
+        {/* <Route path='/salesman-dashboard' element={<SalesmanDashboard />} /> */}
         
       </Routes>
       <Snackbar
