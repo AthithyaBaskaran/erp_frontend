@@ -206,7 +206,13 @@ const Sidebar: React.FC<SidebarProps> = ({ openSidebarToggle, OpenSidebar }) => 
               </NavLink>
               <NavLink to="/customers" className={({isActive}) => isActive ? "sidebar-link active" : "sidebar-link"}>
                 <li className="sidebar-list-item">
-                  <BsPeopleFill className="icon" /> <span className="sidebar-item-text">Sales</span>
+                  <BsPeopleFill className="icon" /> <span className="sidebar-item-text">Customers</span>
+                </li>
+              </NavLink>
+              
+              <NavLink to="/book-order" className={({isActive}) => isActive ? "sidebar-link active" : "sidebar-link"}>
+                <li className="sidebar-list-item">
+                  <BsCart3 className="icon" /> <span className="sidebar-item-text">Book Order</span>
                 </li>
               </NavLink>
      
