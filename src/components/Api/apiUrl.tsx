@@ -240,11 +240,22 @@ export const addInventory = async (user: { name: string; sku: string; price: num
   
   export const showInventory = async (categoryId?: number | string) => {
     try {
-      const url = categoryId ? `/product/getAll?categoryId=${categoryId}` : '/product/getAll';
+      const url = categoryId ? `/product/getAll?categoryId=${categoryId}`
+          : "/product/getAll";
       const response = await InventoryapiUrl.get(url);
-      return response.data;
+      
+      // Return the entire response object, not just the data
+      // This allows the calling function to access response.data
+      return response;
     } catch (error) {
       console.log("❌ Error fetching inventory:", error);
+      
+      // Add more detailed error logging
+      if (error.response) {
+        console.log("Error status:", error.response.status);
+        console.log("Error data:", error.response.data);
+      }
+      
       throw error;
     }
   };

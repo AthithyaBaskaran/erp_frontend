@@ -9,6 +9,12 @@ import AdminUsers from './components/Admin/users';
 import Inventory from './components/Admin/inventory';
 import Products from './components/Admin/products_new';
 import BookMyOrder from './components/Sales/SimpleBookOrder';
+import SalesManagement from './components/Admin/SalesManagement';
+import SupplierDashboard from './components/Supplier/SupplierDashboard';
+
+
+
+import RootRedirect from './components/RootRedirect';
 import { Alert, Box, Snackbar } from '@mui/material';
 import { RefreshToken } from './components/Api/apiUrl';
 import { useEffect, useState } from 'react';
@@ -111,6 +117,10 @@ useEffect(() => {
         <Route path="/change_password" element={<ChangePassword />} />
         <Route path='/forgot-password' element={<ForgetPassword />} />
         <Route path='/email-forgot-password' element={<EmailForgetPassword />} />
+        <Route path='/supplier-dashboard' element={<SupplierDashboard />} />
+        {/* <Route path='/inventory-dashboard' element={<InventoryDashboard />} /> */}
+        {/* <Route path='/salesman-dashboard' element={<SalesmanDashboard />} /> */}
+        
       </Routes>
       <Snackbar
         open={openSnackbar}
