@@ -27,6 +27,8 @@ const App: React.FC = () => {
           navigate("/salesman-dashboard");
         } else if (userRole === 'sales manager') {
           navigate("/sales-dashboard");
+        } else if (userRole === 'inventory') {
+          navigate("/inventory-dashboard");
         } else {
           navigate("/dashboard");
         }

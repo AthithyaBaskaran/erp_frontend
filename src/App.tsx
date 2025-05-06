@@ -12,6 +12,13 @@ import BookMyOrder from './components/Sales/SimpleBookOrder';
 import SupplierDashboard from './components/Supplier/SupplierDashboard';
 import SalesDashboard from './components/SalesManagement/SalesDashboard';
 import SalesOrders from './components/SalesManagement/SalesOrders';
+import InventoryDashboard from './components/Inventory/InventoryDashboard';
+import InventoryProducts from './components/Inventory/InventoryProducts';
+import InventoryAnalytics from './components/Inventory/InventoryAnalytics';
+import InventorySettings from './components/Inventory/InventorySettings';
+
+
+import RootRedirect from './components/RootRedirect';
 import { Alert, Box, Snackbar } from '@mui/material';
 import { RefreshToken } from './components/Api/apiUrl';
 import { useEffect, useState } from 'react';
@@ -115,6 +122,11 @@ useEffect(() => {
         <Route path='/forgot-password' element={<ForgetPassword />} />
         <Route path='/email-forgot-password' element={<EmailForgetPassword />} />
         <Route path='/supplier-dashboard' element={<SupplierDashboard />} />
+        <Route path='/inventory-dashboard' element={<InventoryDashboard />} />
+        <Route path='/inventory-products' element={<InventoryProducts />} />
+        <Route path='/inventory-analytics' element={<InventoryAnalytics />} />
+        <Route path='/inventory-settings' element={<InventorySettings />} />
+        {/* <Route path='/salesman-dashboard' element={<SalesmanDashboard />} /> */}
         
         {/* Sales Management Routes - Commented out until TestLogin component is created */}
         <Route path='/sales-dashboard' element={<SalesDashboard />} />

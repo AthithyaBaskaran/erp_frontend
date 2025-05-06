@@ -155,6 +155,9 @@ const AuthForm: React.FC = () => {
           } else if (role === "sales manager") {
             console.log("Redirecting to sales management dashboard");
             navigate("/sales-dashboard");
+          } else if (role === "inventory") {
+            console.log("Redirecting to inventory dashboard");
+            navigate("/inventory-dashboard");
           } else {
             console.log("Redirecting to regular dashboard");
             navigate("/dashboard");
