@@ -1,0 +1,139 @@
+/* Red and White Sidebar Theme - Only for Sales Manager */
+
+/* Main sidebar background - Only applied when sales-manager-sidebar class is present */
+#sidebar.sales-manager-sidebar {
+  background: linear-gradient(135deg, #d32f2f 0%, #b71c1c 100%) !important; /* Red gradient background */
+  color: #ffffff !important;
+  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.2); /* Add shadow for depth */
+}
+
+/* Sidebar brand/logo area for Sales Manager */
+.sales-manager-sidebar .sidebar-brand {
+  color: #ffffff !important;
+  font-weight: 700;
+  font-size: 22px;
+  padding: 10px 0;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+/* Close icon for Sales Manager */
+.sales-manager-sidebar .close_icon {
+  color: #ffffff !important;
+  opacity: 0.9;
+  font-weight: bold;
+}
+
+.sales-manager-sidebar .close_icon:hover {
+  opacity: 1;
+}
+
+/* Section titles for Sales Manager */
+.sales-manager-sidebar .sidebar-menu-container .MuiTypography-root {
+  color: rgba(255, 255, 255, 0.8) !important;
+  font-weight: 600 !important;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  font-size: 12px !important;
+  margin-top: 20px !important;
+  margin-bottom: 15px !important;
+  padding-left: 20px !important;
+}
+
+/* List items for Sales Manager */
+.sales-manager-sidebar .sidebar-list-item {
+  background-color: transparent;
+  border-left: 4px solid transparent;
+  transition: all 0.3s ease;
+  margin-bottom: 5px;
+  border-radius: 0 8px 8px 0;
+  position: relative;
+}
+
+/* Add subtle dividers between menu items for Sales Manager */
+.sales-manager-sidebar .sidebar-list-item:after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 20px;
+  right: 20px;
+  height: 1px;
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Sidebar item text for Sales Manager */
+.sales-manager-sidebar .sidebar-item-text {
+  color: #ffffff !important;
+  font-weight: 500 !important;
+  font-size: 15px !important;
+}
+
+/* Icons in sidebar for Sales Manager */
+.sales-manager-sidebar .sidebar-list-item .icon {
+  color: #ffffff !important;
+  font-size: 18px;
+}
+
+/* Hover state for Sales Manager */
+.sales-manager-sidebar .sidebar-list-item:hover {
+  background-color: rgba(255, 255, 255, 0.15) !important;
+  border-left: 4px solid #ffffff !important;
+  transform: translateX(5px); /* Slight movement on hover */
+}
+
+/* Active state for Sales Manager */
+.sales-manager-sidebar .sidebar-link.active .sidebar-list-item {
+  background-color: rgba(255, 255, 255, 0.2) !important; /* White overlay for active items */
+  border-left: 4px solid #ffffff !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* Active state icon and text for Sales Manager */
+.sales-manager-sidebar .sidebar-link.active .icon,
+.sales-manager-sidebar .sidebar-link.active .sidebar-item-text {
+  color: #ffffff !important;
+  font-weight: 700;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+/* Underline effect on hover for Sales Manager */
+.sales-manager-sidebar .sidebar-item-text::after {
+  background-color: #ffffff !important;
+}
+
+/* Override any theme-specific styles for Sales Manager */
+body.light .sales-manager-sidebar, 
+body.dark .sales-manager-sidebar {
+  background: linear-gradient(135deg, #d32f2f 0%, #b71c1c 100%) !important;
+  color: #ffffff !important;
+}
+
+body.light .sales-manager-sidebar .sidebar-list-item > a,
+body.dark .sales-manager-sidebar .sidebar-list-item > a {
+  color: #ffffff !important;
+}
+
+/* Make sure all text is white regardless of theme for Sales Manager */
+.sales-manager-sidebar .sidebar-link, 
+.sales-manager-sidebar .sidebar-link.active, 
+.sales-manager-sidebar .sidebar-list-item, 
+.sales-manager-sidebar .sidebar-list-item.active {
+  color: #ffffff !important;
+}
+
+/* Add a subtle texture to the sidebar for Sales Manager */
+.sales-manager-sidebar::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: linear-gradient(45deg, rgba(255, 255, 255, 0.05) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.05) 50%, rgba(255, 255, 255, 0.05) 75%, transparent 75%, transparent);
+  background-size: 4px 4px;
+  pointer-events: none;
+}
+
+/* Ensure the sidebar has proper positioning for the texture */
+#sidebar {
+  position: relative;
+}

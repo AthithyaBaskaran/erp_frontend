@@ -1,0 +1,107 @@
+/* Red Header Theme for Sales Manager */
+
+/* Only apply the red header theme when the user has the Sales Manager role */
+body[data-role="sales-manager"] .header {
+  background: linear-gradient(to right, #d32f2f, #b71c1c) !important;
+  color: #ffffff !important;
+  box-shadow: 0 4px 12px rgba(183, 28, 28, 0.3) !important;
+}
+
+/* Header icons */
+body[data-role="sales-manager"] .header .icon {
+  color: #ffffff !important;
+}
+
+/* Search icon */
+body[data-role="sales-manager"] .header-left .icon {
+  color: rgba(255, 255, 255, 0.9) !important;
+}
+
+/* Profile text */
+body[data-role="sales-manager"] .header .nav_username {
+  color: #ffffff !important;
+}
+
+/* Theme toggle button */
+body[data-role="sales-manager"] .header .MuiButton-root {
+  background-color: rgba(255, 255, 255, 0.15) !important;
+  color: #ffffff !important;
+}
+
+body[data-role="sales-manager"] .header .MuiButton-root:hover {
+  background-color: rgba(255, 255, 255, 0.25) !important;
+}
+
+/* Dropdown arrow */
+body[data-role="sales-manager"] .profile-icon-container span {
+  color: #ffffff !important;
+}
+
+/* Make sure badges are visible against the red background */
+body[data-role="sales-manager"] .header .MuiBadge-badge {
+  background-color: #ffffff !important;
+  color: #d32f2f !important;
+  font-weight: bold !important;
+}
+
+/* Add a subtle border to separate header from content */
+body[data-role="sales-manager"] .header {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Add a subtle texture to the header */
+body[data-role="sales-manager"] .header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: linear-gradient(45deg, rgba(255, 255, 255, 0.05) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.05) 50%, rgba(255, 255, 255, 0.05) 75%, transparent 75%, transparent);
+  background-size: 4px 4px;
+  pointer-events: none;
+  z-index: -1;
+}
+
+/* Ensure the header has proper positioning for the texture */
+body[data-role="sales-manager"] .header {
+  position: relative;
+}
+
+/* Style the profile dropdown menu for Sales Manager */
+body[data-role="sales-manager"] .profile-menu {
+  background-color: #ffffff !important;
+  color: #333333 !important;
+  border: 1px solid rgba(183, 28, 28, 0.2) !important;
+  box-shadow: 0 4px 12px rgba(183, 28, 28, 0.2) !important;
+}
+
+/* Style the profile info section */
+body[data-role="sales-manager"] .profile-info {
+  background-color: rgba(183, 28, 28, 0.05) !important;
+  border-bottom: 1px solid rgba(183, 28, 28, 0.1) !important;
+}
+
+/* Style the role text */
+body[data-role="sales-manager"] .profile-info .MuiTypography-body2 {
+  color: #d32f2f !important;
+  font-weight: 500 !important;
+}
+
+/* Style the logout option */
+body[data-role="sales-manager"] .profile-option.logout {
+  color: #d32f2f !important;
+}
+
+body[data-role="sales-manager"] .profile-option.logout:hover {
+  background-color: rgba(211, 47, 47, 0.1) !important;
+}
+
+/* Style the change password option */
+body[data-role="sales-manager"] .profile-option.change-password {
+  color: #d32f2f !important;
+}
+
+body[data-role="sales-manager"] .profile-option.change-password:hover {
+  background-color: rgba(211, 47, 47, 0.1) !important;
+}

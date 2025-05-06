@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   BsFillArchiveFill,
   BsFillGrid3X3GapFill,
@@ -19,6 +19,7 @@ import {
   Line
 } from 'recharts';
 import { useThemeContext } from './ThemeContext';
+// import '../styles/white-dashboard.css';
 
 interface ChartData {
   name: string;
@@ -30,11 +31,20 @@ interface ChartData {
 const Home: React.FC = () => {
   const { mode } = useThemeContext();
   
-  // Chart colors based on theme
-  const barColor1 = mode === 'dark' ? '#8884d8' : '#4a4ad8';
-  const barColor2 = mode === 'dark' ? '#82ca9d' : '#2e9d6a';
-  const lineColor1 = mode === 'dark' ? '#8884d8' : '#4a4ad8';
-  const lineColor2 = mode === 'dark' ? '#82ca9d' : '#2e9d6a';
+  // Check if user is a Sales Manager
+  const [isSalesManager, setIsSalesManager] = useState(false);
+  
+  useEffect(() => {
+    // Check if the body has the sales-manager data-role attribute
+    const hasSalesManagerRole = document.body.getAttribute('data-role') === 'sales-manager';
+    setIsSalesManager(hasSalesManagerRole);
+  }, []);
+  
+  // Chart colors based on theme and role
+  const barColor1 = isSalesManager ? '#d32f2f' : (mode === 'dark' ? '#8884d8' : '#4a4ad8');
+  const barColor2 = isSalesManager ? '#f44336' : (mode === 'dark' ? '#82ca9d' : '#2e9d6a');
+  const lineColor1 = isSalesManager ? '#d32f2f' : (mode === 'dark' ? '#8884d8' : '#4a4ad8');
+  const lineColor2 = isSalesManager ? '#f44336' : (mode === 'dark' ? '#82ca9d' : '#2e9d6a');
   
   const data: ChartData[] = [
     { name: 'Page A', uv: 4000, pv: 2400, amt: 2400 },
@@ -49,7 +59,7 @@ const Home: React.FC = () => {
   return (
     <main className="main-container">
       <div className="main-title">
-        <h3>DASHBOARD</h3>
+        <h3>{isSalesManager ? 'SALES MANAGER DASHBOARD' : 'DASHBOARD'}</h3>
       </div>
 
       <div className="main-cards">
@@ -91,9 +101,10 @@ const Home: React.FC = () => {
       </div>
 
       <div className="charts" style={{ 
-        backgroundColor: mode === 'dark' ? 'rgba(38, 48, 67, 0.6)' : 'rgba(255, 255, 255, 0.6)',
+        backgroundColor: isSalesManager ? '#ffffff' : (mode === 'dark' ? 'rgba(38, 48, 67, 0.6)' : 'rgba(255, 255, 255, 0.6)'),
         padding: '15px',
         borderRadius: '8px',
+        boxShadow: isSalesManager ? '0 2px 10px rgba(0, 0, 0, 0.05)' : 'none',
       }}>
         <ResponsiveContainer width="100%" height="100%">
           <BarChart
@@ -105,9 +116,10 @@ const Home: React.FC = () => {
             <YAxis />
             <Tooltip 
               contentStyle={{ 
-                backgroundColor: mode === 'dark' ? '#263043' : '#fff',
-                color: mode === 'dark' ? '#fff' : '#333',
-                border: `1px solid ${mode === 'dark' ? '#555' : '#ddd'}`
+                backgroundColor: isSalesManager ? '#fff' : (mode === 'dark' ? '#263043' : '#fff'),
+                color: isSalesManager ? '#333' : (mode === 'dark' ? '#fff' : '#333'),
+                border: isSalesManager ? '1px solid #d32f2f' : `1px solid ${mode === 'dark' ? '#555' : '#ddd'}`,
+                boxShadow: isSalesManager ? '0 2px 8px rgba(0, 0, 0, 0.1)' : 'none'
               }} 
             />
             <Legend />
@@ -126,9 +138,10 @@ const Home: React.FC = () => {
             <YAxis />
             <Tooltip 
               contentStyle={{ 
-                backgroundColor: mode === 'dark' ? '#263043' : '#fff',
-                color: mode === 'dark' ? '#fff' : '#333',
-                border: `1px solid ${mode === 'dark' ? '#555' : '#ddd'}`
+                backgroundColor: isSalesManager ? '#fff' : (mode === 'dark' ? '#263043' : '#fff'),
+                color: isSalesManager ? '#333' : (mode === 'dark' ? '#fff' : '#333'),
+                border: isSalesManager ? '1px solid #d32f2f' : `1px solid ${mode === 'dark' ? '#555' : '#ddd'}`,
+                boxShadow: isSalesManager ? '0 2px 8px rgba(0, 0, 0, 0.1)' : 'none'
               }} 
             />
             <Legend />

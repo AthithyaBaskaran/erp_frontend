@@ -11,11 +11,12 @@ import {
   BsGear,
 } from 'react-icons/bs';
 import { Tooltip, Typography, Avatar, Button, Badge } from '@mui/material';
-import { deepOrange, deepPurple } from '@mui/material/colors';
+import { deepOrange, deepPurple, red } from '@mui/material/colors';
 import { useThemeContext } from './ThemeContext';
 import { useNavigate } from 'react-router-dom';
 import DarkModeIcon from '@mui/icons-material/DarkMode';
 import LightModeIcon from '@mui/icons-material/LightMode';
+import '../styles/red-header.css';
 
 
 interface HeaderProps {
@@ -81,6 +82,31 @@ const Header: React.FC<HeaderProps> = ({ OpenSidebar, onNotificationClick }) => 
       }
     }
   }, [Username]);
+  
+  // Apply the data-role attribute to the body element for role-specific styling
+  useEffect(() => {
+    if (UserRole) {
+      // Check if the user is a Sales Manager
+      const isSalesManager = 
+        UserRole === "Sales Manager" || 
+        UserRole.toLowerCase() === "sales manager" || 
+        UserRole.includes("Sales Manager") || 
+        UserRole.toLowerCase().includes("sales manager");
+      
+      if (isSalesManager) {
+        document.body.setAttribute('data-role', 'sales-manager');
+      } else {
+        document.body.removeAttribute('data-role');
+      }
+    } else {
+      document.body.removeAttribute('data-role');
+    }
+    
+    // Cleanup function to remove the attribute when component unmounts
+    return () => {
+      document.body.removeAttribute('data-role');
+    };
+  }, [UserRole]);
   
   // Get the first letter of username for the avatar fallback
   const getInitial = () => {
@@ -162,8 +188,14 @@ const Header: React.FC<HeaderProps> = ({ OpenSidebar, onNotificationClick }) => 
                   width: 32, 
                   height: 32,
                   marginRight: '8px',
-                  bgcolor: gender === 'male' ? deepOrange[500] : deepPurple[500],
-                  border: showLogout ? '2px solid #4dabf5' : 'none',
+                  bgcolor: document.body.getAttribute('data-role') === 'sales-manager' 
+                    ? red[700] 
+                    : (gender === 'male' ? deepOrange[500] : deepPurple[500]),
+                  border: showLogout 
+                    ? document.body.getAttribute('data-role') === 'sales-manager'
+                      ? '2px solid #ffffff'
+                      : '2px solid #4dabf5' 
+                    : 'none',
                   fontFamily: "'Poppins', sans-serif",
                   cursor: 'pointer'
                 }}

@@ -9,12 +9,9 @@ import AdminUsers from './components/Admin/users';
 import Inventory from './components/Admin/inventory';
 import Products from './components/Admin/products_new';
 import BookMyOrder from './components/Sales/SimpleBookOrder';
-import SalesManagement from './components/Admin/SalesManagement';
 import SupplierDashboard from './components/Supplier/SupplierDashboard';
-
-
-
-import RootRedirect from './components/RootRedirect';
+import SalesDashboard from './components/SalesManagement/SalesDashboard';
+import SalesOrders from './components/SalesManagement/SalesOrders';
 import { Alert, Box, Snackbar } from '@mui/material';
 import { RefreshToken } from './components/Api/apiUrl';
 import { useEffect, useState } from 'react';
@@ -118,10 +115,11 @@ useEffect(() => {
         <Route path='/forgot-password' element={<ForgetPassword />} />
         <Route path='/email-forgot-password' element={<EmailForgetPassword />} />
         <Route path='/supplier-dashboard' element={<SupplierDashboard />} />
-        {/* <Route path='/inventory-dashboard' element={<InventoryDashboard />} /> */}
-        {/* <Route path='/salesman-dashboard' element={<SalesmanDashboard />} /> */}
         
-      </Routes>
+        {/* Sales Management Routes - Commented out until TestLogin component is created */}
+        <Route path='/sales-dashboard' element={<SalesDashboard />} />
+        <Route path='/sales-orders' element={<SalesOrders />} />
+        </Routes>
       <Snackbar
         open={openSnackbar}
         autoHideDuration={2000}

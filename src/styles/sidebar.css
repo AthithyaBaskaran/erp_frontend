@@ -117,6 +117,48 @@ body.dark .sidebar-link {
   display: inline-block; /* Needed for transform to work */
 }
 
+/* Sales Manager Dashboard Styles */
+.sales-manager-dashboard .sidebar-list-item {
+  background-color: #dc3545; /* Solid red background */
+  border-left: 4px solid #b02a37; /* Darker red indicator */
+  border-radius: 0 8px 8px 0; /* Rounded corners on the right side */
+}
+
+.sales-manager-dashboard:hover .sidebar-list-item {
+  background-color: #bb2d3b !important; /* Slightly darker red on hover */
+  border-left: 4px solid #b02a37; /* Darker red indicator */
+  box-shadow: 0 2px 5px rgba(220, 53, 69, 0.5); /* Red shadow on hover */
+}
+
+.sales-manager-dashboard .sales-manager-icon,
+.sales-manager-dashboard .sales-manager-text {
+  color: #ffffff !important; /* White text and icon */
+  font-weight: 700;
+}
+
+/* Override the underline effect for Sales Manager dashboard */
+.sales-manager-dashboard .sales-manager-text::after {
+  background-color: #ffffff; /* White underline */
+}
+
+.sales-manager-dashboard:hover .sales-manager-icon,
+.sales-manager-dashboard:hover .sales-manager-text {
+  color: #ffffff !important; /* Keep white on hover */
+  transform: translateX(3px); /* Slight movement on hover */
+}
+
+.sales-manager-dashboard.active .sidebar-list-item {
+  background-color: #b02a37; /* Darker red when active */
+  border-left: 4px solid #a52834; /* Even darker red indicator */
+  box-shadow: 0 2px 8px rgba(220, 53, 69, 0.6); /* Stronger red glow when active */
+}
+
+.sales-manager-dashboard.active .sales-manager-icon,
+.sales-manager-dashboard.active .sales-manager-text {
+  color: #ffffff !important; /* White text when active */
+  font-weight: 800; /* Extra bold when active */
+}
+
 /* Legacy classes for backward compatibility */
 .Admin_link_sidebar {
   text-decoration: none;

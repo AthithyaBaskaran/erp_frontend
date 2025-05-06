@@ -33,7 +33,8 @@ import Sidebar from '../Sidebar';
 import { 
 showInventory, 
   fetchCategoriesApi, 
-  createSalesOrder 
+  createSalesOrder,
+  showUsers
 } from '../Api/apiUrl';
 
 // Types  
@@ -112,9 +113,15 @@ const SimpleBookOrder: React.FC = () => {
   const fetchCustomers = async () => {
     try {
       setLoading(true);
-      const response = await getAllCustomers();
+      // Using showUsers with empty search string to get all users as customers
+      const response = await showUsers('');
       if (response && response.data) {
-        setCustomers(response.data);
+        // Map users to customer format if needed
+        const customerData = response.data.map((user: any) => ({
+          id: user.id,
+          name: user.name
+        }));
+        setCustomers(customerData);
       }
     } catch (error) {
       console.error('Error fetching customers:', error);
@@ -151,15 +158,24 @@ const SimpleBookOrder: React.FC = () => {
     try {
       setLoading(true);
       const response = await showInventory(categoryId);
+      
+      console.log("API Response:", response);
+      console.log("Response data structure:", response.data);
+      
       if (response && response.data) {
+        // Check if response.data is an array or has a data property that is an array
+        let productsArray = Array.isArray(response.data) ? response.data : 
+                           (response.data.data && Array.isArray(response.data.data) ? response.data.data : []);
+        
         // Map the API response to include stock quantity
-        const productsWithStock = response.data.map((product: any) => ({
+        const productsWithStock = productsArray.map((product: any) => ({
           ...product,
           stockQuantity: Math.floor(Math.random() * 100) + 1 // Simulating stock quantity (replace with actual data)
         }));
+        
+        console.log("Processed products:", productsWithStock);
         setProducts(productsWithStock);
         setFilteredProducts(productsWithStock);
-        
         // Reset selected product when category changes
         setSelectedProduct(null);
       }
@@ -524,9 +540,26 @@ const SimpleBookOrder: React.FC = () => {
                           fetchProducts();
                         }
                       }}
-
+                      sx={{
+                        fontFamily: '"Poppins", sans-serif',
+                        fontWeight: 'medium',
+                        '& .MuiSelect-select': {
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '8px'
+                        }
+                      }}
+                      renderValue={(selected) => {
+                        if (!selected) {
+                          return <em>All Categories</em>;
+                        }
+                        const category = categories.find(cat => cat.id === selected);
+                        return category ? category.categoryName : '';
+                      }}
                     >
-                      <MenuItem value="">All Categories</MenuItem>
+                      <MenuItem value="">
+                        <em>All Categories</em>
+                      </MenuItem>
                       {categories.map((category) => (
                         <MenuItem key={category.id} value={category.id}>
                           {category.categoryName}
@@ -720,152 +753,6 @@ const SimpleBookOrder: React.FC = () => {
                 </Button>
               </Box>
             </Box>
-          </Paper>
-          
-         
-          <Paper elevation={3} className="order-form" sx={{ mt: 4 }}>
-            <Typography 
-              variant="h6" 
-              sx={{ 
-                mb: 3, 
-                fontFamily: '"Poppins", sans-serif',
-                fontWeight: 'bold',
-                color: '#1976d2',
-                borderBottom: '2px solid #1976d2',
-                paddingBottom: '8px',
-                display: 'inline-block'
-              }}
-            >
-              
-            </Typography>
-            
-            {categories.map((category) => {
-              // Filter products for this category
-              const categoryProducts = products.filter(product => product.categoryId === category.id);
-              
-              // Only show categories that have products
-              if (categoryProducts.length === 0) return null;
-              
-              return (
-                <Box key={category.id} sx={{ mb: 4 }}>
-                  <Box 
-                    sx={{ 
-                      display: 'flex', 
-                      alignItems: 'center', 
-                      mb: 2,
-                      backgroundColor: '#f5f5f5',
-                      padding: '8px 16px',
-                      borderRadius: '8px',
-                      boxShadow: '0 2px 4px rgba(0,0,0,0.05)'
-                    }}
-                  >
-                    <Typography 
-                      variant="subtitle1" 
-                      sx={{ 
-                        fontFamily: '"Poppins", sans-serif',
-                        fontWeight: 'bold',
-                        color: '#333'
-                      }}
-                    >
-                      {category.categoryName}
-                    </Typography>
-                    <Typography 
-                      variant="body2" 
-                      sx={{ 
-                        ml: 2,
-                        backgroundColor: '#e3f2fd',
-                        padding: '2px 8px',
-                        borderRadius: '12px',
-                        color: '#1976d2',
-                        fontWeight: 'medium'
-                      }}
-                    >
-                      {categoryProducts.length} products
-                    </Typography>
-                  </Box>
-                  
-                  <Grid container spacing={2}>
-                    {categoryProducts.map((product) => (
-                      <Grid item xs={12} sm={6} md={4} key={product.id}>
-                        <Card 
-                          sx={{ 
-                            p: 2, 
-                            height: '100%',
-                            display: 'flex',
-                            flexDirection: 'column',
-                            justifyContent: 'space-between',
-                            transition: 'transform 0.2s, box-shadow 0.2s',
-                            '&:hover': {
-                              transform: 'translateY(-4px)',
-                              boxShadow: '0 8px 16px rgba(0,0,0,0.1)'
-                            }
-                          }}
-                        >
-                          <Box>
-                            <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 1 }}>
-                              <InventoryIcon fontSize="small" color="primary" />
-                              <Typography 
-                                variant="subtitle1" 
-                                sx={{ 
-                                  fontWeight: 'bold',
-                                  color: '#333'
-                                }}
-                              >
-                                {product.name}
-                              </Typography>
-                            </Stack>
-                            
-                            <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-                              Price: ${product.price.toFixed(2)}
-                            </Typography>
-                            
-                            <Box 
-                              sx={{ 
-                                display: 'flex',
-                                alignItems: 'center',
-                                mt: 1
-                              }}
-                            >
-                              <Typography 
-                                variant="body2" 
-                                sx={{ 
-                                  backgroundColor: product.stockQuantity > 10 ? '#e8f5e9' : '#fff8e1',
-                                  color: product.stockQuantity > 10 ? '#2e7d32' : '#f57c00',
-                                  padding: '2px 8px',
-                                  borderRadius: '12px',
-                                  fontWeight: 'medium'
-                                }}
-                              >
-                                Stock: {product.stockQuantity}
-                              </Typography>
-                            </Box>
-                          </Box>
-                          
-                          <Button 
-                            variant="outlined" 
-                            size="small" 
-                            sx={{ 
-                              mt: 2,
-                              alignSelf: 'flex-start'
-                            }}
-                            onClick={() => {
-                              setSelectedCategory(category);
-                              // Fetch products for the selected category
-                              fetchProducts(category.id);
-                              // Set the selected product directly
-                              setSelectedProduct(product);
-                              setQuantity(1);
-                            }}
-                          >
-                            Select
-                          </Button>
-                        </Card>
-                      </Grid>
-                    ))}
-                  </Grid>
-                </Box>
-              );
-            })}
           </Paper>
           
           {/* Total Amount */}
