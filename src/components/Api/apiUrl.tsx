@@ -195,6 +195,34 @@ export const createSalesOrder = async (data: {
     }
 };
 
+export const fetchSalesOrdersByStatus = async (status: string) => {
+    try {
+        console.log(`Fetching sales orders with status: ${status}`);
+        const response = await SalesApiUrl.get(`/sales-orders/getOrderByStatus?status=${status}`);
+        console.log('Sales orders API response:', response);
+        
+        if (response.data) {
+            return response.data;
+        } else {
+            throw new Error('No data received from server');
+        }
+    } catch (error: any) {
+        console.error('Error fetching sales orders:', error);
+        
+        // More detailed error logging
+        if (error.response) {
+            console.error("Error status:", error.response.status);
+            console.error("Error data:", error.response.data);
+        } else if (error.request) {
+            console.error("No response received:", error.request);
+        } else {
+            console.error("Error message:", error.message);
+        }
+        
+        throw error;
+    }
+};
+
 
 
 export const RefreshToken = async (userId: number, token: string) => {

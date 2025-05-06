@@ -73,7 +73,7 @@ import '../../styles/inventory.css';
 
 // API
 import {
-  fetchCategoriesApi, showInventory, addInventory
+  fetchCategoriesApi, showInventory, addInventory, fetchSalesOrdersByStatus
 } from "../Api/apiUrl";
 
 // Register ChartJS components
@@ -105,6 +105,17 @@ interface InventoryItem {
 interface Category {
   id?: string;
   categoryName: string;
+}
+
+interface SalesOrder {
+  id: number;
+  orderNumber: string;
+  customerName: string;
+  orderDate: string;
+  totalAmount: number;
+  status: string;
+  productName?: string;
+  quantity?: number;
 }
 
 // Validation schema
@@ -139,6 +150,8 @@ const SupplierDashboard: React.FC = () => {
   const [categories, setCategories] = useState<Category[]>([]);
   const [inventoryItems, setInventoryItems] = useState<InventoryItem[]>([]);
   const [isProductsLoading, setIsProductsLoading] = useState(false);
+  const [isOrdersLoading, setIsOrdersLoading] = useState(false);
+  const [salesOrders, setSalesOrders] = useState<SalesOrder[]>([]);
   const [productTabValue, setProductTabValue] = useState(0);
   const [orderTabValue, setOrderTabValue] = useState(0);
   
@@ -299,7 +312,94 @@ const SupplierDashboard: React.FC = () => {
     setProductTabValue(newValue);
   };
   
+  const fetchSalesOrders = async (status: string = 'PENDING') => {
+    setIsOrdersLoading(true);
+    try {
+      // Add a timeout to prevent hanging requests
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('Request timeout')), 15000)
+      );
+      
+      const responsePromise = fetchSalesOrdersByStatus(status);
+      // Properly type the response using type assertion
+      const response = await Promise.race([responsePromise, timeoutPromise]) as any;
+      
+      // Debug the response structure
+      console.log("Sales Orders API Response:", response);
+      
+      // Check if response exists
+      if (response) {
+        // The API might return the data directly or in a data property
+        let processedData;
+        
+        if (response.data) {
+          // If response has a data property (standard Axios response)
+          processedData = response.data;
+          console.log("Response data:", processedData);
+        } else {
+          // If response is the data itself (some APIs return this way)
+          processedData = response;
+          console.log("Direct response:", processedData);
+        }
+        
+        // Check if we have an array in data.data (nested data structure)
+        if (processedData && Array.isArray(processedData)) {
+          console.log("Setting sales orders from array data:", processedData);
+          setSalesOrders(processedData);
+        } 
+        // If data is not in expected format, set empty array
+        else {
+          console.warn("Unexpected data format:", processedData);
+          setSalesOrders([]);
+          throw new Error('Unexpected data format received from server');
+        }
+      } else {
+        throw new Error('No response received from server');
+      }
+    }
+    catch (error: any) {
+      console.error("Error fetching sales orders:", error);
+      
+      // More detailed error message based on the error type
+      let errorMessage = 'There was an error loading the orders list. Please try again.';
+      
+      if (error.response) {
+        // Server responded with an error status
+        if (error.response.status === 500) {
+          errorMessage = 'Server error occurred. Please contact the administrator.';
+        } else if (error.response.data && error.response.data.message) {
+          errorMessage = error.response.data.message;
+        }
+      } else if (error.request) {
+        // Request was made but no response received
+        errorMessage = 'No response from server. Please check your connection.';
+      } else if (error.message) {
+        // Something else caused the error
+        errorMessage = error.message;
+      }
+      
+      Swal.fire({
+        icon: 'error',
+        title: 'Failed to Load Orders',
+        text: errorMessage,
+        customClass: {
+          popup: 'swal2-popup',
+          title: 'swal2-title',
+          htmlContainer: 'swal2-html-container',
+          confirmButton: 'swal2-confirm',
+          icon: 'swal2-icon'
+        }
+      });
+    } finally {
+      setIsOrdersLoading(false);
+    }
+  };
+
   const handleViewAllOrders = (tabIndex: number = 0) => {
+    // Fetch orders based on tab index
+    const status = tabIndex === 0 ? 'PENDING' : 'DELIVERED';
+    fetchSalesOrders(status);
+    
     setOrderTabValue(tabIndex);
     setOpenOrdersModal(true);
   };
@@ -310,6 +410,9 @@ const SupplierDashboard: React.FC = () => {
   
   const handleOrderTabChange = (event: React.SyntheticEvent, newValue: number) => {
     setOrderTabValue(newValue);
+    // Fetch orders based on new tab value
+    const status = newValue === 0 ? 'PENDING' : 'DELIVERED';
+    fetchSalesOrders(status);
   };
   
   const handleInventory: SubmitHandler<InventoryFormData> = async (data) => {
@@ -367,10 +470,10 @@ const SupplierDashboard: React.FC = () => {
   };
 
   const recentOrders = [
-    { id: "ORD-7829", customer: "TechCorp Ltd", date: "Oct 12, 2023", amount: 12500, status: "Delivered" },
-    { id: "ORD-7830", customer: "Global Industries", date: "Oct 10, 2023", amount: 8750, status: "Processing" },
-    { id: "ORD-7831", customer: "Innovate Solutions", date: "Oct 8, 2023", amount: 5200, status: "Pending" },
-    { id: "ORD-7832", customer: "Prime Retailers", date: "Oct 5, 2023", amount: 9300, status: "Delivered" },
+    { id: "ORD-7829", customerName: "TechCorp Ltd", date: "Oct 12, 2023", amount: 12500, status: "Delivered" },
+    { id: "ORD-7830", customerName: "Global Industries", date: "Oct 10, 2023", amount: 8750, status: "Processing" },
+    { id: "ORD-7831", customerName: "Innovate Solutions", date: "Oct 8, 2023", amount: 5200, status: "Pending" },
+    { id: "ORD-7832", customerName: "Prime Retailers", date: "Oct 5, 2023", amount: 9300, status: "Delivered" },
   ];
 
   const lowStockProducts = [
@@ -447,26 +550,30 @@ const SupplierDashboard: React.FC = () => {
   };
 
   const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'Delivered':
+    switch (status.toUpperCase()) {
+      case 'DELIVERED':
         return 'success';
-      case 'Processing':
+      case 'PROCESSING':
         return 'info';
-      case 'Pending':
+      case 'PENDING':
         return 'warning';
-      default:
+      case 'CANCELLED':
         return 'error';
+      default:
+        return 'default';
     }
   };
 
   const getStatusIcon = (status: string) => {
-    switch (status) {
-      case 'Delivered':
+    switch (status.toUpperCase()) {
+      case 'DELIVERED':
         return <CheckCircle fontSize="small" />;
-      case 'Processing':
+      case 'PROCESSING':
         return <Inventory fontSize="small" />;
-      case 'Pending':
+      case 'PENDING':
         return <Warning fontSize="small" />;
+      case 'CANCELLED':
+        return <ErrorOutline fontSize="small" />;
       default:
         return <ErrorOutline fontSize="small" />;
     }
@@ -686,7 +793,7 @@ const SupplierDashboard: React.FC = () => {
                       {recentOrders.map((order) => (
                         <TableRow key={order.id} className="data-row">
                           <TableCell>{order.id}</TableCell>
-                          <TableCell>{order.customer}</TableCell>
+                          <TableCell>{order.customerName}</TableCell>
                           <TableCell>{order.date}</TableCell>
                           <TableCell>${order.amount.toLocaleString()}</TableCell>
                           <TableCell>
@@ -1749,6 +1856,7 @@ const SupplierDashboard: React.FC = () => {
                     <TableRow sx={{ backgroundColor: 'rgba(0,0,0,0.02)' }}>
                       <TableCell>Order ID</TableCell>
                       <TableCell>Customer</TableCell>
+                      <TableCell>Product</TableCell>
                       <TableCell>Date</TableCell>
                       <TableCell>Amount</TableCell>
                       <TableCell>Status</TableCell>
@@ -1756,14 +1864,23 @@ const SupplierDashboard: React.FC = () => {
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {recentOrders
-                      .filter(order => order.status !== 'Delivered')
-                      .map((order) => (
+                    {isOrdersLoading ? (
+                      <TableRow>
+                        <TableCell colSpan={7} align="center" sx={{ py: 3 }}>
+                          <CircularProgress size={40} />
+                          <Typography variant="body2" sx={{ mt: 1, color: 'text.secondary' }}>
+                            Loading orders...
+                          </Typography>
+                        </TableCell>
+                      </TableRow>
+                    ) : salesOrders.length > 0 ? (
+                      salesOrders.map((order) => (
                         <TableRow key={order.id} className="data-row">
-                          <TableCell>{order.id}</TableCell>
-                          <TableCell>{order.customer}</TableCell>
-                          <TableCell>{order.date}</TableCell>
-                          <TableCell>${order.amount.toLocaleString()}</TableCell>
+                          <TableCell>{order.orderNumber || `ORD-${order.id}`}</TableCell>
+                          <TableCell>{order.customerName}</TableCell>
+                          <TableCell>{order.productName || 'Multiple items'}</TableCell>
+                          <TableCell>{new Date(order.orderDate).toLocaleDateString()}</TableCell>
+                          <TableCell>${order.totalAmount.toLocaleString()}</TableCell>
                           <TableCell>
                             <Chip
                               icon={getStatusIcon(order.status)}
@@ -1779,7 +1896,16 @@ const SupplierDashboard: React.FC = () => {
                             </IconButton>
                           </TableCell>
                         </TableRow>
-                    ))}
+                      ))
+                    ) : (
+                      <TableRow>
+                        <TableCell colSpan={7} align="center" sx={{ py: 3 }}>
+                          <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                            No pending orders found
+                          </Typography>
+                        </TableCell>
+                      </TableRow>
+                    )}
                   </TableBody>
                 </Table>
               </TableContainer>
@@ -1798,6 +1924,7 @@ const SupplierDashboard: React.FC = () => {
                     <TableRow sx={{ backgroundColor: 'rgba(0,0,0,0.02)' }}>
                       <TableCell>Order ID</TableCell>
                       <TableCell>Customer</TableCell>
+                      <TableCell>Product</TableCell>
                       <TableCell>Date</TableCell>
                       <TableCell>Amount</TableCell>
                       <TableCell>Status</TableCell>
@@ -1805,14 +1932,23 @@ const SupplierDashboard: React.FC = () => {
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {recentOrders
-                      .filter(order => order.status === 'Delivered')
-                      .map((order) => (
+                    {isOrdersLoading ? (
+                      <TableRow>
+                        <TableCell colSpan={7} align="center" sx={{ py: 3 }}>
+                          <CircularProgress size={40} />
+                          <Typography variant="body2" sx={{ mt: 1, color: 'text.secondary' }}>
+                            Loading orders...
+                          </Typography>
+                        </TableCell>
+                      </TableRow>
+                    ) : salesOrders.length > 0 ? (
+                      salesOrders.map((order) => (
                         <TableRow key={order.id} className="data-row">
-                          <TableCell>{order.id}</TableCell>
+                          <TableCell>{order.orderNumber || `ORD-${order.id}`}</TableCell>
                           <TableCell>{order.customer}</TableCell>
-                          <TableCell>{order.date}</TableCell>
-                          <TableCell>${order.amount.toLocaleString()}</TableCell>
+                          <TableCell>{order.productName || 'Multiple items'}</TableCell>
+                          <TableCell>{new Date(order.orderDate).toLocaleDateString()}</TableCell>
+                          <TableCell>${order.totalAmount.toLocaleString()}</TableCell>
                           <TableCell>
                             <Chip
                               icon={getStatusIcon(order.status)}
@@ -1828,14 +1964,23 @@ const SupplierDashboard: React.FC = () => {
                             </IconButton>
                           </TableCell>
                         </TableRow>
-                    ))}
+                      ))
+                    ) : (
+                      <TableRow>
+                        <TableCell colSpan={7} align="center" sx={{ py: 3 }}>
+                          <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                            No delivered orders found
+                          </Typography>
+                        </TableCell>
+                      </TableRow>
+                    )}
                   </TableBody>
                 </Table>
               </TableContainer>
             )}
             
             {/* Empty state if no orders */}
-            {recentOrders.length === 0 && (
+            {!isOrdersLoading && salesOrders.length === 0 && (
               <div style={{ 
                 display: 'flex', 
                 flexDirection: 'column',
