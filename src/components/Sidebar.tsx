@@ -180,6 +180,68 @@ const Sidebar: React.FC<SidebarProps> = ({ openSidebarToggle, OpenSidebar }) => 
             role.includes("Sales Manager") || 
             role.toLowerCase().includes("sales manager")
           ) ? (
+            <>
+              {/* Sales Manager Menu Options */}
+              <Typography 
+                variant="subtitle2" 
+                sx={{ 
+                  padding: '0 20px', 
+                  marginTop: '20px',
+                  marginBottom: '15px', 
+                  color: '#ffffff',
+                  fontFamily: 'Poppins, sans-serif',
+                  fontWeight: 600,
+                  fontSize: '14px',
+                  letterSpacing: '1px',
+                  textTransform: 'uppercase',
+                  textShadow: '0px 1px 2px rgba(0,0,0,0.2)'
+                }}
+              >
+                SALES MANAGEMENT
+              </Typography>
+              
+              <NavLink to="/book-order" className={({isActive}) => isActive ? "sidebar-link active" : "sidebar-link"}>
+                <li className="sidebar-list-item">
+                  <BsCart3 className="icon" /> <span className="sidebar-item-text">Book Order</span>
+                </li>
+              </NavLink>
+              
+              <NavLink to="/products" className={({isActive}) => isActive ? "sidebar-link active" : "sidebar-link"}>
+                <li className="sidebar-list-item">
+                  <BsFillArchiveFill className="icon" /> <span className="sidebar-item-text">Products</span>
+                </li>
+              </NavLink>
+              
+              <NavLink to="/sales-orders" className={({isActive}) => isActive ? "sidebar-link active" : "sidebar-link"}>
+                <li className="sidebar-list-item">
+                  <BsCart3 className="icon" /> <span className="sidebar-item-text">Sales Orders</span>
+                </li>
+              </NavLink>
+              
+              <NavLink to="/order-items" className={({isActive}) => isActive ? "sidebar-link active" : "sidebar-link"}>
+                <li className="sidebar-list-item">
+                  <BsListCheck className="icon" /> <span className="sidebar-item-text">Order Items</span>
+                </li> 
+              </NavLink>
+              
+              <NavLink to="/invoices" className={({isActive}) => isActive ? "sidebar-link active" : "sidebar-link"}>
+                <li className="sidebar-list-item">
+                  <BsFileEarmarkText className="icon" /> <span className="sidebar-item-text">Invoices</span>
+                </li>
+              </NavLink>
+              
+              <NavLink to="/payments" className={({isActive}) => isActive ? "sidebar-link active" : "sidebar-link"}>
+                <li className="sidebar-list-item">
+                  <BsCreditCard className="icon" /> <span className="sidebar-item-text">Payments</span>
+                </li>
+              </NavLink>
+              
+              <NavLink to="/shipping" className={({isActive}) => isActive ? "sidebar-link active" : "sidebar-link"}>
+                <li className="sidebar-list-item">
+                  <BsTruck className="icon" /> <span className="sidebar-item-text">Shipping Status</span>
+                </li>
+              </NavLink>
+            </>
           ) : role && typeof role === 'string' && role.toLowerCase() === "inventory" ? (
             <>
               {/* Inventory Role Menu Options */}
@@ -209,7 +271,7 @@ const Sidebar: React.FC<SidebarProps> = ({ openSidebarToggle, OpenSidebar }) => 
             </>
           ) : role && typeof role === 'string' && role.toLowerCase() === "salesman" ? (
             <>
-              {/* Sales Manager Menu Options */}
+              {/* Salesman Menu Options */}
               <Typography 
                 variant="subtitle2" 
                 sx={{ 
