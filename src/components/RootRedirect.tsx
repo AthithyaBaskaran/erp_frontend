@@ -18,6 +18,8 @@ const RootRedirect: React.FC = () => {
       return <Navigate to="/supplier-dashboard" replace />;
     } else if (userRole === 'salesman') {
       return <Navigate to="/salesman-dashboard" replace />;
+    } else if (userRole === 'inventory') {
+      return <Navigate to="/inventory-dashboard" replace />;
     }
   }
   

@@ -134,6 +134,33 @@ const Sidebar: React.FC<SidebarProps> = ({ openSidebarToggle, OpenSidebar }) => 
                 </li>
               </NavLink>
             </>
+          ) : role && typeof role === 'string' && role.toLowerCase() === "inventory" ? (
+            <>
+              {/* Inventory Role Menu Options */}
+              <NavLink to="/inventory-dashboard" className={({isActive}) => isActive ? "sidebar-link active" : "sidebar-link"}>
+                <li className="sidebar-list-item">
+                  <BsGrid1X2Fill className="icon" /> <span className="sidebar-item-text">Dashboard</span>
+                </li>
+              </NavLink>
+              
+              <NavLink to="/inventory-products" className={({isActive}) => isActive ? "sidebar-link active" : "sidebar-link"}>
+                <li className="sidebar-list-item">
+                  <BsFillArchiveFill className="icon" /> <span className="sidebar-item-text">Products</span>
+                </li>
+              </NavLink>
+              
+              <NavLink to="/inventory-analytics" className={({isActive}) => isActive ? "sidebar-link active" : "sidebar-link"}>
+                <li className="sidebar-list-item">
+                  <BsMenuButtonWideFill className="icon" /> <span className="sidebar-item-text">Analytics</span>
+                </li>
+              </NavLink>
+              
+              <NavLink to="/inventory-settings" className={({isActive}) => isActive ? "sidebar-link active" : "sidebar-link"}>
+                <li className="sidebar-list-item">
+                  <BsFillGearFill className="icon" /> <span className="sidebar-item-text">Settings</span>
+                </li>
+              </NavLink>
+            </>
           ) : role && typeof role === 'string' && role.toLowerCase() === "salesman" ? (
             <>
               {/* Salesman Dashboard Menu Options */}
@@ -196,13 +223,14 @@ const Sidebar: React.FC<SidebarProps> = ({ openSidebarToggle, OpenSidebar }) => 
                 <li className="sidebar-list-item">
                   <BsListCheck className="icon" /> <span className="sidebar-item-text">Inventory</span>
                 </li>
-                </NavLink>   
-                <NavLink to="/products" className={({isActive}) => isActive ? "sidebar-link active" : "sidebar-link"}>
+              </NavLink>
+              
+
+              
+              <NavLink to="/products" className={({isActive}) => isActive ? "sidebar-link active" : "sidebar-link"}>
                 <li className="sidebar-list-item">
                   <BsFillArchiveFill className="icon" /> <span className="sidebar-item-text">Products</span>
                 </li>
-              
-
               </NavLink>
               <NavLink to="/customers" className={({isActive}) => isActive ? "sidebar-link active" : "sidebar-link"}>
                 <li className="sidebar-list-item">

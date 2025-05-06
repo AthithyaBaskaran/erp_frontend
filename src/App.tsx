@@ -11,7 +11,10 @@ import Products from './components/Admin/products_new';
 import BookMyOrder from './components/Sales/SimpleBookOrder';
 import SalesManagement from './components/Admin/SalesManagement';
 import SupplierDashboard from './components/Supplier/SupplierDashboard';
-
+import InventoryDashboard from './components/Inventory/InventoryDashboard';
+import InventoryProducts from './components/Inventory/InventoryProducts';
+import InventoryAnalytics from './components/Inventory/InventoryAnalytics';
+import InventorySettings from './components/Inventory/InventorySettings';
 
 
 import RootRedirect from './components/RootRedirect';
@@ -118,7 +121,10 @@ useEffect(() => {
         <Route path='/forgot-password' element={<ForgetPassword />} />
         <Route path='/email-forgot-password' element={<EmailForgetPassword />} />
         <Route path='/supplier-dashboard' element={<SupplierDashboard />} />
-        {/* <Route path='/inventory-dashboard' element={<InventoryDashboard />} /> */}
+        <Route path='/inventory-dashboard' element={<InventoryDashboard />} />
+        <Route path='/inventory-products' element={<InventoryProducts />} />
+        <Route path='/inventory-analytics' element={<InventoryAnalytics />} />
+        <Route path='/inventory-settings' element={<InventorySettings />} />
         {/* <Route path='/salesman-dashboard' element={<SalesmanDashboard />} /> */}
         
       </Routes>
