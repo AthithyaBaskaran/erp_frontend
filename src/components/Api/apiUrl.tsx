@@ -1,4 +1,5 @@
 import { apiUrl, InventoryapiUrl, SalesApiUrl } from "../Api/BaseUrl";
+import { SalesOrderResponse, SalesOrderStatus } from "../../models/SalesOrder";
 
 export const LoginForm = async (email: string, password: string,) => {
     try {
@@ -170,17 +171,10 @@ export const ResetEmail = async (token: string, newPassword: string, confirmPass
 };
 
 // Sales Management API functions
-export const createSalesOrder = async (data: { 
-    customer: string; 
-    categoryId: number; 
-    productName: string; 
-    price_per_unit: number; 
-    quantity: number; 
-    amount: number 
-}) => {
+export const createSalesOrder = async (data: CreateSalesOrderRequest) => {
     try {
         // Using SalesApiUrl to ensure it points to the correct endpoint
-        const response = await SalesApiUrl.post('/sales-orders/create', data);
+        const response = await SalesApiUrl.post<CreateSalesOrderResponse>('/sales-orders/create', data);
         if (response.data?.statusMessage) {
             console.log("✅ Sales order created:", response.data);
         }
@@ -198,11 +192,23 @@ export const createSalesOrder = async (data: {
 export const fetchSalesOrdersByStatus = async (status: string) => {
     try {
         console.log(`Fetching sales orders with status: ${status}`);
-        const response = await SalesApiUrl.get(`/sales-orders/getOrderByStatus?status=${status}`);
+        // If status is provided, add it as a query parameter, otherwise just call the endpoint
+        const url = status ? `/sales-orders/getOrderByStatus?status=${status}` : '/sales-orders/getOrderByStatus';
+        const response = await SalesApiUrl.get(url);
         console.log('Sales orders API response:', response);
         
         if (response.data) {
-            return response.data;
+            // Check if the response has the expected structure with data property
+            if (response.data.data && Array.isArray(response.data.data)) {
+                console.log('Returning orders array from response.data.data');
+                return response.data.data; // Return just the array of orders
+            } else if (Array.isArray(response.data)) {
+                console.log('Returning orders array directly from response.data');
+                return response.data; // In case the API changes to return the array directly
+            } else {
+                console.warn('Unexpected response format:', response.data);
+                throw new Error('Unexpected data format received from server');
+            }
         } else {
             throw new Error('No data received from server');
         }
@@ -244,7 +250,14 @@ export const updateOrderStatus = async (orderId: number, status: string, remarks
         console.log('Update order status response:', response);
         
         if (response.data) {
-            return response.data;
+            // Check if the response has the expected structure with data property
+            if (response.data.data) {
+                console.log('Returning data from response.data.data');
+                return response.data.data;
+            } else {
+                console.log('Returning data directly from response.data');
+                return response.data;
+            }
         } else {
             throw new Error('No data received from server');
         }
@@ -265,6 +278,27 @@ export const updateOrderStatus = async (orderId: number, status: string, remarks
     }
 };
 
+// Function to fetch all recent orders
+export const fetchRecentOrders = async (limit?: number) => {
+    try {
+        console.log('Fetching recent orders');
+        // If limit is provided, add it as a query parameter
+        const url = limit ? `/sales-orders/getOrderByStatus?limit=${limit}` : '/sales-orders/getOrderByStatus';
+        const response = await SalesApiUrl.get(url);
+        console.log('Recent orders API response:', response);
+        
+        if (response.data) {
+            // Check if the response has the expected structure with data property
+            if (response.data.data && Array.isArray(response.data.data)) {
+                console.log('Returning orders array from response.data.data');
+                return response.data.data; // Return just the array of orders
+            } else if (Array.isArray(response.data)) {
+                console.log('Returning orders array directly from response.data');
+                return response.data; // In case the API returns the array directly
+            } else {
+                console.warn('Unexpected response format:', response.data);
+                throw new Error('Unexpected data format received from server');
+            }
 export const updateProcessingOrderStatus = async (orderId: number, status: string, processingRemarks?: string) => {
     try {
         console.log(`Updating processing order ${orderId} to status: ${status}`);
@@ -437,3 +471,12 @@ export const fetchCategoriesApi = async () => {
     }
 };
 
+export const showrecentlyorder = async () => {
+    try {
+        const response = await  SalesApiUrl.get('/sales-orders/getOrderByStatus');
+        return response.data;
+    } catch (error: any) {
+        console.log("❌ Error fetching users:", error);
+        throw error;
+    }
+};

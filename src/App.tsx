@@ -13,6 +13,7 @@ import OrderItems from './components/Sales/OrderItems';
 import SupplierDashboard from './components/Supplier/SupplierDashboard';
 import SalesDashboard from './components/SalesManagement/SalesDashboard';
 import SalesOrders from './components/SalesManagement/SalesOrders';
+import RecentlyOrders from './components/SalesManagement/RecentlyOrders';
 import InventoryDashboard from './components/Inventory/InventoryDashboard';
 import InventoryProducts from './components/Inventory/InventoryProducts';
 import InventoryAnalytics from './components/Inventory/InventoryAnalytics';
@@ -134,6 +135,7 @@ useEffect(() => {
         {/* Sales Management Routes - Commented out until TestLogin component is created */}
         <Route path='/sales-dashboard' element={<SalesDashboard />} />
         <Route path='/sales-orders' element={<SalesOrders />} />
+        <Route path='/recently_orders' element={<RecentlyOrders />} />
         </Routes>
       <Snackbar
         open={openSnackbar}
