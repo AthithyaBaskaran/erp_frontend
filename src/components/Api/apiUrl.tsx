@@ -306,82 +306,6 @@ export const addInventory = async (user: { name: string; sku: string; price: num
       }
     }
   };
-
-  
-  export const showInventory = async (categoryId?: number | string) => {
-    try {
-      console.log('Starting inventory API call...');
-      
-      // Log the token being used (without exposing the full token)
-      const token = localStorage.getItem("token");
-      if (token) {
-        const tokenPreview = token.substring(0, 10) + '...';
-        console.log(`Using token: ${tokenPreview}`);
-      } else {
-        console.warn('No token found in localStorage');
-      }
-      
-      const url = categoryId ? `/product/getAll?categoryId=${categoryId}`
-          : "/product/getAll";
-      console.log(`Calling API endpoint: ${url}`);
-      
-      const response = await InventoryapiUrl.get(url);
-      console.log('API call successful, response:', response);
-      
-      // If no data is returned, use mock data for development
-      if (!response.data || (Array.isArray(response.data) && response.data.length === 0)) {
-        console.log('No data returned from API, using mock data');
-        
-        // Mock data for development
-        response.data = [
-          { id: 1, name: "Dairy Milk", price: 5.0, stockQuantity: 50, categoryId: 1, categoryName: "Chocolate", sku: "PC0001" },
-          { id: 2, name: "Snickers", price: 4.0, stockQuantity: 65, categoryId: 1, categoryName: "Chocolate", sku: "PC0002" },
-          { id: 3, name: "Kitkat", price: 4.5, stockQuantity: 75, categoryId: 1, categoryName: "Chocolate", sku: "PC0003" },
-          { id: 4, name: "Lays Classic", price: 3.5, stockQuantity: 100, categoryId: 2, categoryName: "Chips", sku: "PC0004" },
-          { id: 5, name: "Milky biscuit", price: 9.98, stockQuantity: 150, categoryId: 3, categoryName: "Biscuit", sku: "PC0005" },
-          { id: 6, name: "Doritos", price: 4.25, stockQuantity: 85, categoryId: 2, categoryName: "Chips", sku: "PC0006" },
-          { id: 7, name: "Oreo", price: 3.99, stockQuantity: 120, categoryId: 3, categoryName: "Biscuit", sku: "PC0007" },
-          { id: 8, name: "Coca Cola", price: 2.5, stockQuantity: 200, categoryId: 4, categoryName: "Beverages", sku: "PC0008" },
-          { id: 9, name: "Pepsi", price: 2.25, stockQuantity: 180, categoryId: 4, categoryName: "Beverages", sku: "PC0009" },
-          { id: 10, name: "Mountain Dew", price: 2.75, stockQuantity: 15, categoryId: 4, categoryName: "Beverages", sku: "PC0010" }
-        ];
-      }
-      
-      // Return the entire response object
-      return response;
-    } catch (error: any) {
-      console.error("❌ Error fetching inventory:", error);
-      
-      // Add more detailed error logging
-      if (error.response) {
-        console.error("Error status:", error.response.status);
-        console.error("Error data:", error.response.data);
-      } else if (error.request) {
-        console.error("No response received:", error.request);
-      } else {
-        console.error("Error message:", error.message);
-      }
-      
-      // Create a mock response for development
-      console.log('Creating mock response due to API error');
-      return {
-        data: [
-          { id: 1, name: "Dairy Milk", price: 5.0, stockQuantity: 50, categoryId: 1, categoryName: "Chocolate", sku: "PC0001" },
-          { id: 2, name: "Snickers", price: 4.0, stockQuantity: 65, categoryId: 1, categoryName: "Chocolate", sku: "PC0002" },
-          { id: 3, name: "Kitkat", price: 4.5, stockQuantity: 75, categoryId: 1, categoryName: "Chocolate", sku: "PC0003" },
-          { id: 4, name: "Lays Classic", price: 3.5, stockQuantity: 100, categoryId: 2, categoryName: "Chips", sku: "PC0004" },
-          { id: 5, name: "Milky biscuit", price: 9.98, stockQuantity: 150, categoryId: 3, categoryName: "Biscuit", sku: "PC0005" },
-          { id: 6, name: "Doritos", price: 4.25, stockQuantity: 85, categoryId: 2, categoryName: "Chips", sku: "PC0006" },
-          { id: 7, name: "Oreo", price: 3.99, stockQuantity: 120, categoryId: 3, categoryName: "Biscuit", sku: "PC0007" },
-          { id: 8, name: "Coca Cola", price: 2.5, stockQuantity: 200, categoryId: 4, categoryName: "Beverages", sku: "PC0008" },
-          { id: 9, name: "Pepsi", price: 2.25, stockQuantity: 180, categoryId: 4, categoryName: "Beverages", sku: "PC0009" },
-          { id: 10, name: "Mountain Dew", price: 2.75, stockQuantity: 15, categoryId: 4, categoryName: "Beverages", sku: "PC0010" }
-        ]
-      };
-    }
-  };
-
-
 export const deleteInventory = async (id: number) => {
     try {
         const response = await InventoryapiUrl.delete(`/product/delete/${id}`);
@@ -420,6 +344,16 @@ export const updateInventoryApi = async (id: number, data: {
         }
     }
 };
+export const showInventory = async (categoryId?: number | string) => {
+    try {
+      const url = categoryId ? `/product/getAll?categoryId=${categoryId}` : '/product/getAll';
+      const response = await InventoryapiUrl.get(url);
+      return response.data;
+    } catch (error) {
+      console.log("❌ Error fetching inventory:", error);
+      throw error;
+    }
+  };
 
 export const DownloadUserID = async (userId: string) => {
     try {

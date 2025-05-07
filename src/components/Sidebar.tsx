@@ -18,7 +18,7 @@ import {
 } from 'react-icons/bs';
 import { Link, NavLink } from 'react-router-dom';
 import '../styles/sidebar.css';
-import '../styles/red-sidebar.css'; // Import the new red sidebar theme
+import '../styles/purple-blue-sidebar.css'; // Import the purple-blue gradient sidebar theme
 import { Typography } from '@mui/material';
 
 type SidebarProps = {
@@ -206,18 +206,6 @@ const Sidebar: React.FC<SidebarProps> = ({ openSidebarToggle, OpenSidebar }) => 
                 </li>
               </NavLink>
               
-              <NavLink to="/products" className={({isActive}) => isActive ? "sidebar-link active" : "sidebar-link"}>
-                <li className="sidebar-list-item">
-                  <BsFillArchiveFill className="icon" /> <span className="sidebar-item-text">Products</span>
-                </li>
-              </NavLink>
-              
-              <NavLink to="/sales-orders" className={({isActive}) => isActive ? "sidebar-link active" : "sidebar-link"}>
-                <li className="sidebar-list-item">
-                  <BsCart3 className="icon" /> <span className="sidebar-item-text">Sales Orders</span>
-                </li>
-              </NavLink>
-              
               <NavLink to="/order-items" className={({isActive}) => isActive ? "sidebar-link active" : "sidebar-link"}>
                 <li className="sidebar-list-item">
                   <BsListCheck className="icon" /> <span className="sidebar-item-text">Order Items</span>
@@ -293,18 +281,6 @@ const Sidebar: React.FC<SidebarProps> = ({ openSidebarToggle, OpenSidebar }) => 
               <NavLink to="/book-order" className={({isActive}) => isActive ? "sidebar-link active" : "sidebar-link"}>
                 <li className="sidebar-list-item">
                   <BsCart3 className="icon" /> <span className="sidebar-item-text">Book Order</span>
-                </li>
-              </NavLink>
-              
-              <NavLink to="/products" className={({isActive}) => isActive ? "sidebar-link active" : "sidebar-link"}>
-                <li className="sidebar-list-item">
-                  <BsFillArchiveFill className="icon" /> <span className="sidebar-item-text">Products</span>
-                </li>
-              </NavLink>
-              
-              <NavLink to="/sales-orders" className={({isActive}) => isActive ? "sidebar-link active" : "sidebar-link"}>
-                <li className="sidebar-list-item">
-                  <BsCart3 className="icon" /> <span className="sidebar-item-text">Sales Orders</span>
                 </li>
               </NavLink>
               
