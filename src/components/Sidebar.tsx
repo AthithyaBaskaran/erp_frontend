@@ -107,12 +107,19 @@ const Sidebar: React.FC<SidebarProps> = ({ openSidebarToggle, OpenSidebar }) => 
                   <BsGrid1X2Fill className="icon" /> <span className="sidebar-item-text">Users</span>
                 </li>
               </NavLink>
-              
-              <NavLink to="/inventory" className={({isActive}) => isActive ? "sidebar-link active" : "sidebar-link"}>
+
+              <NavLink to="/order-items" className={({isActive}) => isActive ? "sidebar-link active" : "sidebar-link"}>
                 <li className="sidebar-list-item">
-                  <BsListCheck className="icon" /> <span className="sidebar-item-text">Inventory</span>
+                  <BsGrid1X2Fill className="icon" /> <span className="sidebar-item-text">Products</span>
                 </li>
               </NavLink>
+
+              <NavLink to="/supplier-dashboard#orders" className={({isActive}) => isActive ? "sidebar-link active" : "sidebar-link"}>
+                <li className="sidebar-list-item">
+                  <BsGrid1X2Fill className="icon" /> <span className="sidebar-item-text">Orders</span>
+                </li>
+              </NavLink>
+
             </>
           ) : role && typeof role === 'string' && role.toLowerCase() === "supplier" ? (
             <>

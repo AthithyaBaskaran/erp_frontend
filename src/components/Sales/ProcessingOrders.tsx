@@ -44,9 +44,12 @@ import {
   Receipt as ReceiptIcon,
   Search as SearchIcon,
   FilterList as FilterIcon,
-  Refresh as RefreshIcon,
-  CalendarToday as CalendarIcon
+  Refresh as RefreshIcon
 } from '@mui/icons-material';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+import { format } from 'date-fns';
 import '../../styles/processingOrders.css';
 
 const ProcessingOrders: React.FC = () => {
@@ -58,7 +61,7 @@ const ProcessingOrders: React.FC = () => {
   const [openPaymentDialog, setOpenPaymentDialog] = useState(false);
   const [paymentAmount, setPaymentAmount] = useState<number | string>('');
   const [paymentMethod, setPaymentMethod] = useState('Credit Card');
-  const [paymentDate, setPaymentDate] = useState(new Date().toISOString().split('T')[0]); // Format: YYYY-MM-DD
+  const [paymentDate, setPaymentDate] = useState<Date | null>(new Date());
   const [paymentStatus, setPaymentStatus] = useState('Completed');
   const [processingPayment, setProcessingPayment] = useState(false);
   const [snackbar, setSnackbar] = useState({
@@ -113,7 +116,7 @@ const ProcessingOrders: React.FC = () => {
     setSelectedOrder(null);
     setPaymentAmount('');
     setPaymentMethod('Credit Card');
-    setPaymentDate(new Date().toISOString().split('T')[0]); // Reset to today's date in YYYY-MM-DD format
+    setPaymentDate(new Date());
     setPaymentStatus('Completed');
   };
 
@@ -126,12 +129,15 @@ const ProcessingOrders: React.FC = () => {
     try {
       setProcessingPayment(true);
       
+      // Format the date as YYYY-MM-DD
+      const formattedDate = format(paymentDate, 'yyyy-MM-dd');
+      
       // Create payment payload
       const paymentData = {
         orderId: typeof selectedOrder.orderId === 'string' 
           ? parseInt(selectedOrder.orderId.replace('ORD-', ''), 10) || selectedOrder.orderId 
           : selectedOrder.orderId,
-        paymentDate: paymentDate, // Already in YYYY-MM-DD format
+        paymentDate: formattedDate,
         amount: typeof paymentAmount === 'string' ? parseFloat(paymentAmount) : paymentAmount,
         paymentMethod: paymentMethod,
         status: paymentStatus
@@ -289,11 +295,11 @@ const ProcessingOrders: React.FC = () => {
                 <TableBody>
                   {filteredOrders.length > 0 ? (
                     filteredOrders.map((order) => (
-                      <TableRow key={order.orderNumber} hover>
-                        <TableCell>{order.orderNumber }</TableCell>
+                      <TableRow key={order.orderId} hover>
+                        <TableCell>{order.orderNumber}</TableCell>
                         <TableCell>{order.customer || order.customerName || 'N/A'}</TableCell>
                         <TableCell>{order.productName || 'N/A'}</TableCell>
-                        <TableCell>
+                        <TableCell>  
                           {order.orderDate 
                             ? new Date(order.orderDate).toLocaleDateString() 
                             : 'N/A'}
@@ -375,7 +381,7 @@ const ProcessingOrders: React.FC = () => {
                     <Grid container spacing={2}>
                       <Grid item xs={6}>
                         <Typography variant="subtitle2" color="text.secondary">Order ID</Typography>
-                        <Typography variant="body1" fontWeight="medium">{selectedOrder.orderId}</Typography>
+                        <Typography variant="body1" fontWeight="medium">{selectedOrder.orderNumber}</Typography>
                       </Grid>
                       <Grid item xs={6}>
                         <Typography variant="subtitle2" color="text.secondary">Customer</Typography>
@@ -440,24 +446,20 @@ const ProcessingOrders: React.FC = () => {
                   </Grid>
                   
                   <Grid item xs={12}>
-                    <TextField
-                      fullWidth
-                      label="Payment Date"
-                      type="date"
-                      value={paymentDate}
-                      onChange={(e) => setPaymentDate(e.target.value)}
-                      required
-                      InputProps={{
-                        startAdornment: (
-                          <InputAdornment position="start">
-                            <CalendarIcon />
-                          </InputAdornment>
-                        ),
-                      }}
-                      InputLabelProps={{
-                        shrink: true,
-                      }}
-                    />
+                    <LocalizationProvider dateAdapter={AdapterDateFns}>
+                      <DatePicker
+                        label="Payment Date"
+                        value={paymentDate}
+                        onChange={(newDate) => setPaymentDate(newDate)}
+                        slotProps={{
+                          textField: {
+                            fullWidth: true,
+                            variant: 'outlined',
+                            required: true
+                          }
+                        }}
+                      />
+                    </LocalizationProvider>
                   </Grid>
                   
                   <Grid item xs={12}>
@@ -521,7 +523,7 @@ const ProcessingOrders: React.FC = () => {
                     <Grid container spacing={2}>
                       <Grid item xs={6} md={3}>
                         <Typography variant="subtitle2" color="text.secondary">Order ID</Typography>
-                        <Typography variant="body1" fontWeight="medium">{orderDetails.order.orderId}</Typography>
+                        <Typography variant="body1" fontWeight="medium">{orderDetails.order.orderNumber}</Typography>
                       </Grid>
                       <Grid item xs={6} md={3}>
                         <Typography variant="subtitle2" color="text.secondary">Date</Typography>
