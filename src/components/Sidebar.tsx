@@ -16,6 +16,7 @@ import {
   BsBarChartFill,
   BsReceiptCutoff
 } from 'react-icons/bs';
+import { MdOutlineHistory } from 'react-icons/md'; // Import for history icon
 import { Link, NavLink } from 'react-router-dom';
 import '../styles/sidebar.css';
 import '../styles/purple-blue-sidebar.css'; // Import the purple-blue gradient sidebar theme
@@ -211,6 +212,15 @@ const Sidebar: React.FC<SidebarProps> = ({ openSidebarToggle, OpenSidebar }) => 
                   <BsListCheck className="icon" /> <span className="sidebar-item-text">Order Items</span>
                 </li> 
               </NavLink>
+             
+
+          <NavLink to="/recently_orders" className={({isActive}) => isActive ? "sidebar-link active" : "sidebar-link"}>
+              <li className="sidebar-list-item">
+                 <MdOutlineHistory className="icon" /> 
+                 <span className="sidebar-item-text">Recently Orders</span>
+                 </li>
+               </NavLink>
+
               
               <NavLink to="/invoices" className={({isActive}) => isActive ? "sidebar-link active" : "sidebar-link"}>
                 <li className="sidebar-list-item">
