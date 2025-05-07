@@ -240,7 +240,7 @@ export const updateOrderStatus = async (orderId: number, status: string, remarks
             }
         });
         
-        const response = await SalesApiUrl.post('/sales-orders/updateStatus', payload);
+        const response = await SalesApiUrl.put('/sales-orders/updateStatus', payload);
         console.log('Update order status response:', response);
         
         if (response.data) {
