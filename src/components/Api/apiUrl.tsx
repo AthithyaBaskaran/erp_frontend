@@ -299,11 +299,32 @@ export const fetchRecentOrders = async (limit?: number) => {
                 console.warn('Unexpected response format:', response.data);
                 throw new Error('Unexpected data format received from server');
             }
+export const updateProcessingOrderStatus = async (orderId: number, status: string, processingRemarks?: string) => {
+    try {
+        console.log(`Updating processing order ${orderId} to status: ${status}`);
+        const payload = {
+            orderId,
+            status,
+            processingRemarks
+        };
+        
+        // Remove undefined values
+        Object.keys(payload).forEach(key => {
+            if (payload[key as keyof typeof payload] === undefined) {
+                delete payload[key as keyof typeof payload];
+            }
+        });
+        
+        const response = await SalesApiUrl.put('/sales-orders/updateProcessingStatus', payload);
+        console.log('Update processing order status response:', response);
+        
+        if (response.data) {
+            return response.data;
         } else {
             throw new Error('No data received from server');
         }
     } catch (error: any) {
-        console.error('Error fetching recent orders:', error);
+        console.error('Error updating processing order status:', error);
         
         // More detailed error logging
         if (error.response) {
@@ -318,6 +339,8 @@ export const fetchRecentOrders = async (limit?: number) => {
         throw error;
     }
 };
+
+
 
 export const RefreshToken = async (userId: number, token: string) => {
     try {

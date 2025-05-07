@@ -27,7 +27,8 @@ import {
   AccordionSummary,
   AccordionDetails,
   Tabs,
-  Tab
+  Tab,
+  Tooltip
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import CloseIcon from '@mui/icons-material/Close';
@@ -57,7 +58,7 @@ import { Doughnut } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
   ArcElement,
-  Tooltip,
+  Tooltip as ChartTooltip,
   Legend,
 } from 'chart.js';
 import { useForm, SubmitHandler, Controller } from "react-hook-form";
@@ -73,13 +74,13 @@ import '../../styles/inventory.css';
 
 // API
 import {
-  fetchCategoriesApi, showInventory, addInventory, fetchSalesOrdersByStatus, updateOrderStatus
+  fetchCategoriesApi, showInventory, addInventory, fetchSalesOrdersByStatus, updateOrderStatus, updateProcessingOrderStatus
 } from "../Api/apiUrl";
 
 // Register ChartJS components
 ChartJS.register(
   ArcElement,
-  Tooltip,
+  ChartTooltip,
   Legend
 );
 
@@ -107,6 +108,15 @@ interface Category {
   categoryName: string;
 }
 
+interface OrderProduct {
+  id: number;
+  name: string;
+  quantity: number;
+  price: number;
+  sku?: string;
+  categoryName?: string;
+}
+
 interface SalesOrder {
   id: number;
   orderNumber: string;
@@ -118,6 +128,7 @@ interface SalesOrder {
   quantity?: number;
   remarks?: string;
   deliveryDate?: string;
+  products?: OrderProduct[]; // Array of products in the order
 }
 
 // Validation schema
@@ -150,14 +161,17 @@ const SupplierDashboard: React.FC = () => {
   const [openProductsModal, setOpenProductsModal] = useState(false);
   const [openOrdersModal, setOpenOrdersModal] = useState(false);
   const [openApproveModal, setOpenApproveModal] = useState(false);
+  const [openProcessingApproveModal, setOpenProcessingApproveModal] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState<SalesOrder | null>(null);
   const [remarks, setRemarks] = useState('');
+  const [processingRemarks, setProcessingRemarks] = useState('');
   const [deliveryDate, setDeliveryDate] = useState('');
   const [categories, setCategories] = useState<Category[]>([]);
   const [inventoryItems, setInventoryItems] = useState<InventoryItem[]>([]);
   const [isProductsLoading, setIsProductsLoading] = useState(false);
   const [isOrdersLoading, setIsOrdersLoading] = useState(false);
   const [isApproving, setIsApproving] = useState(false);
+  const [isProcessingApproving, setIsProcessingApproving] = useState(false);
   const [salesOrders, setSalesOrders] = useState<SalesOrder[]>([]);
   const [productTabValue, setProductTabValue] = useState(0);
   const [orderTabValue, setOrderTabValue] = useState(0);
@@ -180,6 +194,11 @@ const SupplierDashboard: React.FC = () => {
       const hash = window.location.hash.replace('#', '');
       if (hash) {
         setActiveTab(hash);
+        
+        // If navigating to products tab, automatically fetch inventory data
+        if (hash === 'products') {
+          fetchInventory();
+        }
       } else {
         setActiveTab('overview');
       }
@@ -197,9 +216,10 @@ const SupplierDashboard: React.FC = () => {
   }, []);
   const [openSidebarToggle, setOpenSidebarToggle] = useState(false);
   
-  // Fetch categories on component mount
+  // Fetch categories and orders on component mount
   useEffect(() => {
     fetchCategories();
+    fetchSalesOrders('PENDING'); // Load pending orders by default
   }, []);
 
   const OpenSidebar = () => {
@@ -460,6 +480,17 @@ const SupplierDashboard: React.FC = () => {
     setSelectedOrder(null);
   };
   
+  const handleOpenProcessingApproveModal = (order: SalesOrder) => {
+    setSelectedOrder(order);
+    setProcessingRemarks('');
+    setOpenProcessingApproveModal(true);
+  };
+  
+  const handleCloseProcessingApproveModal = () => {
+    setOpenProcessingApproveModal(false);
+    setSelectedOrder(null);
+  };
+  
   const handleApproveOrder = async () => {
     if (!selectedOrder) return;
     
@@ -515,6 +546,59 @@ const SupplierDashboard: React.FC = () => {
       });
     } finally {
       setIsApproving(false);
+    }
+  };
+  
+  const handleApproveProcessingOrder = async () => {
+    if (!selectedOrder) return;
+    
+    try {
+      setIsProcessingApproving(true);
+      
+      await updateProcessingOrderStatus(
+        selectedOrder.id,
+        'DELIVERED',
+        processingRemarks || undefined
+      );
+      
+      // Show success message
+      Swal.fire({
+        icon: 'success',
+        title: 'Order Delivered',
+        text: `Order ${selectedOrder.orderNumber || selectedOrder.id} has been marked as delivered.`,
+        timer: 2000,
+        showConfirmButton: false,
+        customClass: {
+          popup: 'swal2-popup',
+          title: 'swal2-title',
+          htmlContainer: 'swal2-html-container',
+          icon: 'swal2-icon'
+        }
+      });
+      
+      // Close the modal
+      handleCloseProcessingApproveModal();
+      
+      // Refresh the orders list
+      fetchSalesOrders(orderTabValue === 1 ? 'PROCESSING' : 'DELIVERED');
+    } catch (error: any) {
+      console.error('Error marking order as delivered:', error);
+      
+      // Show error message
+      Swal.fire({
+        icon: 'error',
+        title: 'Failed to Mark as Delivered',
+        text: error.message || 'An error occurred while marking the order as delivered.',
+        customClass: {
+          popup: 'swal2-popup',
+          title: 'swal2-title',
+          htmlContainer: 'swal2-html-container',
+          confirmButton: 'swal2-confirm',
+          icon: 'swal2-icon'
+        }
+      });
+    } finally {
+      setIsProcessingApproving(false);
     }
   };
   
@@ -869,70 +953,231 @@ const SupplierDashboard: React.FC = () => {
               <div className="data-grid-card">
                 <div className="data-grid-header">
                   <h3 className="data-grid-title">Orders Management</h3>
+                  <div className="data-grid-actions">
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      size="small"
+                      onClick={() => handleViewAllOrders(0)}
+                      startIcon={<LocalShipping />}
+                      sx={{
+                        borderRadius: '8px',
+                        textTransform: 'none',
+                        fontSize: '0.875rem',
+                        fontWeight: 500,
+                        boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                        background: 'linear-gradient(45deg, #00C853, #2196F3)',
+                        '&:hover': {
+                          boxShadow: '0 6px 14px rgba(0,0,0,0.2)',
+                          background: 'linear-gradient(45deg, #00B34A, #1976D2)'
+                        }
+                      }}
+                    >
+                      View All Orders
+                    </Button>
+                  </div>
                 </div>
                 
-                <Box sx={{ 
-                  display: 'flex', 
-                  flexDirection: 'column', 
-                  alignItems: 'center', 
-                  justifyContent: 'center',
-                  padding: '40px 20px',
-                  textAlign: 'center'
-                }}>
-                  <img 
-                    src="/assets/images/orders-icon.png" 
-                    alt="Orders" 
-                    style={{ 
-                      width: '120px', 
-                      height: '120px', 
-                      marginBottom: '24px',
-                      opacity: 0.8
-                    }}
-                    onError={(e) => {
-                      // Fallback if image doesn't exist
-                      e.currentTarget.style.display = 'none';
-                    }}
-                  />
-                  
-                  <Typography variant="h5" sx={{ 
+                {/* Recent Orders Section */}
+                <div className="recent-orders-section">
+                  <Typography variant="h6" sx={{ 
                     fontWeight: 600, 
                     color: '#333', 
                     mb: 2,
-                    fontFamily: 'Poppins, sans-serif'
+                    fontFamily: 'Poppins, sans-serif',
+                    fontSize: '1.1rem',
+                    paddingLeft: '16px',
+                    borderLeft: '4px solid #00C853'
                   }}>
-                    Manage Your Orders
+                    Recent Orders
                   </Typography>
                   
-                  <Typography variant="body1" sx={{ 
-                    color: '#666', 
-                    mb: 4, 
-                    maxWidth: '500px',
-                    fontFamily: 'Poppins, sans-serif'
-                  }}>
-                    View and manage all your orders. Approve pending orders, track processing orders, and review delivered orders.
-                  </Typography>
+                  {isOrdersLoading ? (
+                    <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', py: 4 }}>
+                      <CircularProgress size={40} />
+                      <Typography variant="body2" sx={{ ml: 2, color: 'text.secondary' }}>
+                        Loading orders...
+                      </Typography>
+                    </Box>
+                  ) : salesOrders.length > 0 ? (
+                    <TableContainer component={Paper} sx={{ 
+                      boxShadow: 'none', 
+                      border: '1px solid rgba(0,0,0,0.1)',
+                      borderRadius: '12px',
+                      overflow: 'hidden',
+                      mb: 4
+                    }}>
+                      <Table>
+                        <TableHead>
+                          <TableRow sx={{ backgroundColor: 'rgba(0,0,0,0.02)' }}>
+                            <TableCell>Order ID</TableCell>
+                            <TableCell>Customer</TableCell>
+                            <TableCell>Product</TableCell>
+                            <TableCell>Quantity</TableCell>
+                            <TableCell>Order Date</TableCell>
+                            <TableCell>Amount</TableCell>
+                            <TableCell>Status</TableCell>
+                            <TableCell>Action</TableCell>
+                          </TableRow>
+                        </TableHead>
+                        <TableBody>
+                          {salesOrders.slice(0, 5).map((order) => (
+                            <TableRow key={order.id} className="data-row">
+                              <TableCell>{order.orderNumber || `ORD-${order.id}`}</TableCell>
+                              <TableCell>{order.customerName}</TableCell>
+                              <TableCell>
+                                {order.products && order.products.length > 0 ? (
+                                  <div>
+                                    <Typography variant="body2" sx={{ fontWeight: 500 }}>
+                                      {order.products[0].name}
+                                    </Typography>
+                                    {order.products.length > 1 && (
+                                      <Chip 
+                                        label={`+${order.products.length - 1} more`} 
+                                        size="small" 
+                                        sx={{ mt: 0.5, fontSize: '0.7rem' }}
+                                      />
+                                    )}
+                                  </div>
+                                ) : (
+                                  order.productName || 'Multiple items'
+                                )}
+                              </TableCell>
+                              <TableCell>{order.quantity?.toLocaleString()}</TableCell>
+                              <TableCell>{new Date(order.orderDate).toLocaleDateString()}</TableCell>
+                              <TableCell>${order.totalAmount.toLocaleString()}</TableCell>
+                              <TableCell>
+                                <Chip
+                                  icon={getStatusIcon(order.status)}
+                                  label={order.status}
+                                  color={getStatusColor(order.status) as "success" | "info" | "warning" | "error"}
+                                  size="small"
+                                  className="status-chip"
+                                />
+                              </TableCell>
+                              <TableCell>
+                                {order.status === 'PENDING' && (
+                                  <Button
+                                    variant="contained"
+                                    size="small"
+                                    color="primary"
+                                    onClick={() => handleOpenApproveModal(order)}
+                                    sx={{
+                                      textTransform: 'none',
+                                      borderRadius: '8px',
+                                      fontSize: '0.75rem',
+                                      backgroundColor: '#00C853',
+                                      '&:hover': {
+                                        backgroundColor: '#00B34A'
+                                      }
+                                    }}
+                                  >
+                                    Approve
+                                  </Button>
+                                )}
+                                {order.status === 'PROCESSING' && (
+                                  <Button
+                                    variant="contained"
+                                    size="small"
+                                    color="primary"
+                                    onClick={() => handleOpenProcessingApproveModal(order)}
+                                    sx={{
+                                      textTransform: 'none',
+                                      borderRadius: '8px',
+                                      fontSize: '0.75rem',
+                                      backgroundColor: '#00C853',
+                                      '&:hover': {
+                                        backgroundColor: '#00B34A'
+                                      }
+                                    }}
+                                  >
+                                    Mark Delivered
+                                  </Button>
+                                )}
+                                {order.status === 'DELIVERED' && (
+                                  <Chip
+                                    label="Completed"
+                                    size="small"
+                                    color="success"
+                                    sx={{ fontSize: '0.75rem' }}
+                                  />
+                                )}
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </TableContainer>
+                  ) : (
+                    <Box sx={{ 
+                      display: 'flex', 
+                      flexDirection: 'column', 
+                      alignItems: 'center', 
+                      justifyContent: 'center',
+                      padding: '40px 20px',
+                      textAlign: 'center',
+                      backgroundColor: 'rgba(0,0,0,0.02)',
+                      borderRadius: '12px',
+                      border: '1px dashed rgba(0,0,0,0.1)'
+                    }}>
+                      <img 
+                        src="/assets/images/orders-icon.png" 
+                        alt="Orders" 
+                        style={{ 
+                          width: '80px', 
+                          height: '80px', 
+                          marginBottom: '16px',
+                          opacity: 0.6
+                        }}
+                        onError={(e) => {
+                          // Fallback if image doesn't exist
+                          e.currentTarget.style.display = 'none';
+                        }}
+                      />
+                      
+                      <Typography variant="h6" sx={{ 
+                        fontWeight: 600, 
+                        color: '#333', 
+                        mb: 1,
+                        fontFamily: 'Poppins, sans-serif'
+                      }}>
+                        No Orders Found
+                      </Typography>
+                      
+                      <Typography variant="body2" sx={{ 
+                        color: '#666', 
+                        mb: 3,
+                        maxWidth: '400px',
+                        fontFamily: 'Poppins, sans-serif'
+                      }}>
+                        You don't have any orders yet. New orders will appear here when customers place them.
+                      </Typography>
+                    </Box>
+                  )}
                   
-                  <Button
-                    variant="contained"
-                    color="primary"
-                    size="large"
-                    onClick={() => handleViewAllOrders(0)}
-                    startIcon={<LocalShipping />}
-                    sx={{
-                      borderRadius: '8px',
-                      textTransform: 'none',
-                      fontFamily: 'Poppins, sans-serif',
-                      fontWeight: 500,
-                      backgroundColor: '#00C853',
-                      padding: '10px 24px',
-                      '&:hover': {
-                        backgroundColor: '#00B34A'
-                      }
-                    }}
-                  >
-                    View All Orders
-                  </Button>
-                </Box>
+                  <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
+                    <Button
+                      variant="outlined"
+                      color="primary"
+                      onClick={() => handleViewAllOrders(0)}
+                      sx={{
+                        borderRadius: '8px',
+                        textTransform: 'none',
+                        padding: '8px 16px',
+                        fontSize: '0.875rem',
+                        fontWeight: 500,
+                        borderColor: '#2196F3',
+                        color: '#2196F3',
+                        '&:hover': {
+                          borderColor: '#1976D2',
+                          backgroundColor: 'rgba(33, 150, 243, 0.04)'
+                        }
+                      }}
+                    >
+                      View All Orders
+                    </Button>
+                  </Box>
+                </div>
               </div>
             </div>
           )}
@@ -941,92 +1186,230 @@ const SupplierDashboard: React.FC = () => {
           {activeTab === 'products' && (
             <div className="data-grid-container">
               <div className="data-grid-card">
-                <div className="data-grid-header">
+                <div className="data-grid-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <h3 className="data-grid-title">Products Management</h3>
+                  <Button
+                    variant="contained"
+                    startIcon={<AddIcon />}
+                    onClick={() => handleAddProduct()}
+                    sx={{
+                      borderRadius: '8px',
+                      textTransform: 'none',
+                      fontFamily: 'Poppins, sans-serif',
+                      fontWeight: 500,
+                      backgroundColor: '#00C853',
+                      padding: '8px 16px',
+                      '&:hover': {
+                        backgroundColor: '#00B34A'
+                      }
+                    }}
+                  >
+                    Add Product
+                  </Button>
                 </div>
                 
-                <Box sx={{ 
-                  display: 'flex', 
-                  flexDirection: 'column', 
-                  alignItems: 'center', 
-                  justifyContent: 'center',
-                  padding: '40px 20px',
-                  textAlign: 'center'
-                }}>
-                  <img 
-                    src="/assets/images/products-icon.png" 
-                    alt="Products" 
-                    style={{ 
-                      width: '120px', 
-                      height: '120px', 
-                      marginBottom: '24px',
-                      opacity: 0.8
-                    }}
-                    onError={(e) => {
-                      // Fallback if image doesn't exist
-                      e.currentTarget.style.display = 'none';
-                    }}
-                  />
-                  
-                  <Typography variant="h5" sx={{ 
-                    fontWeight: 600, 
-                    color: '#333', 
-                    mb: 2,
-                    fontFamily: 'Poppins, sans-serif'
-                  }}>
-                    Manage Your Products
-                  </Typography>
-                  
-                  <Typography variant="body1" sx={{ 
-                    color: '#666', 
-                    mb: 4, 
-                    maxWidth: '500px',
-                    fontFamily: 'Poppins, sans-serif'
-                  }}>
-                    View all your products, add new products, and manage your inventory efficiently.
-                  </Typography>
-                  
-                  <div style={{ display: 'flex', gap: '16px' }}>
-                    <Button
-                      variant="contained"
-                      color="primary"
-                      size="large"
-                      onClick={() => handleViewAllProducts(0)}
-                      startIcon={<Inventory />}
+                {/* Product Tabs */}
+                <Box sx={{ width: '100%', mt: 3 }}>
+                  <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+                    <Tabs 
+                      value={productTabValue} 
+                      onChange={handleProductTabChange}
+                      aria-label="product tabs"
                       sx={{
-                        borderRadius: '8px',
-                        textTransform: 'none',
-                        fontFamily: 'Poppins, sans-serif',
-                        fontWeight: 500,
-                        backgroundColor: '#2196F3',
-                        padding: '10px 24px',
-                        '&:hover': {
-                          backgroundColor: '#1976D2'
+                        '& .MuiTabs-indicator': {
+                          backgroundColor: '#00C853',
+                        },
+                        '& .Mui-selected': {
+                          color: '#00C853 !important',
+                          fontWeight: 600,
+                        },
+                        '& .MuiTab-root': {
+                          textTransform: 'none',
+                          fontFamily: 'Poppins, sans-serif',
+                          fontSize: '0.95rem',
+                          minWidth: '120px',
+                          color: '#7f8c8d',
                         }
                       }}
                     >
-                      View All Products
-                    </Button>
-                    
-                    <Button
-                      variant="contained"
-                      startIcon={<AddIcon />}
-                      onClick={() => handleAddProduct()}
-                      sx={{
-                        borderRadius: '8px',
-                        textTransform: 'none',
+                      <Tab label="All Products" />
+                      <Tab label="In Stock" />
+                      <Tab label="Low Stock" />
+                    </Tabs>
+                  </Box>
+                  
+                  {isProductsLoading ? (
+                    <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '300px' }}>
+                      <CircularProgress color="primary" />
+                    </Box>
+                  ) : inventoryItems.length > 0 ? (
+                    <div>
+                      {/* All Products Tab */}
+                      {productTabValue === 0 && (
+                        <TableContainer component={Paper} sx={{ 
+                          boxShadow: 'none', 
+                          border: '1px solid rgba(0,0,0,0.1)',
+                          borderRadius: '12px',
+                          overflow: 'hidden',
+                          mt: 3
+                        }}>
+                          <Table>
+                            <TableHead sx={{ backgroundColor: '#f8f9fa' }}>
+                              <TableRow>
+                                <TableCell sx={{ fontWeight: 600 }}>Product Name</TableCell>
+                                <TableCell sx={{ fontWeight: 600 }}>SKU</TableCell>
+                                <TableCell sx={{ fontWeight: 600 }}>Category</TableCell>
+                                <TableCell sx={{ fontWeight: 600 }}>Price</TableCell>
+                                <TableCell sx={{ fontWeight: 600 }}>Stock</TableCell>
+                                <TableCell sx={{ fontWeight: 600 }}>Status</TableCell>
+                              </TableRow>
+                            </TableHead>
+                            <TableBody>
+                              {inventoryItems.map((item) => (
+                                <TableRow key={item.id}>
+                                  <TableCell>{item.name}</TableCell>
+                                  <TableCell>{item.sku}</TableCell>
+                                  <TableCell>{item.categoryName}</TableCell>
+                                  <TableCell>${item.price.toFixed(2)}</TableCell>
+                                  <TableCell>{item.stockQuantity}</TableCell>
+                                  <TableCell>
+                                    <Chip 
+                                      label={item.stockQuantity > 10 ? "In Stock" : item.stockQuantity > 0 ? "Low Stock" : "Out of Stock"} 
+                                      color={item.stockQuantity > 10 ? "success" : item.stockQuantity > 0 ? "warning" : "error"}
+                                      size="small"
+                                    />
+                                  </TableCell>
+                                </TableRow>
+                              ))}
+                            </TableBody>
+                          </Table>
+                        </TableContainer>
+                      )}
+                      
+                      {/* In Stock Tab */}
+                      {productTabValue === 1 && (
+                        <TableContainer component={Paper} sx={{ 
+                          boxShadow: 'none', 
+                          border: '1px solid rgba(0,0,0,0.1)',
+                          borderRadius: '12px',
+                          overflow: 'hidden',
+                          mt: 3
+                        }}>
+                          <Table>
+                            <TableHead sx={{ backgroundColor: '#f8f9fa' }}>
+                              <TableRow>
+                                <TableCell sx={{ fontWeight: 600 }}>Product Name</TableCell>
+                                <TableCell sx={{ fontWeight: 600 }}>SKU</TableCell>
+                                <TableCell sx={{ fontWeight: 600 }}>Category</TableCell>
+                                <TableCell sx={{ fontWeight: 600 }}>Price</TableCell>
+                                <TableCell sx={{ fontWeight: 600 }}>Stock</TableCell>
+                              </TableRow>
+                            </TableHead>
+                            <TableBody>
+                              {inventoryItems
+                                .filter(item => item.stockQuantity > 10)
+                                .map((item) => (
+                                  <TableRow key={item.id}>
+                                    <TableCell>{item.name}</TableCell>
+                                    <TableCell>{item.sku}</TableCell>
+                                    <TableCell>{item.categoryName}</TableCell>
+                                    <TableCell>${item.price.toFixed(2)}</TableCell>
+                                    <TableCell>{item.stockQuantity}</TableCell>
+                                  </TableRow>
+                                ))}
+                            </TableBody>
+                          </Table>
+                        </TableContainer>
+                      )}
+                      
+                      {/* Low Stock Tab */}
+                      {productTabValue === 2 && (
+                        <TableContainer component={Paper} sx={{ 
+                          boxShadow: 'none', 
+                          border: '1px solid rgba(0,0,0,0.1)',
+                          borderRadius: '12px',
+                          overflow: 'hidden',
+                          mt: 3
+                        }}>
+                          <Table>
+                            <TableHead sx={{ backgroundColor: '#f8f9fa' }}>
+                              <TableRow>
+                                <TableCell sx={{ fontWeight: 600 }}>Product Name</TableCell>
+                                <TableCell sx={{ fontWeight: 600 }}>SKU</TableCell>
+                                <TableCell sx={{ fontWeight: 600 }}>Category</TableCell>
+                                <TableCell sx={{ fontWeight: 600 }}>Price</TableCell>
+                                <TableCell sx={{ fontWeight: 600 }}>Stock</TableCell>
+                              </TableRow>
+                            </TableHead>
+                            <TableBody>
+                              {inventoryItems
+                                .filter(item => item.stockQuantity <= 10 && item.stockQuantity > 0)
+                                .map((item) => (
+                                  <TableRow key={item.id}>
+                                    <TableCell>{item.name}</TableCell>
+                                    <TableCell>{item.sku}</TableCell>
+                                    <TableCell>{item.categoryName}</TableCell>
+                                    <TableCell>${item.price.toFixed(2)}</TableCell>
+                                    <TableCell>
+                                      <Typography color="warning.main" fontWeight={500}>
+                                        {item.stockQuantity}
+                                      </Typography>
+                                    </TableCell>
+                                  </TableRow>
+                                ))}
+                            </TableBody>
+                          </Table>
+                        </TableContainer>
+                      )}
+                    </div>
+                  ) : (
+                    <Box sx={{ 
+                      display: 'flex', 
+                      flexDirection: 'column', 
+                      alignItems: 'center', 
+                      justifyContent: 'center',
+                      padding: '40px 20px',
+                      mt: 3
+                    }}>
+                      <Typography variant="h6" sx={{ 
+                        color: '#7f8c8d', 
                         fontFamily: 'Poppins, sans-serif',
-                        fontWeight: 500,
-                        backgroundColor: '#00C853',
-                        padding: '10px 24px',
-                        '&:hover': {
-                          backgroundColor: '#00B34A'
-                        }
-                      }}
-                    >
-                      Add New Product
-                    </Button>
-                  </div>
+                        fontWeight: 500
+                      }}>
+                        {productTabValue === 0 ? "No products found" : 
+                         productTabValue === 1 ? "No in-stock products found" : 
+                         "No low-stock products found"}
+                      </Typography>
+                      <Typography variant="body2" sx={{ 
+                        color: '#95a5a6', 
+                        fontFamily: 'Poppins, sans-serif',
+                        mt: 1,
+                        mb: 3
+                      }}>
+                        {productTabValue === 0 ? "Add your first product to get started" : 
+                         productTabValue === 1 ? "Add products with stock > 10 to see them here" : 
+                         "Products with stock ≤ 10 will appear here"}
+                      </Typography>
+                      <Button
+                        variant="contained"
+                        startIcon={<AddIcon />}
+                        onClick={() => handleAddProduct()}
+                        sx={{
+                          borderRadius: '8px',
+                          textTransform: 'none',
+                          fontFamily: 'Poppins, sans-serif',
+                          fontWeight: 500,
+                          backgroundColor: '#00C853',
+                          padding: '8px 16px',
+                          '&:hover': {
+                            backgroundColor: '#00B34A'
+                          }
+                        }}
+                      >
+                        Add Product
+                      </Button>
+                    </Box>
+                  )}
                 </Box>
               </div>
             </div>
@@ -1458,6 +1841,25 @@ const SupplierDashboard: React.FC = () => {
                   }
                 }}
               />
+              <Button
+                variant="contained"
+                startIcon={<AddIcon />}
+                onClick={() => handleAddProduct()}
+                sx={{
+                  borderRadius: '8px',
+                  textTransform: 'none',
+                  fontFamily: 'Poppins, sans-serif',
+                  fontWeight: 500,
+                  backgroundColor: '#00C853',
+                  padding: '8px 16px',
+                  height: '40px',
+                  '&:hover': {
+                    backgroundColor: '#009624'
+                  }
+                }}
+              >
+                Add Product
+              </Button>
               <IconButton 
                 onClick={handleCloseProductsModal}
                 sx={{
@@ -1974,7 +2376,7 @@ const SupplierDashboard: React.FC = () => {
                       <TableCell>Customer</TableCell>
                       <TableCell>Product</TableCell>
                       <TableCell>Quantity</TableCell>
-                      <TableCell>Date</TableCell>
+                      <TableCell>Order Date</TableCell>
                       <TableCell>Amount</TableCell>
                       <TableCell>Status</TableCell>
                       <TableCell>Action</TableCell>
@@ -2060,7 +2462,7 @@ const SupplierDashboard: React.FC = () => {
                       <TableCell>Customer</TableCell>
                       <TableCell>Product</TableCell>
                       <TableCell>Quantity</TableCell>
-                      <TableCell>Date</TableCell>
+                      <TableCell>Order Date</TableCell>
                       <TableCell>Amount</TableCell>
                       <TableCell>Status</TableCell>
                       <TableCell>Delivery Date</TableCell>
@@ -2070,7 +2472,7 @@ const SupplierDashboard: React.FC = () => {
                   <TableBody>
                     {isOrdersLoading ? (
                       <TableRow>
-                        <TableCell colSpan={8} align="center" sx={{ py: 3 }}>
+                        <TableCell colSpan={9} align="center" sx={{ py: 3 }}>
                           <CircularProgress size={40} />
                           <Typography variant="body2" sx={{ mt: 1, color: 'text.secondary' }}>
                             Loading orders...
@@ -2099,15 +2501,34 @@ const SupplierDashboard: React.FC = () => {
                             {order.deliveryDate ? new Date(order.deliveryDate).toLocaleDateString() : 'Not set'}
                           </TableCell>
                           <TableCell>
-                            <IconButton size="small">
-                              <MoreVert fontSize="small" />
-                            </IconButton>
+                            <div style={{ display: 'flex', gap: '8px' }}>
+                              <Button
+                                variant="contained"
+                                size="small"
+                                color="primary"
+                                onClick={() => handleOpenProcessingApproveModal(order)}
+                                sx={{
+                                  textTransform: 'none',
+                                  borderRadius: '8px',
+                                  fontSize: '0.75rem',
+                                  backgroundColor: '#00C853',
+                                  '&:hover': {
+                                    backgroundColor: '#00B34A'
+                                  }
+                                }}
+                              >
+                                Mark Delivered
+                              </Button>
+                              <IconButton size="small">
+                                <MoreVert fontSize="small" />
+                              </IconButton>
+                            </div>
                           </TableCell>
                         </TableRow>
                       ))
                     ) : (
                       <TableRow>
-                        <TableCell colSpan={8} align="center" sx={{ py: 3 }}>
+                        <TableCell colSpan={9} align="center" sx={{ py: 3 }}>
                           <Typography variant="body2" sx={{ color: 'text.secondary' }}>
                             No processing orders found
                           </Typography>
@@ -2125,7 +2546,8 @@ const SupplierDashboard: React.FC = () => {
                 boxShadow: 'none', 
                 border: '1px solid rgba(0,0,0,0.1)',
                 borderRadius: '12px',
-                overflow: 'hidden'
+                overflowX: 'auto', // ✅ Fixed this
+                maxWidth: '100%',
               }}>
                 <Table>
                   <TableHead>
@@ -2134,7 +2556,7 @@ const SupplierDashboard: React.FC = () => {
                       <TableCell>Customer</TableCell>
                       <TableCell>Product</TableCell>
                       <TableCell>Quantity</TableCell>
-                      <TableCell>Date</TableCell>
+                      <TableCell>Order Date</TableCell>
                       <TableCell>Amount</TableCell>
                       <TableCell>Status</TableCell>
                       <TableCell>Action</TableCell>
@@ -2362,6 +2784,116 @@ const SupplierDashboard: React.FC = () => {
                 ) : 'Approve Order'}
               </Button>
             </div>
+          </div>
+        </div>
+      </Modal>
+
+      {/* Processing Approve Modal */}
+      <Modal
+        open={openProcessingApproveModal}
+        onClose={handleCloseProcessingApproveModal}
+        aria-labelledby="processing-approve-modal-title"
+        aria-describedby="processing-approve-modal-description"
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
+        <div className="modal-container" style={{ 
+          backgroundColor: 'white', 
+          borderRadius: '12px',
+          padding: '24px',
+          width: '500px',
+          maxWidth: '90%',
+          boxShadow: '0 4px 20px rgba(0,0,0,0.1)',
+        }}>
+          <div className="modal-header" style={{ 
+            display: 'flex', 
+            justifyContent: 'space-between', 
+            alignItems: 'center',
+            marginBottom: '20px'
+          }}>
+            <div>
+              <h2 id="processing-approve-modal-title" style={{ 
+                margin: 0, 
+                fontSize: '1.5rem', 
+                fontWeight: 600,
+                color: '#2c3e50'
+              }}>
+                Mark Order as Delivered
+              </h2>
+              <p style={{ 
+                margin: '8px 0 0', 
+                color: '#7f8c8d', 
+                fontSize: '0.9rem' 
+              }}>
+                Order #{selectedOrder?.orderNumber || selectedOrder?.id}
+              </p>
+            </div>
+            <IconButton 
+              onClick={handleCloseProcessingApproveModal}
+              sx={{
+                color: '#95a5a6',
+                '&:hover': { 
+                  color: '#7f8c8d',
+                  backgroundColor: 'rgba(0,0,0,0.04)'
+                }
+              }}
+            >
+              <CloseIcon />
+            </IconButton>
+          </div>
+
+          <div className="modal-content" style={{ marginBottom: '24px' }}>
+            <TextField
+              label="Delivery Remarks"
+              multiline
+              rows={4}
+              value={processingRemarks}
+              onChange={(e) => setProcessingRemarks(e.target.value)}
+              fullWidth
+              placeholder="Enter any remarks about the delivery (optional)"
+              sx={{ marginBottom: '16px' }}
+            />
+          </div>
+
+          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px' }}>
+            <Button
+              variant="outlined"
+              onClick={handleCloseProcessingApproveModal}
+              sx={{
+                borderRadius: '8px',
+                textTransform: 'none',
+                borderColor: '#e0e0e0',
+                color: '#7f8c8d',
+                '&:hover': {
+                  borderColor: '#bdc3c7',
+                  backgroundColor: 'rgba(0,0,0,0.02)'
+                }
+              }}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="contained"
+              onClick={handleApproveProcessingOrder}
+              disabled={isProcessingApproving}
+              sx={{
+                borderRadius: '8px',
+                textTransform: 'none',
+                backgroundColor: '#00C853',
+                '&:hover': {
+                  backgroundColor: '#00B34A'
+                }
+              }}
+            >
+              {isProcessingApproving ? (
+                <CircularProgress size={24} color="inherit" />
+              ) : (
+                'Mark as Delivered'
+              )}
+            </Button>
           </div>
         </div>
       </Modal>

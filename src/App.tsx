@@ -127,6 +127,7 @@ useEffect(() => {
         <Route path='/supplier-dashboard' element={<SupplierDashboard />} />
         <Route path='/inventory-dashboard' element={<InventoryDashboard />} />
         <Route path='/inventory-products' element={<InventoryProducts />} />
+        <Route path='/inventory-bookorder' element={<BookMyOrder />} />
         <Route path='/inventory-analytics' element={<InventoryAnalytics />} />
         <Route path='/inventory-settings' element={<InventorySettings />} />
         {/* <Route path='/salesman-dashboard' element={<SalesmanDashboard />} /> */}
