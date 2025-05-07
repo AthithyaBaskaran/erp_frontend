@@ -1,5 +1,5 @@
 import { apiUrl, InventoryapiUrl, SalesApiUrl } from "../Api/BaseUrl";
-import { SalesOrderResponse, SalesOrderStatus } from "../../models/SalesOrder";
+import { SalesOrderResponse, SalesOrderStatus, CreateSalesOrderRequest, CreateSalesOrderResponse } from "../../models/SalesOrder";
 
 export const LoginForm = async (email: string, password: string,) => {
     try {
@@ -299,6 +299,26 @@ export const fetchRecentOrders = async (limit?: number) => {
                 console.warn('Unexpected response format:', response.data);
                 throw new Error('Unexpected data format received from server');
             }
+        } else {
+            throw new Error('No data received from server');
+        }
+    } catch (error: any) {
+        console.error('Error fetching recent orders:', error);
+        
+        // More detailed error logging
+        if (error.response) {
+            console.error("Error status:", error.response.status);
+            console.error("Error data:", error.response.data);
+        } else if (error.request) {
+            console.error("No response received:", error.request);
+        } else {
+            console.error("Error message:", error.message);
+        }
+        
+        throw error;
+    }
+};
+
 export const updateProcessingOrderStatus = async (orderId: number, status: string, processingRemarks?: string) => {
     try {
         console.log(`Updating processing order ${orderId} to status: ${status}`);
