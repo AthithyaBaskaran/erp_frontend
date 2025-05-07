@@ -867,68 +867,71 @@ const SupplierDashboard: React.FC = () => {
             <div className="data-grid-container">
               <div className="data-grid-card">
                 <div className="data-grid-header">
-                  <h3 className="data-grid-title">Recent Orders</h3>
-
-                  <Button
-                    variant="text"
-                    color="primary"
-                    size="small"
-                    className="view-all-button"
-                    onClick={() => handleViewAllOrders(0)}
-                  >
-                    View All
-                  </Button>
+                  <h3 className="data-grid-title">Orders Management</h3>
                 </div>
-                <TableContainer>
-                  <Table>
-                    <TableHead>
-                      <TableRow>
-                        <TableCell>Order ID</TableCell>
-                        <TableCell>Customer</TableCell>
-                        <TableCell>Date</TableCell>
-                        <TableCell>Amount</TableCell>
-                        <TableCell>Status</TableCell>
-                        <TableCell>Action</TableCell>
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      {recentOrders.map((order) => (
-                        <TableRow key={order.id} className="data-row">
-                          <TableCell>{order.id}</TableCell>
-                          <TableCell>{order.customerName}</TableCell>
-                          <TableCell>{order.date}</TableCell>
-                          <TableCell>${order.amount.toLocaleString()}</TableCell>
-                          <TableCell>
-                            <Chip
-                              icon={getStatusIcon(order.status)}
-                              label={order.status}
-                              color={getStatusColor(order.status) as "success" | "info" | "warning" | "error"}
-                              size="small"
-                              className="status-chip"
-                            />
-                          </TableCell>
-                          <TableCell>
-                            <IconButton 
-                              size="small"
-                              onClick={() => {
-                                // Open the appropriate tab based on order status
-                                if (order.status.toUpperCase() === 'DELIVERED') {
-                                  handleViewAllOrders(2);
-                                } else if (order.status.toUpperCase() === 'PROCESSING') {
-                                  handleViewAllOrders(1);
-                                } else {
-                                  handleViewAllOrders(0);
-                                }
-                              }}
-                            >
-                              <MoreVert fontSize="small" />
-                            </IconButton>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </TableContainer>
+                
+                <Box sx={{ 
+                  display: 'flex', 
+                  flexDirection: 'column', 
+                  alignItems: 'center', 
+                  justifyContent: 'center',
+                  padding: '40px 20px',
+                  textAlign: 'center'
+                }}>
+                  <img 
+                    src="/assets/images/orders-icon.png" 
+                    alt="Orders" 
+                    style={{ 
+                      width: '120px', 
+                      height: '120px', 
+                      marginBottom: '24px',
+                      opacity: 0.8
+                    }}
+                    onError={(e) => {
+                      // Fallback if image doesn't exist
+                      e.currentTarget.style.display = 'none';
+                    }}
+                  />
+                  
+                  <Typography variant="h5" sx={{ 
+                    fontWeight: 600, 
+                    color: '#333', 
+                    mb: 2,
+                    fontFamily: 'Poppins, sans-serif'
+                  }}>
+                    Manage Your Orders
+                  </Typography>
+                  
+                  <Typography variant="body1" sx={{ 
+                    color: '#666', 
+                    mb: 4, 
+                    maxWidth: '500px',
+                    fontFamily: 'Poppins, sans-serif'
+                  }}>
+                    View and manage all your orders. Approve pending orders, track processing orders, and review delivered orders.
+                  </Typography>
+                  
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    size="large"
+                    onClick={() => handleViewAllOrders(0)}
+                    startIcon={<LocalShipping />}
+                    sx={{
+                      borderRadius: '8px',
+                      textTransform: 'none',
+                      fontFamily: 'Poppins, sans-serif',
+                      fontWeight: 500,
+                      backgroundColor: '#00C853',
+                      padding: '10px 24px',
+                      '&:hover': {
+                        backgroundColor: '#00B34A'
+                      }
+                    }}
+                  >
+                    View All Orders
+                  </Button>
+                </Box>
               </div>
             </div>
           )}
@@ -938,85 +941,92 @@ const SupplierDashboard: React.FC = () => {
             <div className="data-grid-container">
               <div className="data-grid-card">
                 <div className="data-grid-header">
-                  <h3 className="data-grid-title">Low Stock Products</h3>
-                  <div className="header-actions" style={{ display: 'flex', justifyContent: 'flex-end' }}>
-                    <Button 
-                      variant="text" 
-                      color="primary" 
-                      size="small"
-                      className="view-all-button"
-                      onClick={() => handleViewAllProducts(2)} // Open with Low Stock tab (index 2)
-                      sx={{ mr: 2 }}
+                  <h3 className="data-grid-title">Products Management</h3>
+                </div>
+                
+                <Box sx={{ 
+                  display: 'flex', 
+                  flexDirection: 'column', 
+                  alignItems: 'center', 
+                  justifyContent: 'center',
+                  padding: '40px 20px',
+                  textAlign: 'center'
+                }}>
+                  <img 
+                    src="/assets/images/products-icon.png" 
+                    alt="Products" 
+                    style={{ 
+                      width: '120px', 
+                      height: '120px', 
+                      marginBottom: '24px',
+                      opacity: 0.8
+                    }}
+                    onError={(e) => {
+                      // Fallback if image doesn't exist
+                      e.currentTarget.style.display = 'none';
+                    }}
+                  />
+                  
+                  <Typography variant="h5" sx={{ 
+                    fontWeight: 600, 
+                    color: '#333', 
+                    mb: 2,
+                    fontFamily: 'Poppins, sans-serif'
+                  }}>
+                    Manage Your Products
+                  </Typography>
+                  
+                  <Typography variant="body1" sx={{ 
+                    color: '#666', 
+                    mb: 4, 
+                    maxWidth: '500px',
+                    fontFamily: 'Poppins, sans-serif'
+                  }}>
+                    View all your products, add new products, and manage your inventory efficiently.
+                  </Typography>
+                  
+                  <div style={{ display: 'flex', gap: '16px' }}>
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      size="large"
+                      onClick={() => handleViewAllProducts(0)}
+                      startIcon={<Inventory />}
+                      sx={{
+                        borderRadius: '8px',
+                        textTransform: 'none',
+                        fontFamily: 'Poppins, sans-serif',
+                        fontWeight: 500,
+                        backgroundColor: '#2196F3',
+                        padding: '10px 24px',
+                        '&:hover': {
+                          backgroundColor: '#1976D2'
+                        }
+                      }}
                     >
-                      View All
+                      View All Products
                     </Button>
+                    
                     <Button
                       variant="contained"
                       startIcon={<AddIcon />}
-                      onClick={() => {
-                        // Close products modal if open, then open add product modal
-                        if (openProductsModal) {
-                          handleCloseProductsModal();
-                        }
-                        handleAddProduct();
-                      }}
+                      onClick={() => handleAddProduct()}
                       sx={{
-                        backgroundColor: '#00C853',
-                        color: 'white',
-                        '&:hover': { backgroundColor: '#00B34E' },
-                        px: 2.5,
-                        py: 1,
-                        fontWeight: 600,
-                        textTransform: 'none',
-                        fontSize: '0.875rem',
                         borderRadius: '8px',
-                        boxShadow: '0 4px 12px rgba(0, 200, 83, 0.2)',
+                        textTransform: 'none',
                         fontFamily: 'Poppins, sans-serif',
-                        transition: 'all 0.3s ease'
+                        fontWeight: 500,
+                        backgroundColor: '#00C853',
+                        padding: '10px 24px',
+                        '&:hover': {
+                          backgroundColor: '#00B34A'
+                        }
                       }}
-                      className="add-button"
                     >
-                      Add Product
+                      Add New Product
                     </Button>
                   </div>
-                </div>
-
-                <TableContainer>
-                  <Table>
-                    <TableHead>
-                      <TableRow>
-                        <TableCell>Product ID</TableCell>
-                        <TableCell>Name</TableCell>
-                        <TableCell>Current Stock</TableCell>
-                        <TableCell>Min Required</TableCell>
-                        <TableCell>Action</TableCell>
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      {lowStockProducts.map((product) => (
-                        <TableRow key={product.id} className="data-row">
-                          <TableCell>{product.id}</TableCell>
-                          <TableCell>{product.name}</TableCell>
-                          <TableCell>
-                            <span className="stock-warning">{product.currentStock}</span>
-                          </TableCell>
-                          <TableCell>{product.minRequired}</TableCell>
-                          <TableCell>
-                            <Button
-                              variant="contained"
-                              color="primary"
-                              size="small"
-                              className="restock-button"
-                              onClick={() => handleViewAllProducts(2)} // Open with Low Stock tab (index 2)
-                            >
-                              Restock
-                            </Button>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </TableContainer>
+                </Box>
               </div>
             </div>
           )}
