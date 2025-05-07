@@ -141,23 +141,6 @@ const Sidebar: React.FC<SidebarProps> = ({ openSidebarToggle, OpenSidebar }) => 
                 <BsFillArchiveFill className="icon" /> <span className="sidebar-item-text">Products</span>
               </li>
               
-              <li 
-                className={`sidebar-list-item ${window.location.hash === '#analytics' ? 'active' : ''}`}
-                onClick={() => {
-                  window.location.href = '/supplier-dashboard#analytics';
-                }}
-              >
-                <BsMenuButtonWideFill className="icon" /> <span className="sidebar-item-text">Analytics</span>
-              </li>
-              
-              <li 
-                className={`sidebar-list-item ${window.location.hash === '#messages' ? 'active' : ''}`}
-                onClick={() => {
-                  window.location.href = '/supplier-dashboard#messages';
-                }}
-              >
-                <BsPeopleFill className="icon" /> <span className="sidebar-item-text">Messages</span>
-              </li>
               
               <li 
                 className={`sidebar-list-item ${window.location.hash === '#notifications' ? 'active' : ''}`}
@@ -168,11 +151,6 @@ const Sidebar: React.FC<SidebarProps> = ({ openSidebarToggle, OpenSidebar }) => 
                 <BsBellFill className="icon" /> <span className="sidebar-item-text">Notifications</span>
               </li>
               
-              <NavLink to="/settings" className={({isActive}) => isActive ? "sidebar-link active" : "sidebar-link"}>
-                <li className="sidebar-list-item">
-                  <BsFillGearFill className="icon" /> <span className="sidebar-item-text">Settings</span>
-                </li>
-              </NavLink>
             </>
           ) : role && (
             role === "Sales Manager" || 
