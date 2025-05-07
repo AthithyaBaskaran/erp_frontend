@@ -223,6 +223,48 @@ export const fetchSalesOrdersByStatus = async (status: string) => {
     }
 };
 
+export const updateOrderStatus = async (orderId: number, status: string, remarks?: string, deliveryDate?: string) => {
+    try {
+        console.log(`Updating order ${orderId} to status: ${status}`);
+        const payload = {
+            orderId,
+            status,
+            remarks,
+            deliveryDate
+        };
+        
+        // Remove undefined values
+        Object.keys(payload).forEach(key => {
+            if (payload[key as keyof typeof payload] === undefined) {
+                delete payload[key as keyof typeof payload];
+            }
+        });
+        
+        const response = await SalesApiUrl.post('/sales-orders/updateStatus', payload);
+        console.log('Update order status response:', response);
+        
+        if (response.data) {
+            return response.data;
+        } else {
+            throw new Error('No data received from server');
+        }
+    } catch (error: any) {
+        console.error('Error updating order status:', error);
+        
+        // More detailed error logging
+        if (error.response) {
+            console.error("Error status:", error.response.status);
+            console.error("Error data:", error.response.data);
+        } else if (error.request) {
+            console.error("No response received:", error.request);
+        } else {
+            console.error("Error message:", error.message);
+        }
+        
+        throw error;
+    }
+};
+
 
 
 export const RefreshToken = async (userId: number, token: string) => {
