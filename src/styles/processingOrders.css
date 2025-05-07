@@ -1,0 +1,123 @@
+/* Processing Orders Styles */
+
+.main-title h3 {
+  color: #333;
+  margin-bottom: 20px;
+  font-weight: 600;
+}
+
+/* Table styles */
+.MuiTableContainer-root {
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.MuiTableHead-root .MuiTableRow-root {
+  background-color: #f5f5f5;
+}
+
+.MuiTableHead-root .MuiTableCell-root {
+  font-weight: 600;
+  color: #333;
+}
+
+.MuiTableBody-root .MuiTableRow-root:hover {
+  background-color: #f9f9f9;
+}
+
+/* Status chip styles */
+.MuiChip-root.MuiChip-colorWarning {
+  background-color: #ff9800;
+  color: white;
+}
+
+.MuiChip-root.MuiChip-colorSuccess {
+  background-color: #4caf50;
+  color: white;
+}
+
+.MuiChip-root.MuiChip-colorError {
+  background-color: #f44336;
+  color: white;
+}
+
+.MuiChip-root.MuiChip-colorInfo {
+  background-color: #2196f3;
+  color: white;
+}
+
+/* Payment button styles */
+.payment-button {
+  background: linear-gradient(45deg, #2196f3 30%, #21cbf3 90%);
+  color: white;
+  box-shadow: 0 3px 5px 2px rgba(33, 203, 243, .3);
+  transition: all 0.3s ease;
+}
+
+.payment-button:hover {
+  background: linear-gradient(45deg, #1976d2 30%, #0d9fc7 90%);
+  transform: translateY(-2px);
+}
+
+/* Dialog styles */
+.MuiDialog-paper {
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.MuiDialogTitle-root {
+  background-color: #f5f5f5;
+  padding: 16px 24px;
+}
+
+.MuiDialogContent-root {
+  padding: 20px 24px;
+}
+
+.MuiDialogActions-root {
+  padding: 16px 24px;
+  background-color: #f5f5f5;
+}
+
+/* Card styles */
+.MuiCard-root {
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.MuiCard-root:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Form styles */
+.MuiFormControl-root {
+  margin-bottom: 16px;
+}
+
+.MuiInputLabel-root {
+  font-weight: 500;
+}
+
+.MuiOutlinedInput-root {
+  border-radius: 8px;
+}
+
+.MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline {
+  border-color: #2196f3;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .MuiTableCell-root {
+    padding: 8px;
+  }
+  
+  .MuiButton-root {
+    padding: 6px 12px;
+    font-size: 0.8rem;
+  }
+  
+  .MuiDialogContent-root {
+    padding: 16px;
+  }
+}

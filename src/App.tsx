@@ -15,6 +15,7 @@ import SalesDashboard from './components/SalesManagement/SalesDashboard';
 import SalesOrders from './components/SalesManagement/SalesOrders';
 import RecentlyOrders from './components/SalesManagement/RecentlyOrders';
 import InventoryDashboard from './components/Inventory/InventoryDashboard';
+import ProcessingOrders from './components/Sales/ProcessingOrders';
 import InventoryProducts from './components/Inventory/InventoryProducts';
 import InventoryAnalytics from './components/Inventory/InventoryAnalytics';
 import InventorySettings from './components/Inventory/InventorySettings';
@@ -136,6 +137,7 @@ useEffect(() => {
         <Route path='/sales-dashboard' element={<SalesDashboard />} />
         <Route path='/sales-orders' element={<SalesOrders />} />
         <Route path='/recently_orders' element={<RecentlyOrders />} />
+        <Route path='/invoices' element={<ProcessingOrders />} />
         </Routes>
       <Snackbar
         open={openSnackbar}

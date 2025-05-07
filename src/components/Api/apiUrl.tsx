@@ -1,5 +1,5 @@
 import { apiUrl, InventoryapiUrl, SalesApiUrl } from "../Api/BaseUrl";
-import { SalesOrderResponse, SalesOrderStatus } from "../../models/SalesOrder";
+import { CreateSalesOrderRequest, CreateSalesOrderResponse, SalesOrderResponse, SalesOrderStatus } from "../../models/SalesOrder";
 
 export const LoginForm = async (email: string, password: string,) => {
     try {
@@ -299,6 +299,26 @@ export const fetchRecentOrders = async (limit?: number) => {
                 console.warn('Unexpected response format:', response.data);
                 throw new Error('Unexpected data format received from server');
             }
+        } else {
+            throw new Error('No data received from server');
+        }
+    } catch (error: any) {
+        console.error('Error fetching recent orders:', error);
+        
+        // More detailed error logging
+        if (error.response) {
+            console.error("Error status:", error.response.status);
+            console.error("Error data:", error.response.data);
+        } else if (error.request) {
+            console.error("No response received:", error.request);
+        } else {
+            console.error("Error message:", error.message);
+        }
+        
+        throw error;
+    }
+};
+
 export const updateProcessingOrderStatus = async (orderId: number, status: string, processingRemarks?: string) => {
     try {
         console.log(`Updating processing order ${orderId} to status: ${status}`);
@@ -452,12 +472,160 @@ export const fetchCategoriesApi = async () => {
     }
 };
 
-export const showrecentlyorder = async () => {
+// This function was removed as it duplicates fetchRecentOrders functionality
+    
+// Invoice Management API functions
+export const createInvoice = async (orderId: string) => {
     try {
-        const response = await  SalesApiUrl.get('/sales-orders/getOrderByStatus');
+        const response = await SalesApiUrl.post(`/invoices/add?orderId=${orderId}`);
+        if (response.data?.statusMessage) {
+            console.log("✅ Invoice generated:", response.data);
+        }
         return response.data;
     } catch (error: any) {
-        console.log("❌ Error fetching users:", error);
+        console.error('Error generating invoice:', error);
+        if (error.response && error.response.data && error.response.data.statusMessage) {
+            throw new Error(error.response.data.statusMessage);
+        } else {
+            throw new Error("Failed to generate invoice");
+        }
+    }
+};
+
+export const fetchAllInvoices = async () => {
+    try {
+        const response = await SalesApiUrl.get('/invoices/getAll');
+        console.log('Invoices API response:', response);
+        
+        if (response.data) {
+            if (response.data.data && Array.isArray(response.data.data)) {
+                return response.data.data;
+            } else if (Array.isArray(response.data)) {
+                return response.data;
+            } else {
+                console.warn('Unexpected response format:', response.data);
+                throw new Error('Unexpected data format received from server');
+            }
+        } else {
+            throw new Error('No data received from server');
+        }
+    } catch (error: any) {
+        console.error('Error fetching invoices:', error);
         throw error;
+    }
+};
+
+export const fetchInvoiceById = async (invoiceId: string) => {
+    try {
+        const response = await SalesApiUrl.get(`/invoices/get?invoiceId=${invoiceId}`);
+        console.log('Invoice details API response:', response);
+        
+        if (response.data) {
+            // Handle response format: { statusCode, statusMessage, data: {...} }
+            if (response.data.data) {
+                return response.data.data;
+            } 
+            // Handle direct object response
+            else if (typeof response.data === 'object' && !Array.isArray(response.data)) {
+                return response.data;
+            }
+            else {
+                console.warn('Unexpected response format:', response.data);
+                throw new Error('Unexpected data format received from server');
+            }
+        } else {
+            console.warn('No data received from server');
+            throw new Error('No data received from server');
+        }
+    } catch (error: any) {
+        console.error('Error fetching invoice details:', error);
+        // If it's a response error with data
+        if (error.response && error.response.data) {
+            if (error.response.data.statusMessage) {
+                throw new Error(error.response.data.statusMessage);
+            } else {
+                throw new Error(`Server error: ${error.response.status}`);
+            }
+        } else if (error.message) {
+            throw new Error(error.message);
+        } else {
+            throw new Error('Failed to fetch invoice details');
+        }
+    }
+};
+
+export const getInvoicesByOrderId = async (orderId: string) => {
+    try {
+        const response = await SalesApiUrl.get(`/invoices/getByOrderId?orderId=${orderId}`);
+        console.log('Invoices by order ID API response:', response);
+        
+        if (response.data) {
+            if (response.data.data && Array.isArray(response.data.data)) {
+                return response.data.data;
+            } else if (Array.isArray(response.data)) {
+                return response.data;
+            } else {
+                console.warn('Unexpected response format:', response.data);
+                throw new Error('Unexpected data format received from server');
+            }
+        } else {
+            throw new Error('No data received from server');
+        }
+    } catch (error: any) {
+        console.error('Error fetching invoices by order ID:', error);
+        throw error;
+    }
+};
+
+// Payment Management API functions
+export const createPayment = async (paymentData: {
+    orderId: number | string;
+    paymentDate: string;
+    amount: number;
+    paymentMethod: string;
+    status: string;
+}) => {
+    try {
+        const response = await SalesApiUrl.post('/payments', paymentData);
+        console.log('Payment created response:', response);
+        
+        if (response.data) {
+            return response.data;
+        } else {
+            throw new Error('No data received from server');
+        }
+    } catch (error: any) {
+        console.error('Error creating payment:', error);
+        
+        if (error.response && error.response.data && error.response.data.statusMessage) {
+            throw new Error(error.response.data.statusMessage);
+        } else if (error.message) {
+            throw new Error(error.message);
+        } else {
+            throw new Error('Failed to create payment');
+        }
+    }
+};
+
+export const getPaymentsByOrderId = async (orderId: number | string) => {
+    try {
+        const response = await SalesApiUrl.get(`/payments/by-order?orderId=${orderId}`);
+        console.log('Payments by order ID response:', response);
+        
+        if (response.data) {
+            if (response.data.data && Array.isArray(response.data.data)) {
+                return response.data.data;
+            } else if (Array.isArray(response.data)) {
+                return response.data;
+            } else {
+                console.warn('Unexpected response format:', response.data);
+                return [];
+            }
+        } else {
+            return [];
+        }
+    } catch (error: any) {
+        console.error('Error fetching payments by order ID:', error);
+        return [];
     }
 };

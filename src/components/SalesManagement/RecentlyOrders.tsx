@@ -395,7 +395,7 @@ const RecentlyOrders: React.FC = () => {
                 >
                   <MenuItem value="all">All Statuses</MenuItem>
                   <MenuItem value="delivered">Delivered</MenuItem>
-                  <MenuItem value="in transit">In Transit</MenuItem>
+                  <MenuItem value="in transit">Processing</MenuItem>
                   <MenuItem value="pending">Pending</MenuItem>
                   <MenuItem value="cancelled">Cancelled</MenuItem>
                 </Select>
