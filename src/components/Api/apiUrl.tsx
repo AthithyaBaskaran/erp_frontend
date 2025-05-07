@@ -265,6 +265,47 @@ export const updateOrderStatus = async (orderId: number, status: string, remarks
     }
 };
 
+export const updateProcessingOrderStatus = async (orderId: number, status: string, processingRemarks?: string) => {
+    try {
+        console.log(`Updating processing order ${orderId} to status: ${status}`);
+        const payload = {
+            orderId,
+            status,
+            processingRemarks
+        };
+        
+        // Remove undefined values
+        Object.keys(payload).forEach(key => {
+            if (payload[key as keyof typeof payload] === undefined) {
+                delete payload[key as keyof typeof payload];
+            }
+        });
+        
+        const response = await SalesApiUrl.put('/sales-orders/updateProcessingStatus', payload);
+        console.log('Update processing order status response:', response);
+        
+        if (response.data) {
+            return response.data;
+        } else {
+            throw new Error('No data received from server');
+        }
+    } catch (error: any) {
+        console.error('Error updating processing order status:', error);
+        
+        // More detailed error logging
+        if (error.response) {
+            console.error("Error status:", error.response.status);
+            console.error("Error data:", error.response.data);
+        } else if (error.request) {
+            console.error("No response received:", error.request);
+        } else {
+            console.error("Error message:", error.message);
+        }
+        
+        throw error;
+    }
+};
+
 
 
 export const RefreshToken = async (userId: number, token: string) => {

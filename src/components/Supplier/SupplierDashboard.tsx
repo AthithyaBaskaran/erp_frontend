@@ -73,7 +73,7 @@ import '../../styles/inventory.css';
 
 // API
 import {
-  fetchCategoriesApi, showInventory, addInventory, fetchSalesOrdersByStatus, updateOrderStatus
+  fetchCategoriesApi, showInventory, addInventory, fetchSalesOrdersByStatus, updateOrderStatus, updateProcessingOrderStatus
 } from "../Api/apiUrl";
 
 // Register ChartJS components
@@ -150,14 +150,17 @@ const SupplierDashboard: React.FC = () => {
   const [openProductsModal, setOpenProductsModal] = useState(false);
   const [openOrdersModal, setOpenOrdersModal] = useState(false);
   const [openApproveModal, setOpenApproveModal] = useState(false);
+  const [openProcessingApproveModal, setOpenProcessingApproveModal] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState<SalesOrder | null>(null);
   const [remarks, setRemarks] = useState('');
+  const [processingRemarks, setProcessingRemarks] = useState('');
   const [deliveryDate, setDeliveryDate] = useState('');
   const [categories, setCategories] = useState<Category[]>([]);
   const [inventoryItems, setInventoryItems] = useState<InventoryItem[]>([]);
   const [isProductsLoading, setIsProductsLoading] = useState(false);
   const [isOrdersLoading, setIsOrdersLoading] = useState(false);
   const [isApproving, setIsApproving] = useState(false);
+  const [isProcessingApproving, setIsProcessingApproving] = useState(false);
   const [salesOrders, setSalesOrders] = useState<SalesOrder[]>([]);
   const [productTabValue, setProductTabValue] = useState(0);
   const [orderTabValue, setOrderTabValue] = useState(0);
@@ -460,6 +463,17 @@ const SupplierDashboard: React.FC = () => {
     setSelectedOrder(null);
   };
   
+  const handleOpenProcessingApproveModal = (order: SalesOrder) => {
+    setSelectedOrder(order);
+    setProcessingRemarks('');
+    setOpenProcessingApproveModal(true);
+  };
+  
+  const handleCloseProcessingApproveModal = () => {
+    setOpenProcessingApproveModal(false);
+    setSelectedOrder(null);
+  };
+  
   const handleApproveOrder = async () => {
     if (!selectedOrder) return;
     
@@ -515,6 +529,59 @@ const SupplierDashboard: React.FC = () => {
       });
     } finally {
       setIsApproving(false);
+    }
+  };
+  
+  const handleApproveProcessingOrder = async () => {
+    if (!selectedOrder) return;
+    
+    try {
+      setIsProcessingApproving(true);
+      
+      await updateProcessingOrderStatus(
+        selectedOrder.id,
+        'DELIVERED',
+        processingRemarks || undefined
+      );
+      
+      // Show success message
+      Swal.fire({
+        icon: 'success',
+        title: 'Order Delivered',
+        text: `Order ${selectedOrder.orderNumber || selectedOrder.id} has been marked as delivered.`,
+        timer: 2000,
+        showConfirmButton: false,
+        customClass: {
+          popup: 'swal2-popup',
+          title: 'swal2-title',
+          htmlContainer: 'swal2-html-container',
+          icon: 'swal2-icon'
+        }
+      });
+      
+      // Close the modal
+      handleCloseProcessingApproveModal();
+      
+      // Refresh the orders list
+      fetchSalesOrders(orderTabValue === 1 ? 'PROCESSING' : 'DELIVERED');
+    } catch (error: any) {
+      console.error('Error marking order as delivered:', error);
+      
+      // Show error message
+      Swal.fire({
+        icon: 'error',
+        title: 'Failed to Mark as Delivered',
+        text: error.message || 'An error occurred while marking the order as delivered.',
+        customClass: {
+          popup: 'swal2-popup',
+          title: 'swal2-title',
+          htmlContainer: 'swal2-html-container',
+          confirmButton: 'swal2-confirm',
+          icon: 'swal2-icon'
+        }
+      });
+    } finally {
+      setIsProcessingApproving(false);
     }
   };
   
@@ -1974,7 +2041,7 @@ const SupplierDashboard: React.FC = () => {
                       <TableCell>Customer</TableCell>
                       <TableCell>Product</TableCell>
                       <TableCell>Quantity</TableCell>
-                      <TableCell>Date</TableCell>
+                      <TableCell>Order Date</TableCell>
                       <TableCell>Amount</TableCell>
                       <TableCell>Status</TableCell>
                       <TableCell>Action</TableCell>
@@ -2060,7 +2127,7 @@ const SupplierDashboard: React.FC = () => {
                       <TableCell>Customer</TableCell>
                       <TableCell>Product</TableCell>
                       <TableCell>Quantity</TableCell>
-                      <TableCell>Date</TableCell>
+                      <TableCell>Order Date</TableCell>
                       <TableCell>Amount</TableCell>
                       <TableCell>Status</TableCell>
                       <TableCell>Delivery Date</TableCell>
@@ -2070,7 +2137,7 @@ const SupplierDashboard: React.FC = () => {
                   <TableBody>
                     {isOrdersLoading ? (
                       <TableRow>
-                        <TableCell colSpan={8} align="center" sx={{ py: 3 }}>
+                        <TableCell colSpan={9} align="center" sx={{ py: 3 }}>
                           <CircularProgress size={40} />
                           <Typography variant="body2" sx={{ mt: 1, color: 'text.secondary' }}>
                             Loading orders...
@@ -2099,15 +2166,34 @@ const SupplierDashboard: React.FC = () => {
                             {order.deliveryDate ? new Date(order.deliveryDate).toLocaleDateString() : 'Not set'}
                           </TableCell>
                           <TableCell>
-                            <IconButton size="small">
-                              <MoreVert fontSize="small" />
-                            </IconButton>
+                            <div style={{ display: 'flex', gap: '8px' }}>
+                              <Button
+                                variant="contained"
+                                size="small"
+                                color="primary"
+                                onClick={() => handleOpenProcessingApproveModal(order)}
+                                sx={{
+                                  textTransform: 'none',
+                                  borderRadius: '8px',
+                                  fontSize: '0.75rem',
+                                  backgroundColor: '#00C853',
+                                  '&:hover': {
+                                    backgroundColor: '#00B34A'
+                                  }
+                                }}
+                              >
+                                Mark Delivered
+                              </Button>
+                              <IconButton size="small">
+                                <MoreVert fontSize="small" />
+                              </IconButton>
+                            </div>
                           </TableCell>
                         </TableRow>
                       ))
                     ) : (
                       <TableRow>
-                        <TableCell colSpan={8} align="center" sx={{ py: 3 }}>
+                        <TableCell colSpan={9} align="center" sx={{ py: 3 }}>
                           <Typography variant="body2" sx={{ color: 'text.secondary' }}>
                             No processing orders found
                           </Typography>
@@ -2125,7 +2211,8 @@ const SupplierDashboard: React.FC = () => {
                 boxShadow: 'none', 
                 border: '1px solid rgba(0,0,0,0.1)',
                 borderRadius: '12px',
-                overflow: 'hidden'
+                overflowX: 'auto', // ✅ Fixed this
+                maxWidth: '100%',
               }}>
                 <Table>
                   <TableHead>
@@ -2134,7 +2221,7 @@ const SupplierDashboard: React.FC = () => {
                       <TableCell>Customer</TableCell>
                       <TableCell>Product</TableCell>
                       <TableCell>Quantity</TableCell>
-                      <TableCell>Date</TableCell>
+                      <TableCell>Order Date</TableCell>
                       <TableCell>Amount</TableCell>
                       <TableCell>Status</TableCell>
                       <TableCell>Action</TableCell>
@@ -2362,6 +2449,116 @@ const SupplierDashboard: React.FC = () => {
                 ) : 'Approve Order'}
               </Button>
             </div>
+          </div>
+        </div>
+      </Modal>
+
+      {/* Processing Approve Modal */}
+      <Modal
+        open={openProcessingApproveModal}
+        onClose={handleCloseProcessingApproveModal}
+        aria-labelledby="processing-approve-modal-title"
+        aria-describedby="processing-approve-modal-description"
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
+        <div className="modal-container" style={{ 
+          backgroundColor: 'white', 
+          borderRadius: '12px',
+          padding: '24px',
+          width: '500px',
+          maxWidth: '90%',
+          boxShadow: '0 4px 20px rgba(0,0,0,0.1)',
+        }}>
+          <div className="modal-header" style={{ 
+            display: 'flex', 
+            justifyContent: 'space-between', 
+            alignItems: 'center',
+            marginBottom: '20px'
+          }}>
+            <div>
+              <h2 id="processing-approve-modal-title" style={{ 
+                margin: 0, 
+                fontSize: '1.5rem', 
+                fontWeight: 600,
+                color: '#2c3e50'
+              }}>
+                Mark Order as Delivered
+              </h2>
+              <p style={{ 
+                margin: '8px 0 0', 
+                color: '#7f8c8d', 
+                fontSize: '0.9rem' 
+              }}>
+                Order #{selectedOrder?.orderNumber || selectedOrder?.id}
+              </p>
+            </div>
+            <IconButton 
+              onClick={handleCloseProcessingApproveModal}
+              sx={{
+                color: '#95a5a6',
+                '&:hover': { 
+                  color: '#7f8c8d',
+                  backgroundColor: 'rgba(0,0,0,0.04)'
+                }
+              }}
+            >
+              <CloseIcon />
+            </IconButton>
+          </div>
+
+          <div className="modal-content" style={{ marginBottom: '24px' }}>
+            <TextField
+              label="Delivery Remarks"
+              multiline
+              rows={4}
+              value={processingRemarks}
+              onChange={(e) => setProcessingRemarks(e.target.value)}
+              fullWidth
+              placeholder="Enter any remarks about the delivery (optional)"
+              sx={{ marginBottom: '16px' }}
+            />
+          </div>
+
+          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px' }}>
+            <Button
+              variant="outlined"
+              onClick={handleCloseProcessingApproveModal}
+              sx={{
+                borderRadius: '8px',
+                textTransform: 'none',
+                borderColor: '#e0e0e0',
+                color: '#7f8c8d',
+                '&:hover': {
+                  borderColor: '#bdc3c7',
+                  backgroundColor: 'rgba(0,0,0,0.02)'
+                }
+              }}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="contained"
+              onClick={handleApproveProcessingOrder}
+              disabled={isProcessingApproving}
+              sx={{
+                borderRadius: '8px',
+                textTransform: 'none',
+                backgroundColor: '#00C853',
+                '&:hover': {
+                  backgroundColor: '#00B34A'
+                }
+              }}
+            >
+              {isProcessingApproving ? (
+                <CircularProgress size={24} color="inherit" />
+              ) : (
+                'Mark as Delivered'
+              )}
+            </Button>
           </div>
         </div>
       </Modal>
