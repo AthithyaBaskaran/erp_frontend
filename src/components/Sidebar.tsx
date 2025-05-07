@@ -225,7 +225,7 @@ const Sidebar: React.FC<SidebarProps> = ({ openSidebarToggle, OpenSidebar }) => 
 
               <NavLink to="/inventory-bookorder" className={({isActive}) => isActive ? "sidebar-link active" : "sidebar-link"}>
                 <li className="sidebar-list-item">
-                  <BsFillArchiveFill className="icon" /> <span className="sidebar-item-text">Book Order</span>
+                  <BsCart3 className="icon" /> <span className="sidebar-item-text">Book Order</span>
                 </li>
               </NavLink>
               
