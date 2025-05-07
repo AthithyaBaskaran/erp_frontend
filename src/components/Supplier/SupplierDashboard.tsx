@@ -73,7 +73,7 @@ import '../../styles/inventory.css';
 
 // API
 import {
-  fetchCategoriesApi, showInventory, addInventory, fetchSalesOrdersByStatus
+  fetchCategoriesApi, showInventory, addInventory, fetchSalesOrdersByStatus, updateOrderStatus
 } from "../Api/apiUrl";
 
 // Register ChartJS components
@@ -116,6 +116,8 @@ interface SalesOrder {
   status: string;
   productName?: string;
   quantity?: number;
+  remarks?: string;
+  deliveryDate?: string;
 }
 
 // Validation schema
@@ -147,10 +149,15 @@ const SupplierDashboard: React.FC = () => {
   const [openUserModal, setOpenUserModal] = useState(false);
   const [openProductsModal, setOpenProductsModal] = useState(false);
   const [openOrdersModal, setOpenOrdersModal] = useState(false);
+  const [openApproveModal, setOpenApproveModal] = useState(false);
+  const [selectedOrder, setSelectedOrder] = useState<SalesOrder | null>(null);
+  const [remarks, setRemarks] = useState('');
+  const [deliveryDate, setDeliveryDate] = useState('');
   const [categories, setCategories] = useState<Category[]>([]);
   const [inventoryItems, setInventoryItems] = useState<InventoryItem[]>([]);
   const [isProductsLoading, setIsProductsLoading] = useState(false);
   const [isOrdersLoading, setIsOrdersLoading] = useState(false);
+  const [isApproving, setIsApproving] = useState(false);
   const [salesOrders, setSalesOrders] = useState<SalesOrder[]>([]);
   const [productTabValue, setProductTabValue] = useState(0);
   const [orderTabValue, setOrderTabValue] = useState(0);
@@ -397,7 +404,20 @@ const SupplierDashboard: React.FC = () => {
 
   const handleViewAllOrders = (tabIndex: number = 0) => {
     // Fetch orders based on tab index
-    const status = tabIndex === 0 ? 'PENDING' : 'DELIVERED';
+    let status;
+    switch(tabIndex) {
+      case 0:
+        status = 'PENDING';
+        break;
+      case 1:
+        status = 'PROCESSING';
+        break;
+      case 2:
+        status = 'DELIVERED';
+        break;
+      default:
+        status = 'PENDING';
+    }
     fetchSalesOrders(status);
     
     setOrderTabValue(tabIndex);
@@ -411,8 +431,90 @@ const SupplierDashboard: React.FC = () => {
   const handleOrderTabChange = (event: React.SyntheticEvent, newValue: number) => {
     setOrderTabValue(newValue);
     // Fetch orders based on new tab value
-    const status = newValue === 0 ? 'PENDING' : 'DELIVERED';
+    let status;
+    switch(newValue) {
+      case 0:
+        status = 'PENDING';
+        break;
+      case 1:
+        status = 'PROCESSING';
+        break;
+      case 2:
+        status = 'DELIVERED';
+        break;
+      default:
+        status = 'PENDING';
+    }
     fetchSalesOrders(status);
+  };
+  
+  const handleOpenApproveModal = (order: SalesOrder) => {
+    setSelectedOrder(order);
+    setRemarks('');
+    setDeliveryDate('');
+    setOpenApproveModal(true);
+  };
+  
+  const handleCloseApproveModal = () => {
+    setOpenApproveModal(false);
+    setSelectedOrder(null);
+  };
+  
+  const handleApproveOrder = async () => {
+    if (!selectedOrder) return;
+    
+    try {
+      setIsApproving(true);
+      
+      // Format delivery date if provided
+      const formattedDeliveryDate = deliveryDate ? new Date(deliveryDate).toISOString() : undefined;
+      
+      await updateOrderStatus(
+        selectedOrder.id,
+        'PROCESSING',
+        remarks || undefined,
+        formattedDeliveryDate
+      );
+      
+      // Show success message
+      Swal.fire({
+        icon: 'success',
+        title: 'Order Approved',
+        text: `Order ${selectedOrder.orderNumber || selectedOrder.id} has been approved and moved to processing.`,
+        timer: 2000,
+        showConfirmButton: false,
+        customClass: {
+          popup: 'swal2-popup',
+          title: 'swal2-title',
+          htmlContainer: 'swal2-html-container',
+          icon: 'swal2-icon'
+        }
+      });
+      
+      // Close the modal
+      handleCloseApproveModal();
+      
+      // Refresh the orders list
+      fetchSalesOrders(orderTabValue === 0 ? 'PENDING' : 'PROCESSING');
+    } catch (error: any) {
+      console.error('Error approving order:', error);
+      
+      // Show error message
+      Swal.fire({
+        icon: 'error',
+        title: 'Failed to Approve Order',
+        text: error.message || 'An error occurred while approving the order.',
+        customClass: {
+          popup: 'swal2-popup',
+          title: 'swal2-title',
+          htmlContainer: 'swal2-html-container',
+          confirmButton: 'swal2-confirm',
+          icon: 'swal2-icon'
+        }
+      });
+    } finally {
+      setIsApproving(false);
+    }
   };
   
   const handleInventory: SubmitHandler<InventoryFormData> = async (data) => {
@@ -765,66 +867,71 @@ const SupplierDashboard: React.FC = () => {
             <div className="data-grid-container">
               <div className="data-grid-card">
                 <div className="data-grid-header">
-                  <h3 className="data-grid-title">Recent Orders</h3>
-
-                  <Button
-                    variant="text"
-                    color="primary"
-                    size="small"
-                    className="view-all-button"
-                    onClick={() => handleViewAllOrders(0)}
-                  >
-                    View All
-                  </Button>
+                  <h3 className="data-grid-title">Orders Management</h3>
                 </div>
-                <TableContainer>
-                  <Table>
-                    <TableHead>
-                      <TableRow>
-                        <TableCell>Order ID</TableCell>
-                        <TableCell>Customer</TableCell>
-                        <TableCell>Date</TableCell>
-                        <TableCell>Amount</TableCell>
-                        <TableCell>Status</TableCell>
-                        <TableCell>Action</TableCell>
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      {recentOrders.map((order) => (
-                        <TableRow key={order.id} className="data-row">
-                          <TableCell>{order.id}</TableCell>
-                          <TableCell>{order.customerName}</TableCell>
-                          <TableCell>{order.date}</TableCell>
-                          <TableCell>${order.amount.toLocaleString()}</TableCell>
-                          <TableCell>
-                            <Chip
-                              icon={getStatusIcon(order.status)}
-                              label={order.status}
-                              color={getStatusColor(order.status) as "success" | "info" | "warning" | "error"}
-                              size="small"
-                              className="status-chip"
-                            />
-                          </TableCell>
-                          <TableCell>
-                            <IconButton 
-                              size="small"
-                              onClick={() => {
-                                // If order is delivered, open the delivered orders tab
-                                if (order.status === 'Delivered') {
-                                  handleViewAllOrders(1);
-                                } else {
-                                  handleViewAllOrders(0);
-                                }
-                              }}
-                            >
-                              <MoreVert fontSize="small" />
-                            </IconButton>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </TableContainer>
+                
+                <Box sx={{ 
+                  display: 'flex', 
+                  flexDirection: 'column', 
+                  alignItems: 'center', 
+                  justifyContent: 'center',
+                  padding: '40px 20px',
+                  textAlign: 'center'
+                }}>
+                  <img 
+                    src="/assets/images/orders-icon.png" 
+                    alt="Orders" 
+                    style={{ 
+                      width: '120px', 
+                      height: '120px', 
+                      marginBottom: '24px',
+                      opacity: 0.8
+                    }}
+                    onError={(e) => {
+                      // Fallback if image doesn't exist
+                      e.currentTarget.style.display = 'none';
+                    }}
+                  />
+                  
+                  <Typography variant="h5" sx={{ 
+                    fontWeight: 600, 
+                    color: '#333', 
+                    mb: 2,
+                    fontFamily: 'Poppins, sans-serif'
+                  }}>
+                    Manage Your Orders
+                  </Typography>
+                  
+                  <Typography variant="body1" sx={{ 
+                    color: '#666', 
+                    mb: 4, 
+                    maxWidth: '500px',
+                    fontFamily: 'Poppins, sans-serif'
+                  }}>
+                    View and manage all your orders. Approve pending orders, track processing orders, and review delivered orders.
+                  </Typography>
+                  
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    size="large"
+                    onClick={() => handleViewAllOrders(0)}
+                    startIcon={<LocalShipping />}
+                    sx={{
+                      borderRadius: '8px',
+                      textTransform: 'none',
+                      fontFamily: 'Poppins, sans-serif',
+                      fontWeight: 500,
+                      backgroundColor: '#00C853',
+                      padding: '10px 24px',
+                      '&:hover': {
+                        backgroundColor: '#00B34A'
+                      }
+                    }}
+                  >
+                    View All Orders
+                  </Button>
+                </Box>
               </div>
             </div>
           )}
@@ -834,85 +941,92 @@ const SupplierDashboard: React.FC = () => {
             <div className="data-grid-container">
               <div className="data-grid-card">
                 <div className="data-grid-header">
-                  <h3 className="data-grid-title">Low Stock Products</h3>
-                  <div className="header-actions" style={{ display: 'flex', justifyContent: 'flex-end' }}>
-                    <Button 
-                      variant="text" 
-                      color="primary" 
-                      size="small"
-                      className="view-all-button"
-                      onClick={() => handleViewAllProducts(2)} // Open with Low Stock tab (index 2)
-                      sx={{ mr: 2 }}
+                  <h3 className="data-grid-title">Products Management</h3>
+                </div>
+                
+                <Box sx={{ 
+                  display: 'flex', 
+                  flexDirection: 'column', 
+                  alignItems: 'center', 
+                  justifyContent: 'center',
+                  padding: '40px 20px',
+                  textAlign: 'center'
+                }}>
+                  <img 
+                    src="/assets/images/products-icon.png" 
+                    alt="Products" 
+                    style={{ 
+                      width: '120px', 
+                      height: '120px', 
+                      marginBottom: '24px',
+                      opacity: 0.8
+                    }}
+                    onError={(e) => {
+                      // Fallback if image doesn't exist
+                      e.currentTarget.style.display = 'none';
+                    }}
+                  />
+                  
+                  <Typography variant="h5" sx={{ 
+                    fontWeight: 600, 
+                    color: '#333', 
+                    mb: 2,
+                    fontFamily: 'Poppins, sans-serif'
+                  }}>
+                    Manage Your Products
+                  </Typography>
+                  
+                  <Typography variant="body1" sx={{ 
+                    color: '#666', 
+                    mb: 4, 
+                    maxWidth: '500px',
+                    fontFamily: 'Poppins, sans-serif'
+                  }}>
+                    View all your products, add new products, and manage your inventory efficiently.
+                  </Typography>
+                  
+                  <div style={{ display: 'flex', gap: '16px' }}>
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      size="large"
+                      onClick={() => handleViewAllProducts(0)}
+                      startIcon={<Inventory />}
+                      sx={{
+                        borderRadius: '8px',
+                        textTransform: 'none',
+                        fontFamily: 'Poppins, sans-serif',
+                        fontWeight: 500,
+                        backgroundColor: '#2196F3',
+                        padding: '10px 24px',
+                        '&:hover': {
+                          backgroundColor: '#1976D2'
+                        }
+                      }}
                     >
-                      View All
+                      View All Products
                     </Button>
+                    
                     <Button
                       variant="contained"
                       startIcon={<AddIcon />}
-                      onClick={() => {
-                        // Close products modal if open, then open add product modal
-                        if (openProductsModal) {
-                          handleCloseProductsModal();
-                        }
-                        handleAddProduct();
-                      }}
+                      onClick={() => handleAddProduct()}
                       sx={{
-                        backgroundColor: '#00C853',
-                        color: 'white',
-                        '&:hover': { backgroundColor: '#00B34E' },
-                        px: 2.5,
-                        py: 1,
-                        fontWeight: 600,
-                        textTransform: 'none',
-                        fontSize: '0.875rem',
                         borderRadius: '8px',
-                        boxShadow: '0 4px 12px rgba(0, 200, 83, 0.2)',
+                        textTransform: 'none',
                         fontFamily: 'Poppins, sans-serif',
-                        transition: 'all 0.3s ease'
+                        fontWeight: 500,
+                        backgroundColor: '#00C853',
+                        padding: '10px 24px',
+                        '&:hover': {
+                          backgroundColor: '#00B34A'
+                        }
                       }}
-                      className="add-button"
                     >
-                      Add Product
+                      Add New Product
                     </Button>
                   </div>
-                </div>
-
-                <TableContainer>
-                  <Table>
-                    <TableHead>
-                      <TableRow>
-                        <TableCell>Product ID</TableCell>
-                        <TableCell>Name</TableCell>
-                        <TableCell>Current Stock</TableCell>
-                        <TableCell>Min Required</TableCell>
-                        <TableCell>Action</TableCell>
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      {lowStockProducts.map((product) => (
-                        <TableRow key={product.id} className="data-row">
-                          <TableCell>{product.id}</TableCell>
-                          <TableCell>{product.name}</TableCell>
-                          <TableCell>
-                            <span className="stock-warning">{product.currentStock}</span>
-                          </TableCell>
-                          <TableCell>{product.minRequired}</TableCell>
-                          <TableCell>
-                            <Button
-                              variant="contained"
-                              color="primary"
-                              size="small"
-                              className="restock-button"
-                              onClick={() => handleViewAllProducts(2)} // Open with Low Stock tab (index 2)
-                            >
-                              Restock
-                            </Button>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </TableContainer>
+                </Box>
               </div>
             </div>
           )}
@@ -1838,12 +1952,13 @@ const SupplierDashboard: React.FC = () => {
               }}
             >
               <Tab label="New Orders" />
+              <Tab label="Processing Orders" />
               <Tab label="Delivered Orders" />
             </Tabs>
           </Box>
           
           <div className="orders-table-container" style={{ position: 'relative', minHeight: '300px' }}>
-            {/* New Orders Tab */}
+            {/* New Orders Tab (Pending) */}
             {orderTabValue === 0 && (
               <TableContainer component={Paper} sx={{ 
                 boxShadow: 'none', 
@@ -1857,6 +1972,7 @@ const SupplierDashboard: React.FC = () => {
                       <TableCell>Order ID</TableCell>
                       <TableCell>Customer</TableCell>
                       <TableCell>Product</TableCell>
+                      <TableCell>Quantity</TableCell>
                       <TableCell>Date</TableCell>
                       <TableCell>Amount</TableCell>
                       <TableCell>Status</TableCell>
@@ -1879,8 +1995,9 @@ const SupplierDashboard: React.FC = () => {
                           <TableCell>{order.orderNumber || `ORD-${order.id}`}</TableCell>
                           <TableCell>{order.customerName}</TableCell>
                           <TableCell>{order.productName || 'Multiple items'}</TableCell>
+                          <TableCell>{order.quantity?.toLocaleString()}</TableCell>
                           <TableCell>{new Date(order.orderDate).toLocaleDateString()}</TableCell>
-                          <TableCell>${order.totalAmount.toLocaleString()}</TableCell>
+                          <TableCell>{order.totalAmount.toLocaleString()}</TableCell>
                           <TableCell>
                             <Chip
                               icon={getStatusIcon(order.status)}
@@ -1891,15 +2008,29 @@ const SupplierDashboard: React.FC = () => {
                             />
                           </TableCell>
                           <TableCell>
-                            <IconButton size="small">
-                              <MoreVert fontSize="small" />
-                            </IconButton>
+                            <Button
+                              variant="contained"
+                              size="small"
+                              color="primary"
+                              onClick={() => handleOpenApproveModal(order)}
+                              sx={{
+                                textTransform: 'none',
+                                borderRadius: '8px',
+                                fontSize: '0.75rem',
+                                backgroundColor: '#00C853',
+                                '&:hover': {
+                                  backgroundColor: '#00B34A'
+                                }
+                              }}
+                            >
+                              Approve
+                            </Button>
                           </TableCell>
                         </TableRow>
                       ))
                     ) : (
                       <TableRow>
-                        <TableCell colSpan={7} align="center" sx={{ py: 3 }}>
+                        <TableCell colSpan={8} align="center" sx={{ py: 3 }}>
                           <Typography variant="body2" sx={{ color: 'text.secondary' }}>
                             No pending orders found
                           </Typography>
@@ -1911,7 +2042,7 @@ const SupplierDashboard: React.FC = () => {
               </TableContainer>
             )}
             
-            {/* Delivered Orders Tab */}
+            {/* Processing Orders Tab */}
             {orderTabValue === 1 && (
               <TableContainer component={Paper} sx={{ 
                 boxShadow: 'none', 
@@ -1925,6 +2056,81 @@ const SupplierDashboard: React.FC = () => {
                       <TableCell>Order ID</TableCell>
                       <TableCell>Customer</TableCell>
                       <TableCell>Product</TableCell>
+                      <TableCell>Quantity</TableCell>
+                      <TableCell>Date</TableCell>
+                      <TableCell>Amount</TableCell>
+                      <TableCell>Status</TableCell>
+                      <TableCell>Delivery Date</TableCell>
+                      <TableCell>Action</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {isOrdersLoading ? (
+                      <TableRow>
+                        <TableCell colSpan={8} align="center" sx={{ py: 3 }}>
+                          <CircularProgress size={40} />
+                          <Typography variant="body2" sx={{ mt: 1, color: 'text.secondary' }}>
+                            Loading orders...
+                          </Typography>
+                        </TableCell>
+                      </TableRow>
+                    ) : salesOrders.length > 0 ? (
+                      salesOrders.map((order) => (
+                        <TableRow key={order.id} className="data-row">
+                          <TableCell>{order.orderNumber || `ORD-${order.id}`}</TableCell>
+                          <TableCell>{order.customerName}</TableCell>
+                          <TableCell>{order.productName || 'Multiple items'}</TableCell>
+                          <TableCell>{order.quantity?.toLocaleString()}</TableCell>
+                          <TableCell>{new Date(order.orderDate).toLocaleDateString()}</TableCell>
+                          <TableCell>{order.totalAmount.toLocaleString()}</TableCell>
+                          <TableCell>
+                            <Chip
+                              icon={getStatusIcon(order.status)}
+                              label={order.status}
+                              color={getStatusColor(order.status) as "success" | "info" | "warning" | "error"}
+                              size="small"
+                              className="status-chip"
+                            />
+                          </TableCell>
+                          <TableCell>
+                            {order.deliveryDate ? new Date(order.deliveryDate).toLocaleDateString() : 'Not set'}
+                          </TableCell>
+                          <TableCell>
+                            <IconButton size="small">
+                              <MoreVert fontSize="small" />
+                            </IconButton>
+                          </TableCell>
+                        </TableRow>
+                      ))
+                    ) : (
+                      <TableRow>
+                        <TableCell colSpan={8} align="center" sx={{ py: 3 }}>
+                          <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                            No processing orders found
+                          </Typography>
+                        </TableCell>
+                      </TableRow>
+                    )}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            )}
+            
+            {/* Delivered Orders Tab */}
+            {orderTabValue === 2 && (
+              <TableContainer component={Paper} sx={{ 
+                boxShadow: 'none', 
+                border: '1px solid rgba(0,0,0,0.1)',
+                borderRadius: '12px',
+                overflow: 'hidden'
+              }}>
+                <Table>
+                  <TableHead>
+                    <TableRow sx={{ backgroundColor: 'rgba(0,0,0,0.02)' }}>
+                      <TableCell>Order ID</TableCell>
+                      <TableCell>Customer</TableCell>
+                      <TableCell>Product</TableCell>
+                      <TableCell>Quantity</TableCell>
                       <TableCell>Date</TableCell>
                       <TableCell>Amount</TableCell>
                       <TableCell>Status</TableCell>
@@ -1945,10 +2151,11 @@ const SupplierDashboard: React.FC = () => {
                       salesOrders.map((order) => (
                         <TableRow key={order.id} className="data-row">
                           <TableCell>{order.orderNumber || `ORD-${order.id}`}</TableCell>
-                          <TableCell>{order.customer}</TableCell>
+                          <TableCell>{order.customerName}</TableCell>
                           <TableCell>{order.productName || 'Multiple items'}</TableCell>
+                          <TableCell>{order.quantity?.toLocaleString()}</TableCell>
                           <TableCell>{new Date(order.orderDate).toLocaleDateString()}</TableCell>
-                          <TableCell>${order.totalAmount.toLocaleString()}</TableCell>
+                          <TableCell>{order.totalAmount.toLocaleString()}</TableCell>
                           <TableCell>
                             <Chip
                               icon={getStatusIcon(order.status)}
@@ -1996,17 +2203,162 @@ const SupplierDashboard: React.FC = () => {
                   fontFamily: 'Poppins, sans-serif',
                   fontWeight: 500
                 }}>
-                  {orderTabValue === 0 ? "No new orders found" : "No delivered orders found"}
+                  {orderTabValue === 0 ? "No new orders found" : 
+                   orderTabValue === 1 ? "No processing orders found" : 
+                   "No delivered orders found"}
                 </Typography>
                 <Typography variant="body2" sx={{ 
                   color: '#95a5a6', 
                   fontFamily: 'Poppins, sans-serif',
                   mt: 1
                 }}>
-                  {orderTabValue === 0 ? "New orders will appear here" : "Delivered orders will appear here"}
+                  {orderTabValue === 0 ? "New orders will appear here" : 
+                   orderTabValue === 1 ? "Processing orders will appear here" : 
+                   "Delivered orders will appear here"}
                 </Typography>
               </div>
             )}
+          </div>
+        </div>
+      </Modal>
+
+      {/* Approve Order Modal */}
+      <Modal
+        open={openApproveModal}
+        onClose={handleCloseApproveModal}
+        aria-labelledby="approve-order-modal"
+        className="inventory-modal approve-modal"
+      >
+        <div className="modal-content" style={{
+          backgroundColor: '#f8f9ff',
+          borderRadius: '16px',
+          padding: '24px',
+          maxWidth: '500px',
+          width: '100%',
+          boxShadow: '0 10px 30px rgba(0, 0, 0, 0.1)',
+          border: '1px solid rgba(230, 230, 250, 0.7)',
+          position: 'relative'
+        }}>
+          <div className="modal-header" style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            marginBottom: '20px',
+            position: 'sticky',
+            top: 0,
+            backgroundColor: '#f8f9ff',
+            zIndex: 10,
+            padding: '0 0 16px 0',
+            borderBottom: '1px solid rgba(0,0,0,0.1)'
+          }}>
+            <div>
+              <h2 className="modal-title" style={{
+                fontFamily: 'Poppins, sans-serif',
+                fontWeight: 600,
+                fontSize: '1.5rem',
+                color: '#2c3e50',
+                margin: 0,
+                background: 'linear-gradient(45deg, #00C853, #2196F3)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                letterSpacing: '0.5px'
+              }}>
+                Approve Order
+              </h2>
+              <p style={{
+                margin: '5px 0 0',
+                fontSize: '0.85rem',
+                color: '#7f8c8d',
+                fontFamily: 'Poppins, sans-serif'
+              }}>
+                {selectedOrder ? `Order #${selectedOrder.orderNumber || selectedOrder.id}` : 'Order details'}
+              </p>
+            </div>
+            <IconButton 
+              onClick={handleCloseApproveModal}
+              sx={{
+                color: '#95a5a6',
+                '&:hover': { 
+                  color: '#e74c3c',
+                  backgroundColor: 'rgba(231, 76, 60, 0.1)'
+                }
+              }}
+            >
+              <CloseIcon />
+            </IconButton>
+          </div>
+
+          <div className="approve-form" style={{ marginTop: '20px' }}>
+            <TextField
+              label="Remarks"
+              multiline
+              rows={4}
+              value={remarks}
+              onChange={(e) => setRemarks(e.target.value)}
+              fullWidth
+              variant="outlined"
+              placeholder="Add any notes or special instructions for this order"
+              sx={{ mb: 3 }}
+            />
+
+            <TextField
+              label="Delivery Date"
+              type="date"
+              value={deliveryDate}
+              onChange={(e) => setDeliveryDate(e.target.value)}
+              fullWidth
+              variant="outlined"
+              InputLabelProps={{
+                shrink: true,
+              }}
+              sx={{ mb: 4 }}
+              inputProps={{
+                min: new Date().toISOString().split('T')[0] // Set min date to today
+              }}
+            />
+
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px' }}>
+              <Button
+                variant="outlined"
+                onClick={handleCloseApproveModal}
+                sx={{
+                  borderRadius: '8px',
+                  textTransform: 'none',
+                  fontFamily: 'Poppins, sans-serif',
+                  fontWeight: 500,
+                  color: '#7f8c8d',
+                  borderColor: '#bdc3c7',
+                  '&:hover': {
+                    borderColor: '#95a5a6',
+                    backgroundColor: 'rgba(0,0,0,0.01)'
+                  }
+                }}
+              >
+                Cancel
+              </Button>
+              <Button
+                variant="contained"
+                onClick={handleApproveOrder}
+                disabled={isApproving}
+                sx={{
+                  borderRadius: '8px',
+                  textTransform: 'none',
+                  fontFamily: 'Poppins, sans-serif',
+                  fontWeight: 500,
+                  backgroundColor: '#00C853',
+                  '&:hover': {
+                    backgroundColor: '#00B34A'
+                  }
+                }}
+              >
+                {isApproving ? (
+                  <>
+                    <CircularProgress size={20} sx={{ mr: 1, color: 'white' }} />
+                    Processing...
+                  </>
+                ) : 'Approve Order'}
+              </Button>
+            </div>
           </div>
         </div>
       </Modal>
