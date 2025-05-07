@@ -9,6 +9,7 @@ import AdminUsers from './components/Admin/users';
 import Inventory from './components/Admin/inventory';
 import Products from './components/Admin/products_new';
 import BookMyOrder from './components/Sales/SimpleBookOrder';
+import OrderItems from './components/Sales/OrderItems';
 import SupplierDashboard from './components/Supplier/SupplierDashboard';
 import SalesDashboard from './components/SalesManagement/SalesDashboard';
 import SalesOrders from './components/SalesManagement/SalesOrders';
@@ -118,6 +119,7 @@ useEffect(() => {
         <Route path="/inventory" element={<Inventory />} />
         <Route path="/products" element={<Products />} />
         <Route path="/book-order" element={<BookMyOrder />} />
+        <Route path="/order-items" element={<OrderItems />} />
         <Route path="/change_password" element={<ChangePassword />} />
         <Route path='/forgot-password' element={<ForgetPassword />} />
         <Route path='/email-forgot-password' element={<EmailForgetPassword />} />

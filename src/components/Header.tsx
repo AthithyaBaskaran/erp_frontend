@@ -16,7 +16,7 @@ import { useThemeContext } from './ThemeContext';
 import { useNavigate } from 'react-router-dom';
 import DarkModeIcon from '@mui/icons-material/DarkMode';
 import LightModeIcon from '@mui/icons-material/LightMode';
-import '../styles/red-header.css';
+import '../styles/purple-blue-header.css';
 
 
 interface HeaderProps {
@@ -189,12 +189,15 @@ const Header: React.FC<HeaderProps> = ({ OpenSidebar, onNotificationClick }) => 
                   height: 32,
                   marginRight: '8px',
                   bgcolor: document.body.getAttribute('data-role') === 'sales-manager' 
-                    ? red[700] 
+                    ? '#6a11cb' 
                     : (gender === 'male' ? deepOrange[500] : deepPurple[500]),
                   border: showLogout 
                     ? document.body.getAttribute('data-role') === 'sales-manager'
                       ? '2px solid #ffffff'
                       : '2px solid #4dabf5' 
+                    : 'none',
+                  boxShadow: document.body.getAttribute('data-role') === 'sales-manager' 
+                    ? '0 0 8px rgba(37, 117, 252, 0.6)' 
                     : 'none',
                   fontFamily: "'Poppins', sans-serif",
                   cursor: 'pointer'
