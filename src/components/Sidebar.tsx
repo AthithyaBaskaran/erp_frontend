@@ -222,6 +222,12 @@ const Sidebar: React.FC<SidebarProps> = ({ openSidebarToggle, OpenSidebar }) => 
                   <BsFillArchiveFill className="icon" /> <span className="sidebar-item-text">Products</span>
                 </li>
               </NavLink>
+
+              <NavLink to="/inventory-bookorder" className={({isActive}) => isActive ? "sidebar-link active" : "sidebar-link"}>
+                <li className="sidebar-list-item">
+                  <BsFillArchiveFill className="icon" /> <span className="sidebar-item-text">Book Order</span>
+                </li>
+              </NavLink>
               
               <NavLink to="/inventory-analytics" className={({isActive}) => isActive ? "sidebar-link active" : "sidebar-link"}>
                 <li className="sidebar-list-item">

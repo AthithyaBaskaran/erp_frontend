@@ -194,6 +194,11 @@ const SupplierDashboard: React.FC = () => {
       const hash = window.location.hash.replace('#', '');
       if (hash) {
         setActiveTab(hash);
+        
+        // If navigating to products tab, automatically fetch inventory data
+        if (hash === 'products') {
+          fetchInventory();
+        }
       } else {
         setActiveTab('overview');
       }
@@ -1008,6 +1013,7 @@ const SupplierDashboard: React.FC = () => {
                             <TableCell>Order ID</TableCell>
                             <TableCell>Customer</TableCell>
                             <TableCell>Product</TableCell>
+                            <TableCell>Quantity</TableCell>
                             <TableCell>Order Date</TableCell>
                             <TableCell>Amount</TableCell>
                             <TableCell>Status</TableCell>
@@ -1037,6 +1043,7 @@ const SupplierDashboard: React.FC = () => {
                                   order.productName || 'Multiple items'
                                 )}
                               </TableCell>
+                              <TableCell>{order.quantity?.toLocaleString()}</TableCell>
                               <TableCell>{new Date(order.orderDate).toLocaleDateString()}</TableCell>
                               <TableCell>${order.totalAmount.toLocaleString()}</TableCell>
                               <TableCell>
@@ -1179,92 +1186,230 @@ const SupplierDashboard: React.FC = () => {
           {activeTab === 'products' && (
             <div className="data-grid-container">
               <div className="data-grid-card">
-                <div className="data-grid-header">
+                <div className="data-grid-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <h3 className="data-grid-title">Products Management</h3>
+                  <Button
+                    variant="contained"
+                    startIcon={<AddIcon />}
+                    onClick={() => handleAddProduct()}
+                    sx={{
+                      borderRadius: '8px',
+                      textTransform: 'none',
+                      fontFamily: 'Poppins, sans-serif',
+                      fontWeight: 500,
+                      backgroundColor: '#00C853',
+                      padding: '8px 16px',
+                      '&:hover': {
+                        backgroundColor: '#00B34A'
+                      }
+                    }}
+                  >
+                    Add Product
+                  </Button>
                 </div>
                 
-                <Box sx={{ 
-                  display: 'flex', 
-                  flexDirection: 'column', 
-                  alignItems: 'center', 
-                  justifyContent: 'center',
-                  padding: '40px 20px',
-                  textAlign: 'center'
-                }}>
-                  <img 
-                    src="/assets/images/products-icon.png" 
-                    alt="Products" 
-                    style={{ 
-                      width: '120px', 
-                      height: '120px', 
-                      marginBottom: '24px',
-                      opacity: 0.8
-                    }}
-                    onError={(e) => {
-                      // Fallback if image doesn't exist
-                      e.currentTarget.style.display = 'none';
-                    }}
-                  />
-                  
-                  <Typography variant="h5" sx={{ 
-                    fontWeight: 600, 
-                    color: '#333', 
-                    mb: 2,
-                    fontFamily: 'Poppins, sans-serif'
-                  }}>
-                    Manage Your Products
-                  </Typography>
-                  
-                  <Typography variant="body1" sx={{ 
-                    color: '#666', 
-                    mb: 4, 
-                    maxWidth: '500px',
-                    fontFamily: 'Poppins, sans-serif'
-                  }}>
-                    View all your products, add new products, and manage your inventory efficiently.
-                  </Typography>
-                  
-                  <div style={{ display: 'flex', gap: '16px' }}>
-                    <Button
-                      variant="contained"
-                      color="primary"
-                      size="large"
-                      onClick={() => handleViewAllProducts(0)}
-                      startIcon={<Inventory />}
+                {/* Product Tabs */}
+                <Box sx={{ width: '100%', mt: 3 }}>
+                  <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+                    <Tabs 
+                      value={productTabValue} 
+                      onChange={handleProductTabChange}
+                      aria-label="product tabs"
                       sx={{
-                        borderRadius: '8px',
-                        textTransform: 'none',
-                        fontFamily: 'Poppins, sans-serif',
-                        fontWeight: 500,
-                        backgroundColor: '#2196F3',
-                        padding: '10px 24px',
-                        '&:hover': {
-                          backgroundColor: '#1976D2'
+                        '& .MuiTabs-indicator': {
+                          backgroundColor: '#00C853',
+                        },
+                        '& .Mui-selected': {
+                          color: '#00C853 !important',
+                          fontWeight: 600,
+                        },
+                        '& .MuiTab-root': {
+                          textTransform: 'none',
+                          fontFamily: 'Poppins, sans-serif',
+                          fontSize: '0.95rem',
+                          minWidth: '120px',
+                          color: '#7f8c8d',
                         }
                       }}
                     >
-                      View All Products
-                    </Button>
-                    
-                    <Button
-                      variant="contained"
-                      startIcon={<AddIcon />}
-                      onClick={() => handleAddProduct()}
-                      sx={{
-                        borderRadius: '8px',
-                        textTransform: 'none',
+                      <Tab label="All Products" />
+                      <Tab label="In Stock" />
+                      <Tab label="Low Stock" />
+                    </Tabs>
+                  </Box>
+                  
+                  {isProductsLoading ? (
+                    <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '300px' }}>
+                      <CircularProgress color="primary" />
+                    </Box>
+                  ) : inventoryItems.length > 0 ? (
+                    <div>
+                      {/* All Products Tab */}
+                      {productTabValue === 0 && (
+                        <TableContainer component={Paper} sx={{ 
+                          boxShadow: 'none', 
+                          border: '1px solid rgba(0,0,0,0.1)',
+                          borderRadius: '12px',
+                          overflow: 'hidden',
+                          mt: 3
+                        }}>
+                          <Table>
+                            <TableHead sx={{ backgroundColor: '#f8f9fa' }}>
+                              <TableRow>
+                                <TableCell sx={{ fontWeight: 600 }}>Product Name</TableCell>
+                                <TableCell sx={{ fontWeight: 600 }}>SKU</TableCell>
+                                <TableCell sx={{ fontWeight: 600 }}>Category</TableCell>
+                                <TableCell sx={{ fontWeight: 600 }}>Price</TableCell>
+                                <TableCell sx={{ fontWeight: 600 }}>Stock</TableCell>
+                                <TableCell sx={{ fontWeight: 600 }}>Status</TableCell>
+                              </TableRow>
+                            </TableHead>
+                            <TableBody>
+                              {inventoryItems.map((item) => (
+                                <TableRow key={item.id}>
+                                  <TableCell>{item.name}</TableCell>
+                                  <TableCell>{item.sku}</TableCell>
+                                  <TableCell>{item.categoryName}</TableCell>
+                                  <TableCell>${item.price.toFixed(2)}</TableCell>
+                                  <TableCell>{item.stockQuantity}</TableCell>
+                                  <TableCell>
+                                    <Chip 
+                                      label={item.stockQuantity > 10 ? "In Stock" : item.stockQuantity > 0 ? "Low Stock" : "Out of Stock"} 
+                                      color={item.stockQuantity > 10 ? "success" : item.stockQuantity > 0 ? "warning" : "error"}
+                                      size="small"
+                                    />
+                                  </TableCell>
+                                </TableRow>
+                              ))}
+                            </TableBody>
+                          </Table>
+                        </TableContainer>
+                      )}
+                      
+                      {/* In Stock Tab */}
+                      {productTabValue === 1 && (
+                        <TableContainer component={Paper} sx={{ 
+                          boxShadow: 'none', 
+                          border: '1px solid rgba(0,0,0,0.1)',
+                          borderRadius: '12px',
+                          overflow: 'hidden',
+                          mt: 3
+                        }}>
+                          <Table>
+                            <TableHead sx={{ backgroundColor: '#f8f9fa' }}>
+                              <TableRow>
+                                <TableCell sx={{ fontWeight: 600 }}>Product Name</TableCell>
+                                <TableCell sx={{ fontWeight: 600 }}>SKU</TableCell>
+                                <TableCell sx={{ fontWeight: 600 }}>Category</TableCell>
+                                <TableCell sx={{ fontWeight: 600 }}>Price</TableCell>
+                                <TableCell sx={{ fontWeight: 600 }}>Stock</TableCell>
+                              </TableRow>
+                            </TableHead>
+                            <TableBody>
+                              {inventoryItems
+                                .filter(item => item.stockQuantity > 10)
+                                .map((item) => (
+                                  <TableRow key={item.id}>
+                                    <TableCell>{item.name}</TableCell>
+                                    <TableCell>{item.sku}</TableCell>
+                                    <TableCell>{item.categoryName}</TableCell>
+                                    <TableCell>${item.price.toFixed(2)}</TableCell>
+                                    <TableCell>{item.stockQuantity}</TableCell>
+                                  </TableRow>
+                                ))}
+                            </TableBody>
+                          </Table>
+                        </TableContainer>
+                      )}
+                      
+                      {/* Low Stock Tab */}
+                      {productTabValue === 2 && (
+                        <TableContainer component={Paper} sx={{ 
+                          boxShadow: 'none', 
+                          border: '1px solid rgba(0,0,0,0.1)',
+                          borderRadius: '12px',
+                          overflow: 'hidden',
+                          mt: 3
+                        }}>
+                          <Table>
+                            <TableHead sx={{ backgroundColor: '#f8f9fa' }}>
+                              <TableRow>
+                                <TableCell sx={{ fontWeight: 600 }}>Product Name</TableCell>
+                                <TableCell sx={{ fontWeight: 600 }}>SKU</TableCell>
+                                <TableCell sx={{ fontWeight: 600 }}>Category</TableCell>
+                                <TableCell sx={{ fontWeight: 600 }}>Price</TableCell>
+                                <TableCell sx={{ fontWeight: 600 }}>Stock</TableCell>
+                              </TableRow>
+                            </TableHead>
+                            <TableBody>
+                              {inventoryItems
+                                .filter(item => item.stockQuantity <= 10 && item.stockQuantity > 0)
+                                .map((item) => (
+                                  <TableRow key={item.id}>
+                                    <TableCell>{item.name}</TableCell>
+                                    <TableCell>{item.sku}</TableCell>
+                                    <TableCell>{item.categoryName}</TableCell>
+                                    <TableCell>${item.price.toFixed(2)}</TableCell>
+                                    <TableCell>
+                                      <Typography color="warning.main" fontWeight={500}>
+                                        {item.stockQuantity}
+                                      </Typography>
+                                    </TableCell>
+                                  </TableRow>
+                                ))}
+                            </TableBody>
+                          </Table>
+                        </TableContainer>
+                      )}
+                    </div>
+                  ) : (
+                    <Box sx={{ 
+                      display: 'flex', 
+                      flexDirection: 'column', 
+                      alignItems: 'center', 
+                      justifyContent: 'center',
+                      padding: '40px 20px',
+                      mt: 3
+                    }}>
+                      <Typography variant="h6" sx={{ 
+                        color: '#7f8c8d', 
                         fontFamily: 'Poppins, sans-serif',
-                        fontWeight: 500,
-                        backgroundColor: '#00C853',
-                        padding: '10px 24px',
-                        '&:hover': {
-                          backgroundColor: '#00B34A'
-                        }
-                      }}
-                    >
-                      Add New Product
-                    </Button>
-                  </div>
+                        fontWeight: 500
+                      }}>
+                        {productTabValue === 0 ? "No products found" : 
+                         productTabValue === 1 ? "No in-stock products found" : 
+                         "No low-stock products found"}
+                      </Typography>
+                      <Typography variant="body2" sx={{ 
+                        color: '#95a5a6', 
+                        fontFamily: 'Poppins, sans-serif',
+                        mt: 1,
+                        mb: 3
+                      }}>
+                        {productTabValue === 0 ? "Add your first product to get started" : 
+                         productTabValue === 1 ? "Add products with stock > 10 to see them here" : 
+                         "Products with stock ≤ 10 will appear here"}
+                      </Typography>
+                      <Button
+                        variant="contained"
+                        startIcon={<AddIcon />}
+                        onClick={() => handleAddProduct()}
+                        sx={{
+                          borderRadius: '8px',
+                          textTransform: 'none',
+                          fontFamily: 'Poppins, sans-serif',
+                          fontWeight: 500,
+                          backgroundColor: '#00C853',
+                          padding: '8px 16px',
+                          '&:hover': {
+                            backgroundColor: '#00B34A'
+                          }
+                        }}
+                      >
+                        Add Product
+                      </Button>
+                    </Box>
+                  )}
                 </Box>
               </div>
             </div>
@@ -1696,6 +1841,25 @@ const SupplierDashboard: React.FC = () => {
                   }
                 }}
               />
+              <Button
+                variant="contained"
+                startIcon={<AddIcon />}
+                onClick={() => handleAddProduct()}
+                sx={{
+                  borderRadius: '8px',
+                  textTransform: 'none',
+                  fontFamily: 'Poppins, sans-serif',
+                  fontWeight: 500,
+                  backgroundColor: '#00C853',
+                  padding: '8px 16px',
+                  height: '40px',
+                  '&:hover': {
+                    backgroundColor: '#009624'
+                  }
+                }}
+              >
+                Add Product
+              </Button>
               <IconButton 
                 onClick={handleCloseProductsModal}
                 sx={{
