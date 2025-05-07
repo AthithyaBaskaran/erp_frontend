@@ -29,12 +29,22 @@ import '../../styles/orderItems.css';
 import { useNavigate } from 'react-router-dom';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import InventoryIcon from '@mui/icons-material/Inventory';
+import Inventory2Icon from '@mui/icons-material/Inventory2';
 import LocalOfferIcon from '@mui/icons-material/LocalOffer';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import StorefrontIcon from '@mui/icons-material/Storefront';
 import VerifiedIcon from '@mui/icons-material/Verified';
 import CircleIcon from '@mui/icons-material/Circle';
 import StarIcon from '@mui/icons-material/Star';
+import SearchIcon from '@mui/icons-material/Search';
+import CategoryIcon from '@mui/icons-material/Category';
+import FolderIcon from '@mui/icons-material/Folder';
+import AllInboxIcon from '@mui/icons-material/AllInbox';
+import FirstPageIcon from '@mui/icons-material/FirstPage';
+import LastPageIcon from '@mui/icons-material/LastPage';
+import RefreshIcon from '@mui/icons-material/Refresh';
+import Badge from '@mui/material/Badge';
+import InputBase from '@mui/material/InputBase';
 import { showInventory, fetchCategoriesApi } from '../Api/apiUrl';
 
 // Define types for our data
@@ -357,303 +367,760 @@ const OrderItems: React.FC = () => {
   };
 
   return (
-    <Container maxWidth="xl" sx={{ py: 4 }}>
-      {/* Header Section */}
+    <Container maxWidth="xl" sx={{ py: 3, backgroundColor: '#f8f9fa' }}>
+      {/* Modern Dashboard Header Section */}
       <Paper 
-        elevation={1} 
-        className="header-section"
+        elevation={0} 
+        className="dashboard-header"
+        sx={{
+          borderRadius: '16px',
+          mb: 4,
+          overflow: 'hidden',
+          background: 'linear-gradient(135deg, #4158D0 0%, #C850C0 50%, #FFCC70 100%)',
+          boxShadow: '0 10px 30px rgba(0, 0, 0, 0.15)',
+          position: 'relative'
+        }}
       >
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-          <Box sx={{ display: 'flex', alignItems: 'center' }}>
-            <StorefrontIcon sx={{ fontSize: 28, mr: 1.5 }} />
-            <Box>
-              <Typography sx={{ 
-                fontFamily: 'Roboto, sans-serif', 
-                fontWeight: 600, 
-                fontSize: '1.5rem',
-                letterSpacing: '-0.5px'
-              }}>
-                Product Catalog
-              </Typography>
-              <Typography sx={{ 
-                fontFamily: 'Roboto, sans-serif', 
-                fontSize: '0.9rem',
-                opacity: 0.9
-              }}>
-                Browse products and add to your order
-              </Typography>
-            </Box>
-          </Box>
-        </Box>
+        <Box className="header-pattern"></Box>
+        <Box 
+          sx={{ 
+            position: 'absolute', 
+            top: 0, 
+            right: 0, 
+            width: '300px', 
+            height: '300px', 
+            borderRadius: '50%', 
+            background: 'radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 70%)',
+            transform: 'translate(30%, -30%)'
+          }}
+        />
+        <Box 
+          sx={{ 
+            position: 'absolute', 
+            bottom: 0, 
+            left: 0, 
+            width: '200px', 
+            height: '200px', 
+            borderRadius: '50%', 
+            background: 'radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 70%)',
+            transform: 'translate(-30%, 30%)'
+          }}
+        />
         
         <Box sx={{ 
           display: 'flex', 
-          alignItems: 'center', 
-          gap: 1,
-          backgroundColor: 'rgba(255,255,255,0.15)',
-          padding: '6px 12px',
-          borderRadius: '4px'
+          flexDirection: { xs: 'column', md: 'row' },
+          alignItems: { xs: 'flex-start', md: 'center' }, 
+          justifyContent: 'space-between',
+          p: { xs: 3, md: 4 },
+          position: 'relative',
+          zIndex: 2
         }}>
-          <Typography sx={{ fontFamily: 'Roboto, sans-serif', fontSize: '0.9rem' }}>
-            {products.length} Products Available
-          </Typography>
+          <Box sx={{ display: 'flex', alignItems: 'center', mb: { xs: 3, md: 0 } }}>
+            <Box sx={{ 
+              backgroundColor: 'rgba(255,255,255,0.2)', 
+              borderRadius: '16px', 
+              p: 1.5,
+              mr: 2.5,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              boxShadow: '0 4px 20px rgba(0, 0, 0, 0.1)',
+              backdropFilter: 'blur(10px)',
+              border: '1px solid rgba(255,255,255,0.2)'
+            }}>
+              <StorefrontIcon sx={{ fontSize: 38, color: 'white' }} />
+            </Box>
+            <Box>
+              <Typography className="header-title" sx={{ 
+                fontFamily: 'Poppins, sans-serif', 
+                fontWeight: 800, 
+                fontSize: { xs: '2rem', md: '2.5rem' },
+                color: 'white',
+                letterSpacing: '-0.5px',
+                position: 'relative',
+                textShadow: '2px 2px 4px rgba(0,0,0,0.2)',
+                lineHeight: 1.2
+              }}>
+                Product Catalog
+              </Typography>
+              <Typography className="header-subtitle" sx={{ 
+                fontFamily: 'Poppins, sans-serif', 
+                fontSize: '1.1rem',
+                color: 'white',
+                opacity: 0.9,
+                mt: 1,
+                maxWidth: '600px',
+                textShadow: '1px 1px 2px rgba(0,0,0,0.1)'
+              }}>
+                Browse our premium collection and add products to your order
+              </Typography>
+            </Box>
+          </Box>
+          
+          <Box sx={{ 
+            display: 'flex', 
+            flexDirection: { xs: 'column', sm: 'row' },
+            gap: 2
+          }}>
+            <Box sx={{ 
+              display: 'flex', 
+              alignItems: 'center', 
+              gap: 1,
+              backgroundColor: 'rgba(255,255,255,0.15)',
+              padding: '10px 20px',
+              borderRadius: '12px',
+              boxShadow: '0 4px 15px rgba(0,0,0,0.1)',
+              backdropFilter: 'blur(10px)',
+              border: '1px solid rgba(255,255,255,0.2)'
+            }}>
+              <Badge 
+                badgeContent={products.length} 
+                color="error" 
+                sx={{ 
+                  '& .MuiBadge-badge': { 
+                    backgroundColor: '#FF9A8B',
+                    fontWeight: 'bold',
+                    boxShadow: '0 2px 5px rgba(0,0,0,0.2)'
+                  } 
+                }}
+              >
+                <Inventory2Icon sx={{ color: 'white', mr: 1, fontSize: '1.3rem' }} />
+              </Badge>
+              <Typography sx={{ 
+                fontFamily: 'Poppins, sans-serif', 
+                fontSize: '1rem',
+                fontWeight: 600,
+                color: 'white'
+              }}>
+                Products Available
+              </Typography>
+            </Box>
+            
+            <Button
+              variant="contained"
+              startIcon={<ShoppingCartIcon />}
+              sx={{
+                backgroundColor: 'rgba(255,255,255,0.2)',
+                color: 'white',
+                borderRadius: '12px',
+                padding: '10px 20px',
+                fontFamily: 'Poppins, sans-serif',
+                fontWeight: 600,
+                textTransform: 'none',
+                fontSize: '1rem',
+                boxShadow: '0 4px 15px rgba(0,0,0,0.1)',
+                backdropFilter: 'blur(10px)',
+                border: '1px solid rgba(255,255,255,0.2)',
+                '&:hover': {
+                  backgroundColor: 'rgba(255,255,255,0.3)',
+                }
+              }}
+            >
+              View Cart
+            </Button>
+          </Box>
         </Box>
       </Paper>
 
-      <Box>
+      {/* Dashboard Controls with Glass Morphism */}
+      <Box sx={{ 
+        display: 'flex', 
+        flexDirection: { xs: 'column', md: 'row' },
+        justifyContent: 'space-between',
+        alignItems: { xs: 'stretch', md: 'center' },
+        mb: 4,
+        gap: 2
+      }}>
         {/* Category Filter */}
-        <Box className="category-filter">
-          <FormControl fullWidth variant="outlined">
-            <InputLabel id="category-select-label">Filter by Category</InputLabel>
+        <Paper 
+          elevation={0} 
+          sx={{ 
+            p: 2.5, 
+            borderRadius: '16px',
+            flex: 1,
+            boxShadow: '0 8px 32px rgba(31, 38, 135, 0.1)',
+            border: '1px solid rgba(255, 255, 255, 0.18)',
+            backdropFilter: 'blur(4px)',
+            backgroundColor: 'rgba(255, 255, 255, 0.95)'
+          }}
+        >
+          <FormControl fullWidth variant="outlined" size="small">
+            <InputLabel id="category-select-label">
+              <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                <CategoryIcon sx={{ mr: 1, fontSize: '1.1rem' }} />
+                Filter by Category
+              </Box>
+            </InputLabel>
             <Select
               labelId="category-select-label"
               id="category-select"
               value={selectedCategory}
               label="Filter by Category"
               onChange={(e) => handleCategoryChange(e.target.value)}
+              sx={{ 
+                '& .MuiOutlinedInput-notchedOutline': { 
+                  borderColor: 'rgba(0,0,0,0.1)',
+                  borderRadius: '8px'
+                },
+                '&:hover .MuiOutlinedInput-notchedOutline': { 
+                  borderColor: '#C850C0' 
+                },
+                '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                  borderColor: '#4158D0'
+                }
+              }}
             >
               <MenuItem value="">
-                <em>All Categories</em>
+                <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                  <AllInboxIcon sx={{ mr: 1, fontSize: '1.2rem', color: '#4158D0' }} />
+                  <em>All Categories</em>
+                </Box>
               </MenuItem>
               {categories.map((category) => (
                 <MenuItem key={category.id} value={category.id}>
-                  {category.categoryName}
+                  <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                    <FolderIcon sx={{ mr: 1, fontSize: '1.2rem', color: '#C850C0' }} />
+                    {category.categoryName}
+                  </Box>
                 </MenuItem>
               ))}
             </Select>
           </FormControl>
-        </Box>
+        </Paper>
+        
+        {/* Search Box with Glass Morphism */}
+        <Paper 
+          elevation={0} 
+          sx={{ 
+            p: 2.5, 
+            borderRadius: '16px',
+            flex: 2,
+            boxShadow: '0 8px 32px rgba(31, 38, 135, 0.1)',
+            border: '1px solid rgba(255, 255, 255, 0.18)',
+            backdropFilter: 'blur(4px)',
+            backgroundColor: 'rgba(255, 255, 255, 0.95)',
+            display: 'flex',
+            alignItems: 'center'
+          }}
+        >
+          <SearchIcon sx={{ color: '#C850C0', mr: 1.5, fontSize: '1.3rem' }} />
+          <InputBase
+            placeholder="Search products by name, SKU or description..."
+            fullWidth
+            sx={{ 
+              fontFamily: 'Poppins, sans-serif',
+              fontSize: '0.95rem',
+              '& input': {
+                padding: '4px 0'
+              }
+            }}
+          />
+        </Paper>
+      </Box>
 
-        {/* Products Grid */}
+        {/* Products Grid with Modern Design */}
         {error && !loading ? (
-          // Error state - Flipkart style
+          // Error state with modern design
           <Paper 
             elevation={0} 
             sx={{ 
               textAlign: 'center', 
-              py: 6, 
-              backgroundColor: 'transparent',
+              py: 8, 
+              backgroundColor: 'rgba(255, 97, 97, 0.03)',
               border: '1px dashed #ff6161',
-              borderRadius: '2px'
+              borderRadius: '16px',
+              boxShadow: '0 10px 30px rgba(255, 97, 97, 0.1)',
+              maxWidth: '800px',
+              margin: '0 auto'
             }}
           >
             <Box sx={{ 
-              width: 180, 
-              height: 180, 
-              margin: '0 auto', 
-              backgroundImage: 'url(https://static-assets-web.flixcart.com/fk-p-linchpin-web/fk-cp-zion/img/error-500_cd3e64.png)',
-              backgroundSize: 'contain',
-              backgroundRepeat: 'no-repeat',
-              backgroundPosition: 'center'
-            }} />
+              width: 120, 
+              height: 120, 
+              margin: '0 auto',
+              backgroundColor: 'rgba(255, 97, 97, 0.1)',
+              borderRadius: '50%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              mb: 3
+            }}>
+              <ErrorOutlineIcon sx={{ fontSize: 60, color: '#ff6161' }} />
+            </Box>
             <Typography sx={{ 
-              fontFamily: 'Roboto, sans-serif', 
-              fontSize: '1.2rem',
-              fontWeight: 500,
+              fontFamily: 'Poppins, sans-serif', 
+              fontSize: '1.5rem',
+              fontWeight: 700,
               color: '#212121',
               mt: 2
             }}>
               Something went wrong
             </Typography>
             <Typography sx={{ 
-              fontFamily: 'Roboto, sans-serif', 
-              fontSize: '0.9rem',
-              color: '#878787',
+              fontFamily: 'Poppins, sans-serif', 
+              fontSize: '1rem',
+              color: '#666',
               mt: 1,
-              mb: 3
+              mb: 4,
+              maxWidth: '500px',
+              margin: '10px auto 32px'
             }}>
               {error}
             </Typography>
             <Button 
               variant="contained" 
               disableElevation
+              startIcon={<RefreshIcon />}
               onClick={() => window.location.reload()}
               sx={{ 
-                backgroundColor: '#2874f0',
-                borderRadius: '2px',
+                background: 'linear-gradient(135deg, #4158D0 0%, #C850C0 100%)',
+                borderRadius: '50px',
                 textTransform: 'none',
-                fontFamily: 'Roboto, sans-serif',
-                padding: '8px 24px'
+                fontFamily: 'Poppins, sans-serif',
+                fontWeight: 600,
+                padding: '10px 32px',
+                boxShadow: '0 10px 20px rgba(200, 80, 192, 0.3)',
+                '&:hover': {
+                  boxShadow: '0 15px 25px rgba(200, 80, 192, 0.4)',
+                  transform: 'translateY(-2px)'
+                },
+                transition: 'all 0.3s ease'
               }}
             >
-              Retry
+              Try Again
             </Button>
           </Paper>
         ) : loading ? (
-          // Loading skeleton - Flipkart style
-          <Grid container spacing={2}>
-            {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((item) => (
-              <Grid item xs={12} sm={6} md={3} lg={2.4} key={item}>
-                <Card sx={{ 
-                  borderRadius: '2px', 
-                  boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-                  height: '100%'
-                }}>
-                  <Skeleton variant="rectangular" height={240} animation="wave" />
-                  <Box sx={{ p: 2 }}>
-                    <Skeleton variant="text" height={20} width="90%" animation="wave" />
-                    <Skeleton variant="text" height={20} width="60%" animation="wave" sx={{ mt: 0.5 }} />
-                    <Skeleton variant="text" height={24} width="40%" animation="wave" sx={{ mt: 1.5 }} />
-                    <Skeleton variant="text" height={16} width="30%" animation="wave" sx={{ mt: 0.5 }} />
-                    
-                    <Box sx={{ display: 'flex', gap: 1, mt: 2 }}>
-                      <Skeleton variant="rectangular" height={36} width="50%" animation="wave" sx={{ borderRadius: 0.5 }} />
-                      <Skeleton variant="rectangular" height={36} width="50%" animation="wave" sx={{ borderRadius: 0.5 }} />
+          // Loading skeleton with modern design
+          <Box sx={{ mt: 2 }}>
+            <Box sx={{ 
+              display: 'flex', 
+              justifyContent: 'space-between', 
+              alignItems: 'center',
+              mb: 3
+            }}>
+              <Typography sx={{ 
+                fontFamily: 'Poppins, sans-serif', 
+                fontWeight: 600, 
+                fontSize: '1.2rem',
+                color: '#212121'
+              }}>
+                <Skeleton variant="text" width={200} animation="wave" sx={{ borderRadius: '8px' }} />
+              </Typography>
+              <Skeleton variant="rectangular" width={120} height={40} animation="wave" sx={{ borderRadius: '50px' }} />
+            </Box>
+            
+            <Grid container spacing={3}>
+              {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((item) => (
+                <Grid item xs={12} sm={6} md={4} key={item}>
+                  <Paper elevation={0} sx={{ 
+                    borderRadius: '16px', 
+                    overflow: 'hidden',
+                    height: '100%',
+                    boxShadow: '0 8px 32px rgba(31, 38, 135, 0.1)',
+                    border: '1px solid rgba(255, 255, 255, 0.18)',
+                    backgroundColor: 'white',
+                    transition: 'all 0.3s ease',
+                    '&:hover': {
+                      transform: 'translateY(-5px)',
+                      boxShadow: '0 15px 35px rgba(31, 38, 135, 0.15)'
+                    }
+                  }}>
+                    <Skeleton variant="rectangular" height={200} animation="wave" />
+                    <Box sx={{ p: 3 }}>
+                      <Skeleton variant="text" height={28} width="90%" animation="wave" sx={{ borderRadius: '4px' }} />
+                      <Skeleton variant="text" height={20} width="60%" animation="wave" sx={{ mt: 1, borderRadius: '4px' }} />
+                      <Skeleton variant="text" height={32} width="40%" animation="wave" sx={{ mt: 2, borderRadius: '4px' }} />
+                      <Skeleton variant="text" height={18} width="30%" animation="wave" sx={{ mt: 1, borderRadius: '4px' }} />
+                      
+                      <Box sx={{ display: 'flex', gap: 2, mt: 3 }}>
+                        <Skeleton variant="rectangular" height={44} width="100%" animation="wave" sx={{ borderRadius: '8px' }} />
+                      </Box>
                     </Box>
-                  </Box>
-                </Card>
-              </Grid>
-            ))}
-          </Grid>
+                  </Paper>
+                </Grid>
+              ))}
+            </Grid>
+          </Box>
         ) : products.length > 0 ? (
           <>
-            <Grid container spacing={2}>
+            <Box sx={{ 
+              display: 'flex', 
+              justifyContent: 'space-between', 
+              alignItems: 'center',
+              mb: 3
+            }}>
+              <Typography sx={{ 
+                fontFamily: 'Poppins, sans-serif', 
+                fontWeight: 700, 
+                fontSize: '1.3rem',
+                color: '#333',
+                display: 'flex',
+                alignItems: 'center'
+              }}>
+                <LocalOfferIcon sx={{ mr: 1.5, color: '#C850C0' }} />
+                Featured Products
+                {selectedCategory !== '' && (
+                  <Chip 
+                    label={categories.find(c => c.id === selectedCategory)?.categoryName || 'Category'} 
+                    size="small" 
+                    sx={{ 
+                      ml: 2, 
+                      backgroundColor: 'rgba(65, 88, 208, 0.1)', 
+                      color: '#4158D0',
+                      fontWeight: 600,
+                      borderRadius: '50px',
+                      '& .MuiChip-deleteIcon': {
+                        color: '#4158D0'
+                      }
+                    }}
+                    onDelete={() => handleCategoryChange('')}
+                  />
+                )}
+              </Typography>
+              <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                <Typography sx={{ 
+                  fontFamily: 'Poppins, sans-serif', 
+                  fontSize: '0.9rem',
+                  color: '#666',
+                  mr: 2
+                }}>
+                  Page {page} of {totalPages}
+                </Typography>
+              </Box>
+            </Box>
+            
+            <Grid container spacing={3}>
               {getCurrentPageItems().map((product) => (
                 <Grid item xs={12} sm={6} md={4} key={product.id}>
-                  <Card className="product-card">
-                    <Box className="product-image-container">
+                  <Paper 
+                    elevation={0} 
+                    className="product-card-modern"
+                    sx={{
+                      borderRadius: '16px',
+                      overflow: 'hidden',
+                      height: '100%',
+                      boxShadow: '0 8px 32px rgba(31, 38, 135, 0.1)',
+                      border: '1px solid rgba(255, 255, 255, 0.18)',
+                      backgroundColor: 'white',
+                      transition: 'all 0.3s ease',
+                      '&:hover': {
+                        transform: 'translateY(-5px)',
+                        boxShadow: '0 15px 35px rgba(31, 38, 135, 0.15)'
+                      }
+                    }}
+                  >
+                    <Box 
+                      className="product-image-container-modern"
+                      sx={{
+                        height: '220px',
+                        position: 'relative',
+                        backgroundColor: '#f8f9fa',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        padding: '20px',
+                        overflow: 'hidden'
+                      }}
+                    >
+                      {product.stockQuantity && product.stockQuantity > 0 ? (
+                        <Chip 
+                          label={`In Stock: ${product.stockQuantity}`}
+                          size="small"
+                          sx={{
+                            position: 'absolute',
+                            top: 12,
+                            right: 12,
+                            backgroundColor: 'rgba(65, 88, 208, 0.1)',
+                            color: '#4158D0',
+                            fontWeight: 600,
+                            fontSize: '0.7rem',
+                            zIndex: 2,
+                            borderRadius: '50px',
+                            boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
+                          }}
+                          icon={<VerifiedIcon style={{ fontSize: '0.9rem', color: '#4158D0' }} />}
+                        />
+                      ) : (
+                        <Chip 
+                          label="Out of Stock"
+                          size="small"
+                          sx={{
+                            position: 'absolute',
+                            top: 12,
+                            right: 12,
+                            backgroundColor: 'rgba(255, 97, 97, 0.1)',
+                            color: '#ff6161',
+                            fontWeight: 600,
+                            fontSize: '0.7rem',
+                            zIndex: 2,
+                            borderRadius: '50px',
+                            boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
+                          }}
+                        />
+                      )}
+                      
                       <CardMedia
                         component="img"
-                        className="product-image"
+                        className="product-image-modern"
                         image={product.imageUrl}
                         alt={product.name}
                         loading="eager"
                         sx={{ 
-                          height: '180px',
-                          objectFit: 'contain'
+                          maxHeight: '180px',
+                          maxWidth: '100%',
+                          objectFit: 'contain',
+                          transition: 'transform 0.5s ease',
+                          '&:hover': {
+                            transform: 'scale(1.08)'
+                          }
                         }}
                       />
-                      <Box className="card-overlay" />
                     </Box>
                     
-                    <Box className="card-content-area">
-                      <Typography className="product-title" sx={{ fontWeight: 500 }}>
+                    <Box sx={{ p: 3 }}>
+                      <Typography 
+                        sx={{ 
+                          fontFamily: 'Poppins, sans-serif',
+                          fontWeight: 600,
+                          fontSize: '1.1rem',
+                          color: '#333',
+                          mb: 1,
+                          display: '-webkit-box',
+                          WebkitLineClamp: 2,
+                          WebkitBoxOrient: 'vertical',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          minHeight: '2.8rem'
+                        }}
+                      >
                         {product.name}
                       </Typography>
                       
-                      <Box className="sku-label" sx={{ color: '#878787', fontSize: '0.8rem', mt: 0.5 }}>
-                        <Typography component="span" sx={{ color: '#878787', fontSize: '0.8rem' }}>
+                      <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                        <Typography sx={{ 
+                          fontFamily: 'Roboto, sans-serif',
+                          fontSize: '0.85rem',
+                          color: '#666',
+                          backgroundColor: 'rgba(0,0,0,0.03)',
+                          padding: '4px 8px',
+                          borderRadius: '4px'
+                        }}>
                           SKU: {product.sku}
                         </Typography>
                       </Box>
                       
-                      <Box sx={{ mt: 1.5 }}>
-                        <Typography className="price-tag" sx={{ fontWeight: 600, fontSize: '1.25rem' }}>
+                      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 3 }}>
+                        <Typography sx={{ 
+                          fontFamily: 'Poppins, sans-serif',
+                          fontWeight: 700,
+                          fontSize: '1.4rem',
+                          color: '#4158D0',
+                          display: 'flex',
+                          alignItems: 'center'
+                        }}>
                           ₹{product.price.toFixed(2)}
                         </Typography>
                         
-                        {product.stockQuantity && (
-                          <Box 
-                            className={`stock-indicator ${
-                              product.stockQuantity > 20 ? 'in-stock' : 
-                              product.stockQuantity > 5 ? 'low-stock' : 
-                              'out-of-stock'
-                            }`}
-                            sx={{ mt: 0.5 }}
-                          >
-                            {product.stockQuantity > 0 ? (
-                              <>
-                                <CircleIcon sx={{ fontSize: 8, mr: 0.5 }} />
-                                {product.stockQuantity} in stock
-                              </>
-                            ) : (
-                              <>
-                                <CircleIcon sx={{ fontSize: 8, mr: 0.5 }} />
-                                Out of stock
-                              </>
-                            )}
-                          </Box>
-                        )}
+                        <Box sx={{ 
+                          display: 'flex', 
+                          alignItems: 'center',
+                          backgroundColor: product.stockQuantity && product.stockQuantity > 0 ? 'rgba(46, 204, 113, 0.1)' : 'rgba(255, 97, 97, 0.1)',
+                          padding: '4px 10px',
+                          borderRadius: '50px'
+                        }}>
+                          <CircleIcon sx={{ 
+                            fontSize: 8, 
+                            mr: 0.5,
+                            color: product.stockQuantity && product.stockQuantity > 0 ? '#2ecc71' : '#ff6161'
+                          }} />
+                          <Typography component="span" sx={{ 
+                            fontSize: '0.8rem',
+                            fontWeight: 500,
+                            color: product.stockQuantity && product.stockQuantity > 0 ? '#2ecc71' : '#ff6161'
+                          }}>
+                            {product.stockQuantity && product.stockQuantity > 0 ? 'Available' : 'Unavailable'}
+                          </Typography>
+                        </Box>
+                      </Box>
+                      
+                      <Box sx={{ display: 'flex', gap: 2 }}>
+                        <Button 
+                          variant="contained" 
+                          fullWidth
+                          disableElevation
+                          startIcon={<ShoppingCartIcon />}
+                          onClick={() => handleAddToShop(product)}
+                          sx={{
+                            background: 'linear-gradient(135deg, #4158D0 0%, #C850C0 100%)',
+                            borderRadius: '8px',
+                            textTransform: 'none',
+                            fontFamily: 'Poppins, sans-serif',
+                            fontWeight: 600,
+                            padding: '10px',
+                            boxShadow: '0 4px 15px rgba(65, 88, 208, 0.3)',
+                            '&:hover': {
+                              boxShadow: '0 8px 25px rgba(65, 88, 208, 0.4)',
+                            },
+                            '&.Mui-disabled': {
+                              background: '#e0e0e0',
+                              color: '#a0a0a0'
+                            }
+                          }}
+                        >
+                          Add to Order
+                        </Button>
                       </Box>
                     </Box>
-                    
-                    <Box className="card-footer">
-                      <Button 
-                        variant="contained" 
-                        fullWidth
-                        disableElevation
-                        startIcon={<ShoppingCartIcon />}
-                        onClick={() => handleAddToShop(product)}
-                        className="add-to-shop-button"
-                      >
-                        ADD TO ORDER
-                      </Button>
-                    </Box>
-                  </Card>
+                  </Paper>
                 </Grid>
               ))}
             </Grid>
             
-            {/* Pagination */}
+            {/* Enhanced Pagination */}
             {totalPages > 1 && (
-              <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
-                <Pagination 
-                  count={totalPages} 
-                  page={page} 
-                  onChange={handlePageChange} 
-                  color="primary"
-                  size="medium"
-                  siblingCount={0}
-                  boundaryCount={1}
-                  sx={{
-                    '& .MuiPaginationItem-root': {
-                      fontFamily: 'Roboto, sans-serif',
-                      fontWeight: 400,
-                      fontSize: '0.9rem',
-                      color: '#212121'
-                    },
-                    '& .Mui-selected': {
-                      backgroundColor: '#2874f0 !important',
-                      color: 'white !important'
-                    },
-                    '& .MuiPaginationItem-page': {
-                      border: '1px solid #e0e0e0',
-                      borderRadius: '2px',
-                      margin: '0 4px'
-                    }
-                  }}
-                />
-              </Box>
+              <Paper 
+                elevation={0} 
+                sx={{ 
+                  display: 'flex', 
+                  justifyContent: 'center', 
+                  alignItems: 'center',
+                  mt: 5,
+                  py: 2.5,
+                  borderRadius: '16px',
+                  boxShadow: '0 8px 32px rgba(31, 38, 135, 0.1)',
+                  border: '1px solid rgba(255, 255, 255, 0.18)',
+                  backdropFilter: 'blur(4px)',
+                  backgroundColor: 'rgba(255, 255, 255, 0.95)'
+                }}
+              >
+                <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                  <Button 
+                    disabled={page === 1}
+                    onClick={() => handlePageChange(null, 1)}
+                    sx={{ 
+                      minWidth: 'auto', 
+                      p: 1,
+                      color: page === 1 ? '#bdbdbd' : '#4158D0',
+                      mr: 1
+                    }}
+                  >
+                    <FirstPageIcon fontSize="small" />
+                  </Button>
+                  
+                  <Pagination 
+                    count={totalPages} 
+                    page={page} 
+                    onChange={handlePageChange} 
+                    color="primary"
+                    size="large"
+                    siblingCount={1}
+                    boundaryCount={1}
+                    sx={{
+                      '& .MuiPaginationItem-root': {
+                        fontFamily: 'Poppins, sans-serif',
+                        fontWeight: 500,
+                        fontSize: '0.95rem',
+                        color: '#333',
+                        margin: '0 2px'
+                      },
+                      '& .Mui-selected': {
+                        background: 'linear-gradient(135deg, #4158D0 0%, #C850C0 100%) !important',
+                        color: 'white !important',
+                        boxShadow: '0 4px 10px rgba(65, 88, 208, 0.3)'
+                      },
+                      '& .MuiPaginationItem-page': {
+                        borderRadius: '8px',
+                        margin: '0 4px'
+                      }
+                    }}
+                  />
+                  
+                  <Button 
+                    disabled={page === totalPages}
+                    onClick={() => handlePageChange(null, totalPages)}
+                    sx={{ 
+                      minWidth: 'auto', 
+                      p: 1,
+                      color: page === totalPages ? '#bdbdbd' : '#4158D0',
+                      ml: 1
+                    }}
+                  >
+                    <LastPageIcon fontSize="small" />
+                  </Button>
+                </Box>
+              </Paper>
             )}
           </>
         ) : (
           <Paper elevation={0} sx={{ 
             textAlign: 'center', 
-            py: 6, 
-            backgroundColor: 'transparent',
-            border: '1px dashed #e0e0e0',
-            borderRadius: '2px'
+            py: 8, 
+            backgroundColor: 'rgba(65, 88, 208, 0.02)',
+            border: '1px dashed rgba(65, 88, 208, 0.2)',
+            borderRadius: '16px',
+            maxWidth: '800px',
+            margin: '0 auto',
+            boxShadow: '0 10px 30px rgba(65, 88, 208, 0.05)'
           }}>
             <Box sx={{ 
-              width: 180, 
-              height: 180, 
-              margin: '0 auto', 
-              backgroundImage: 'url(https://static-assets-web.flixcart.com/fk-p-linchpin-web/fk-cp-zion/img/error-no-search-results_2353c5.png)',
-              backgroundSize: 'contain',
-              backgroundRepeat: 'no-repeat',
-              backgroundPosition: 'center'
-            }} />
+              width: 120, 
+              height: 120, 
+              margin: '0 auto',
+              backgroundColor: 'rgba(65, 88, 208, 0.1)',
+              borderRadius: '50%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              mb: 3
+            }}>
+              <SearchIcon sx={{ fontSize: 60, color: '#4158D0' }} />
+            </Box>
             <Typography sx={{ 
-              fontFamily: 'Roboto, sans-serif', 
-              fontSize: '1.2rem',
-              fontWeight: 500,
-              color: '#212121',
+              fontFamily: 'Poppins, sans-serif', 
+              fontSize: '1.5rem',
+              fontWeight: 700,
+              color: '#333',
               mt: 2
             }}>
               No Products Found
             </Typography>
             <Typography sx={{ 
-              fontFamily: 'Roboto, sans-serif', 
-              fontSize: '0.9rem',
-              color: '#878787',
-              mt: 1
+              fontFamily: 'Poppins, sans-serif', 
+              fontSize: '1rem',
+              color: '#666',
+              mt: 1,
+              mb: 4,
+              maxWidth: '500px',
+              margin: '10px auto 32px'
             }}>
-              Try selecting a different category or check back later
+              We couldn't find any products matching your criteria. Try selecting a different category or check back later.
             </Typography>
+            <Button 
+              variant="contained" 
+              disableElevation
+              onClick={() => handleCategoryChange('')}
+              sx={{ 
+                background: 'linear-gradient(135deg, #4158D0 0%, #C850C0 100%)',
+                borderRadius: '50px',
+                textTransform: 'none',
+                fontFamily: 'Poppins, sans-serif',
+                fontWeight: 600,
+                padding: '10px 32px',
+                boxShadow: '0 10px 20px rgba(65, 88, 208, 0.3)',
+                '&:hover': {
+                  boxShadow: '0 15px 25px rgba(65, 88, 208, 0.4)',
+                  transform: 'translateY(-2px)'
+                },
+                transition: 'all 0.3s ease'
+              }}
+            >
+              View All Products
+            </Button>
           </Paper>
         )}
-      </Box>
-      
+        
       {/* Error Snackbar */}
       <Snackbar
         open={snackbar.open}
