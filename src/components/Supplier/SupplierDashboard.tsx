@@ -466,8 +466,9 @@ const SupplierDashboard: React.FC = () => {
     try {
       setIsApproving(true);
       
-      // Format delivery date if provided
-      const formattedDeliveryDate = deliveryDate ? new Date(deliveryDate).toISOString() : undefined;
+      // Format delivery date as YYYY-MM-DD if provided
+      const formattedDeliveryDate = deliveryDate ? 
+        new Date(deliveryDate).toISOString().split('T')[0] : undefined;
       
       await updateOrderStatus(
         selectedOrder.id,
@@ -2048,7 +2049,9 @@ const SupplierDashboard: React.FC = () => {
                 boxShadow: 'none', 
                 border: '1px solid rgba(0,0,0,0.1)',
                 borderRadius: '12px',
-                overflow: 'hidden'
+                overflowX: 'auto', // ✅ Fixed this
+                maxWidth: '100%',  // ✅ Allows full scroll
+
               }}>
                 <Table>
                   <TableHead>
