@@ -1972,6 +1972,7 @@ const SupplierDashboard: React.FC = () => {
                       <TableCell>Order ID</TableCell>
                       <TableCell>Customer</TableCell>
                       <TableCell>Product</TableCell>
+                      <TableCell>Quantity</TableCell>
                       <TableCell>Date</TableCell>
                       <TableCell>Amount</TableCell>
                       <TableCell>Status</TableCell>
@@ -1994,8 +1995,9 @@ const SupplierDashboard: React.FC = () => {
                           <TableCell>{order.orderNumber || `ORD-${order.id}`}</TableCell>
                           <TableCell>{order.customerName}</TableCell>
                           <TableCell>{order.productName || 'Multiple items'}</TableCell>
+                          <TableCell>{order.quantity?.toLocaleString()}</TableCell>
                           <TableCell>{new Date(order.orderDate).toLocaleDateString()}</TableCell>
-                          <TableCell>${order.totalAmount.toLocaleString()}</TableCell>
+                          <TableCell>{order.totalAmount.toLocaleString()}</TableCell>
                           <TableCell>
                             <Chip
                               icon={getStatusIcon(order.status)}
@@ -2028,7 +2030,7 @@ const SupplierDashboard: React.FC = () => {
                       ))
                     ) : (
                       <TableRow>
-                        <TableCell colSpan={7} align="center" sx={{ py: 3 }}>
+                        <TableCell colSpan={8} align="center" sx={{ py: 3 }}>
                           <Typography variant="body2" sx={{ color: 'text.secondary' }}>
                             No pending orders found
                           </Typography>
@@ -2054,6 +2056,7 @@ const SupplierDashboard: React.FC = () => {
                       <TableCell>Order ID</TableCell>
                       <TableCell>Customer</TableCell>
                       <TableCell>Product</TableCell>
+                      <TableCell>Quantity</TableCell>
                       <TableCell>Date</TableCell>
                       <TableCell>Amount</TableCell>
                       <TableCell>Status</TableCell>
@@ -2077,8 +2080,9 @@ const SupplierDashboard: React.FC = () => {
                           <TableCell>{order.orderNumber || `ORD-${order.id}`}</TableCell>
                           <TableCell>{order.customerName}</TableCell>
                           <TableCell>{order.productName || 'Multiple items'}</TableCell>
+                          <TableCell>{order.quantity?.toLocaleString()}</TableCell>
                           <TableCell>{new Date(order.orderDate).toLocaleDateString()}</TableCell>
-                          <TableCell>${order.totalAmount.toLocaleString()}</TableCell>
+                          <TableCell>{order.totalAmount.toLocaleString()}</TableCell>
                           <TableCell>
                             <Chip
                               icon={getStatusIcon(order.status)}
@@ -2126,6 +2130,7 @@ const SupplierDashboard: React.FC = () => {
                       <TableCell>Order ID</TableCell>
                       <TableCell>Customer</TableCell>
                       <TableCell>Product</TableCell>
+                      <TableCell>Quantity</TableCell>
                       <TableCell>Date</TableCell>
                       <TableCell>Amount</TableCell>
                       <TableCell>Status</TableCell>
@@ -2148,8 +2153,9 @@ const SupplierDashboard: React.FC = () => {
                           <TableCell>{order.orderNumber || `ORD-${order.id}`}</TableCell>
                           <TableCell>{order.customerName}</TableCell>
                           <TableCell>{order.productName || 'Multiple items'}</TableCell>
+                          <TableCell>{order.quantity?.toLocaleString()}</TableCell>
                           <TableCell>{new Date(order.orderDate).toLocaleDateString()}</TableCell>
-                          <TableCell>${order.totalAmount.toLocaleString()}</TableCell>
+                          <TableCell>{order.totalAmount.toLocaleString()}</TableCell>
                           <TableCell>
                             <Chip
                               icon={getStatusIcon(order.status)}
