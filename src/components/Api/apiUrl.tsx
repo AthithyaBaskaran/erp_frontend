@@ -385,6 +385,25 @@ export const updateInventoryApi = async (id: number, data: {
         }
     }
 };
+export const fetchLowStockProducts = async () => {
+  try {
+    // Using threshold of 100 for low stock products
+    const response = await InventoryapiUrl.get('/product/lowStock?threshold=100');
+    if (response.data) {
+      console.log("✅ Low stock products fetched:", response.data);
+      return response.data;
+    }
+    return { data: [] };
+  } catch (error: any) {
+    console.error('❌ Error fetching low stock products:', error);
+    if (error.response?.data?.statusMessage) {
+      throw new Error(error.response.data.statusMessage);
+    } else {
+      throw new Error("Failed to fetch low stock products");
+    }
+  }
+};
+
 export const showInventory = async (categoryId?: number | string) => {
     try {
       const url = categoryId ? `/product/getAll?categoryId=${categoryId}` : '/product/getAll';

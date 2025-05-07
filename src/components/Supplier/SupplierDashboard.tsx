@@ -74,7 +74,8 @@ import '../../styles/inventory.css';
 
 // API
 import {
-  fetchCategoriesApi, showInventory, addInventory, fetchSalesOrdersByStatus, updateOrderStatus, updateProcessingOrderStatus
+  fetchCategoriesApi, showInventory, addInventory, fetchSalesOrdersByStatus, updateOrderStatus, updateProcessingOrderStatus,
+  fetchLowStockProducts
 } from "../Api/apiUrl";
 
 // Register ChartJS components
@@ -197,7 +198,12 @@ const SupplierDashboard: React.FC = () => {
         
         // If navigating to products tab, automatically fetch inventory data
         if (hash === 'products') {
-          fetchInventory();
+          // Check if we should load low stock products based on the current tab
+          if (productTabValue === 2) {
+            fetchLowStock();
+          } else {
+            fetchInventory();
+          }
         }
       } else {
         setActiveTab('overview');
@@ -335,8 +341,97 @@ const SupplierDashboard: React.FC = () => {
     setOpenProductsModal(false);
   };
   
+  const fetchLowStock = async () => {
+    setIsProductsLoading(true);
+    try {
+      // Add a timeout to prevent hanging requests
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('Request timeout')), 15000)
+      );
+      
+      const responsePromise = fetchLowStockProducts();
+      // Properly type the response using type assertion
+      const response = await Promise.race([responsePromise, timeoutPromise]) as any;
+      
+      // Debug the response structure
+      console.log("Low Stock API Response:", response);
+      
+      // Check if response exists
+      if (response) {
+        // The API might return the data directly or in a data property
+        let processedData;
+        
+        if (response.data) {
+          // If response has a data property (standard Axios response)
+          processedData = response.data;
+          console.log("Low Stock Response data:", processedData);
+        } else {
+          // If response is the data itself (some APIs return this way)
+          processedData = response;
+          console.log("Low Stock Direct response:", processedData);
+        }
+        
+        // Check if we have an array in data.data (nested data structure)
+        if (processedData && processedData.data && Array.isArray(processedData.data)) {
+          console.log("Setting low stock items from data.data:", processedData.data);
+          setInventoryItems(processedData.data);
+        } 
+        // Check if the data itself is an array
+        else if (Array.isArray(processedData)) {
+          console.log("Setting low stock items from array data:", processedData);
+          setInventoryItems(processedData);
+        }
+        // If data is not in expected format, set empty array
+        else {
+          console.warn("Unexpected low stock data format:", processedData);
+          setInventoryItems([]);
+          throw new Error('Unexpected data format received from server');
+        }
+      } else {
+        throw new Error('No response received from server');
+      }
+    }
+    catch (error: any) {
+      console.error("Error fetching low stock inventory:", error);
+      
+      // More detailed error message based on the error type
+      let errorMessage = 'There was an error loading the low stock products. Please try again.';
+      
+      if (error.response) {
+        // Server responded with an error status
+        if (error.response.status === 500) {
+          errorMessage = 'Server error occurred. Please contact the administrator.';
+        } else if (error.response.status === 404) {
+          errorMessage = 'The requested resource was not found.';
+        } else if (error.response.status === 403) {
+          errorMessage = 'You do not have permission to access this resource.';
+        }
+      } else if (error.message === 'Request timeout') {
+        errorMessage = 'The request timed out. Please check your connection and try again.';
+      }
+      
+      // Show error message
+      console.error(errorMessage);
+    }
+    finally {
+      setIsProductsLoading(false);
+    }
+  };
+
   const handleProductTabChange = (event: React.SyntheticEvent, newValue: number) => {
     setProductTabValue(newValue);
+    
+    // If switching to the Low Stock tab, fetch low stock products
+    if (newValue === 2) {
+      fetchLowStock();
+    } else if (newValue === 0) {
+      // If switching to All Products tab, fetch all products
+      fetchInventory();
+    } else if (newValue === 1) {
+      // For In Stock tab, we can use the same data as All Products
+      // but filter it in the UI for items with stockQuantity > 10
+      fetchInventory();
+    }
   };
   
   const fetchSalesOrders = async (status: string = 'PENDING') => {
@@ -1274,8 +1369,8 @@ const SupplierDashboard: React.FC = () => {
                                   <TableCell>{item.stockQuantity}</TableCell>
                                   <TableCell>
                                     <Chip 
-                                      label={item.stockQuantity > 10 ? "In Stock" : item.stockQuantity > 0 ? "Low Stock" : "Out of Stock"} 
-                                      color={item.stockQuantity > 10 ? "success" : item.stockQuantity > 0 ? "warning" : "error"}
+                                      label={item.stockQuantity > 100 ? "In Stock" : item.stockQuantity > 0 ? "Low Stock" : "Out of Stock"} 
+                                      color={item.stockQuantity > 100 ? "success" : item.stockQuantity > 0 ? "warning" : "error"}
                                       size="small"
                                     />
                                   </TableCell>
@@ -1342,9 +1437,7 @@ const SupplierDashboard: React.FC = () => {
                               </TableRow>
                             </TableHead>
                             <TableBody>
-                              {inventoryItems
-                                .filter(item => item.stockQuantity <= 10 && item.stockQuantity > 0)
-                                .map((item) => (
+                              {inventoryItems.map((item) => (
                                   <TableRow key={item.id}>
                                     <TableCell>{item.name}</TableCell>
                                     <TableCell>{item.sku}</TableCell>
@@ -2014,11 +2107,11 @@ const SupplierDashboard: React.FC = () => {
                         }}>{item.stockQuantity}</TableCell>
                         <TableCell>
                           <Chip 
-                            label={item.stockQuantity > 10 ? "In Stock" : "Low Stock"} 
+                            label={item.stockQuantity >= 100 ? "In Stock" : "Low Stock"} 
                             size="small"
                             sx={{
-                              backgroundColor: item.stockQuantity > 10 ? 'rgba(0, 200, 83, 0.1)' : 'rgba(255, 193, 7, 0.1)',
-                              color: item.stockQuantity > 10 ? '#00C853' : '#FFC107',
+                              backgroundColor: item.stockQuantity >= 100 ? 'rgba(0, 200, 83, 0.1)' : 'rgba(255, 193, 7, 0.1)',
+                              color: item.stockQuantity >= 100 ? '#00C853' : '#FFC107',
                               fontFamily: 'Poppins, sans-serif',
                               fontWeight: 500,
                               fontSize: '0.75rem',
@@ -2057,7 +2150,7 @@ const SupplierDashboard: React.FC = () => {
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {inventoryItems.filter(item => item.stockQuantity > 10).map((item) => (
+                    {inventoryItems.filter(item => item.stockQuantity >= 100).map((item) => (
                       <TableRow key={item.id}>
                         <TableCell sx={{ fontFamily: 'Poppins, sans-serif', fontSize: '0.85rem', fontWeight: 500 }}>{item.id}</TableCell>
                         <TableCell sx={{ fontFamily: 'Poppins, sans-serif', fontSize: '0.85rem', fontWeight: 500 }}>{item.name}</TableCell>
@@ -2108,7 +2201,7 @@ const SupplierDashboard: React.FC = () => {
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {inventoryItems.filter(item => item.stockQuantity <= 10).map((item) => (
+                    {inventoryItems.filter(item => item.stockQuantity < 100).map((item) => (
                       <TableRow key={item.id}>
                         <TableCell sx={{ fontFamily: 'Poppins, sans-serif', fontSize: '0.85rem', fontWeight: 500 }}>{item.id}</TableCell>
                         <TableCell sx={{ fontFamily: 'Poppins, sans-serif', fontSize: '0.85rem', fontWeight: 500 }}>{item.name}</TableCell>
@@ -2142,8 +2235,8 @@ const SupplierDashboard: React.FC = () => {
               <div>
                 {/* Empty state for each tab */}
                 {(productTabValue === 0 || 
-                  (productTabValue === 1 && !inventoryItems.some(item => item.stockQuantity > 10)) || 
-                  (productTabValue === 2 && !inventoryItems.some(item => item.stockQuantity <= 10))) && (
+                  (productTabValue === 1 && !inventoryItems.some(item => item.stockQuantity >= 100)) || 
+                  (productTabValue === 2 && !inventoryItems.some(item => item.stockQuantity < 100))) && (
                   <div style={{ 
                     display: 'flex', 
                     flexDirection: 'column',
